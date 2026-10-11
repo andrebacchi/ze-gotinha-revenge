@@ -44,6 +44,8 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   `bossStart()` chama `music('boss')` (a mesma faixa serve para todos os chefões, por decisão do André). Ao renascer volta a da fase; ao vencer, silêncio.
   As faixas vieram de um gerador e não fecham laço: foram aparadas e terminam com um fade de 2 segundos antes de recomeçar (`ffmpeg ... afade`).
   Sem internet: a página guarda os MP3 inteiros no cache `ze-gotinha-revenge-fixos-v1` e o `sw.js` responde os pedidos com `Range` cortando o arquivo guardado (`pedaco()`); sem isso o Safari não toca.
+- **Efeitos sonoros:** `sfx('nome')`. Os que têm WAV em `SFX_WAV` (hoje `gota`, `hurt`, `jump` e `sus`, feitos pelo André no jsfxr; originais em `tools/sons/`) tocam o arquivo, embutido em base64.
+  Os demais continuam sintetizados por oscilador (`SND`). `sus` é o som de crescer com o SUS; escudo, reforço e seringa extra seguem com o `power` sintetizado.
 - **Estado:** tudo em `st`. Placar só no aparelho (localStorage `mg-placar`, `mg-nome`, `mg-mudo`).
 
 ## Regras do jogo (decisões do André)
