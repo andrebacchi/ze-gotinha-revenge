@@ -225,7 +225,7 @@ body.touch .pads{display:flex}
     </section>
 
     <section class="screen soon" id="scSoon" hidden>
-      <span class="eyebrow">Fase 1 concluída</span>
+      <span class="eyebrow">Fase 1 completa</span>
       <h2>Em construção</h2>
       <p>Este jogo está em construção.<br>Em breve, novas fases e atualizações.</p>
       <div class="row"><button class="btn" id="btSoon" type="button">Ver pontuação</button></div>
@@ -530,6 +530,10 @@ const EXTRA_ART = {
     src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKoAAAAgCAYAAACCXeM8AAAEIklEQVR42u1bvW7bMBCmDGWSBvkB6r3wEHnx0g5+gvoB/Hzd4zfo0KlL7KHwnj5APMRLPKhDccbpQoqkdEfSBQ8wIguO7tPxu19RSmXJkiVLFh4pxv5j1bQdHF/OhyLmTaSEJUtCUjVt93R470Cqpu0wWUJjwRILR5Y7IWtMkujImgn7f8mM82Jvr88qFkH2x2sPR0wsWRInagyyVk3bff/xKyiW7AB3lvZp6g9dBrjg4MYCZQaUF7nMCCPllAi2fXwYjKz1fNWl0IVLYHl7fe59r+erPHm4p0gaKqrGwqJrInW6cpRNvEYNVSOa6lJpLJfzodht1r3mTacrVjMXsxyR1F2OIcdQyg8tobH4OEno8qdq2g6XJFCOhNAPdoH14NbNGlHr+UrV89WH41hEwfolsOh00b8hpwSX86HAenFkl8ZAMw13VpmpLJwN263Jwt9DlwG0LIlZinDpZR/4U+OkRCTOaE5LDiAljqj4u66WC51t7pmsMw6PHUq5UinGFUtoRzD9pXXkvUc4TidxwTObQhAdSU7LhTotFzfCShTyrmQ9LRfqz9dtz3lCdcVQo9NalWYdzrGZT5PH/RDEdbZO9YJNbHjKEQTpGQRIAgA//dyLkhTLbrNWgAWTFbB8/v3y7wSqHQmZxDpycFbpThuO8ZqEnIT4jgrxJAQ7rm1CUo6MZh8MtD9eFY5yUgSAxSFjGKXzaMkaeX+8WgkBTmvCM8WZNaMoZSIMRHX4Paqfb4ThWDcfB6H4bVJyGEhHZrh5TsKabm7ohrlrWFsUpyQFB8YY4Rz3I93akDk819M5y9hSvg6Pqcm0rVPpe1PUa00pFXkvS3o1RRBqIBrZbdmBK4KZDL19fLjZCH5DSTrWqV2iOiax1DTE1XlMjuTiuOVYELqFCVUbmUiqI0GIcReQwIQJYxtyAMmaGZOVYqeOxLlOtHnEthJbM9OGDOiinw7vH465dcN1TRtDpLp5l80oPgJ2AhljLx9MdFsinOPQ77LlE+uaqneyYbBCqVmdbdeU9I4tioGLvGMXTPf+mg7Ty5dvt4+OqGPtZrNF1bRGvT73LDLwl+r66TV1OCQH6ZfzoYDPbrNW8KnnK+NcWbq50z1jd9ndxZXybfN1PKY7LRc9vT4pv/D1HtpM6R4lSteIqeDw6YBxk0dnnqYma4pu2uxhTJSkU/TSc7oRGcbEodc7/cV8EzUVHKY0qEuBunoR190SZRlOyxTbFL30zd8hvRz1OGvNGnPDLl2E2DhMhKWLxGkz17cepjqHjaS2OjzK2w+pRbMUcOCpB41g0tFE+oVHHUl9GsuxekX2o6byTn0MHLjZiiExdENTKSkl14Vwpxdq6J4yDtBLN/HExMRpY2gC8f3gPSDc0yAWg9GoFWshUsExhCvk+1NS48MY9/MXKCVsECUm2KQAAAAASUVORK5CYII=' },
   b: { cw: 48, ch: 37, base: 36, seat: 8, names: ['ride', 'rthrow', 'drownA', 'drownB'],
     src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAAAlCAYAAAAUVeY2AAAFJUlEQVR42u1cPU5bQRDeh54rXOADhIomosBuqCi4gSsqjsAVIiGkXCFHSEWDb0BBRePnIqJJFQ5gF3aDi5ciGjOMZ/ftvv0nO5IlG7D1zew3vztGiCJFihQp8n9K5eNDD4/GLTzfrJoqN6Ng/LnqUCQiebAcHo1bSqjU8T80b1nrUCQxJwAS5ewEuelQRE8OfH3wbLH98Hq9nIvcCCTToThCcQBl9Pz5+Mz+7jMQaL2cZ+nMRQKWDlz5kEs58Rl0KJJACZSrA8uylyqjFcsVB/hAnunZIDvyUPLr6FCkOIBR5ByOJlkYpZC/OIB38qTkDCalz3A02WHPxaGLyKUuJvhcPQx+XW6wu6VyZfg+9fNwNEnmkHLX4fBo3K6X82Ttm6rTOimBNqumur48372mF0iyEiJlcaVDqEZ/s2oqiin1excIOnC3YorXhV4HLr24ywleL6bi5fRYrJfzpCIn4KdRv0sHnc8NPe3ibq9NMITESgOnCV5sWxsnr1wQiEu9XFMJBEuB/GAwjsgy/FQHleDPDaUvRFRZ+daFA84SdIuNWYaD41wUXsmWxqg8NG+trafGwI3xUx10xbW+Mhvq3mDL8MRaYNTBjXFgnNzWbhJE6nsIKZJfVyffulLHo6TQXd/gMMkcOqQD6GKmf4+f98Fb26au3MaENN1ydT6Xjrn3TM8GYrbY7n5HP2t6NoB+p7VJzVzK1/3c4WiyK8fgOfdejD3URaAJhzDm68vzva0D1dDCiwN0GQsTQ6fhitUTAImhif/5+KyFHRsdv1/W7PnADqToWkEhxN/reyip+pKpL/n7Ohw9uz52dn4RBo0LEAlIAcrCaxrVbKOkzdQEiI+jkcoJ4O8p6X3i5zINxuE6M/psKPtWD+Dw2Glss1XtIyrRqIMFDD1bbLUjrU8yoTJlj0y0LABngYgZOnP1KVPwVAefDy2DYu0/yaY/qjGzy9Lb2zq0bEwVU7i5s+pg8IOm2c2qqUKRH+PGeLruIqgTcPZPsZfDQZTjjktnrS0PRbuOw9FL9jyWzBZbsV7Oxfjb+89u7/No7HEZJMuow9FEvJwea0XX0GeiwoxxqjDb4K0dRKaWS0u39wNxd7XlJiJBG8UuxwXB5AdpvosgNbENYWj5xhEKyI+fwzkAseB9PslvMqakWQBec2Vq3wZYCIf/FwiUO7l599S7q23vW8kQUwh4jjFT4qeGmbs1xUHF5ks9thOVLjvT23FKZor39WIqhBDi668/exMs7Kg2eJ01wZtVU2FlcfRPUcBgNCr9wz1QTiFiZwIuC3BE5u4laET1VfaoVk1o5qEYsG5fnmZirSh5bJ21DnFYnIenQqbNqql+/5i0JzfzndPGuBRyVTtzmEEfLoLSssdF9Jft6siw0myww/Y0Y8sgl3LggUw7Q6okpV11wH17P4jaEJpOsWSRXjbR4sojH5GfIyqMvWXZgE7cKPHhXsm1s3q76KAlUciLFldNmqzeTmGTVbUKYJK1QkR/rhTrymI6gShZB9Bp3nDjluK3lnQazhQaYkyqPk7gUh9qM+pcXSvmJk26K/sH/U4w9vgU1iBsG86YuF3u77jQQRYwMFm58bOJuCR+lIilu/NdMJthhAesROOHaq0bvuPgCofu6jWHVWcF3Ye9o/5XCB9z55BTrVQaY65/UeH1ZXe6sMeVNrQ37LKrb3vXMQmUS0qjh5Aibq7EiLVo2GdgQL9bwfUqPuwd9ABz/L81XLRKGbdJmeBaD5PzNS1nfNn8L1/KwGT8M2AJAAAAAElFTkSuQmCC' },
+  vn: { cw: 32, ch: 36, base: 35, names: ['vprep', 'vjump', 'vpose'],   // vitória: preparo, salto e pose com a seringa
+    src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAkCAYAAAB2UT9CAAADWUlEQVR42u1asW7bMBCVhGSSBukD0rlAh0gI4CUZjH5A3N3fl92auhUeMmWRPKVzMhRdLAOVl3hgl1I4X0mRlO7EGDEBIY5l6Y7vju94TwqC82AfcZoL3bnoDI/fcQ7AOQAfg350NBSeOp/ud3U4tV1bm3Gai8+rH93/P799ncxfNhDwiNNc9BU5Krur+s3ZZpzm4ma9Fd9//RE36y27n96CIEF5b8GXAZAHiY/SqK9o4mz0HYQ+u3Gai+ff2+4Y7R92wEcg+gKgA4PKR1PwoR2YqPg4SR6GAPQFAAdB+jvWR1fbbFTpmwJMAOCkoPLR1bZuFbD2AW1TBVxBiNNcPKyfgsX1pZe687B+GoxJ21Q0W+YhFDAV9cBsh7QjhDi61tU32zmr/MHXkK0AUxZSrgSYfUOzf3F9OejaIZmfZIU1Tk4B8EkBFKPcHIIkKwbTgG7eEHCd3XJz0J6/4ObAqYbkWfxZjuV8Ri4DJFkRtE3V/VWBb0rYiJJ6uAtyXya93i2CJCuOMlIFCqVteX9d8CFeutUXUWU/nLhpWXKN5y+fOgCwP5wiGA6+y/zfvRy939Xhcj6z5lRIDWPBV9m2CT5eCX0+nMTzAAyEKhBXj2Vw9Vhq+ZgzAaRtHHybBLDWtV23gpTLPk5zASely0ToW7k5kBZeWM9UlCyDhP00+XDh6oiusr/eLbpsoGzAVMXUlARc4PclgQp4ku4Xq3u6rvDl9l683N6TdcI6MctFi6Gat8tY1W/0mhhu8+GB23wqZRRPXE7MRhKg7MJVAFPajlz4Vy47KTC1TdUtNXxurPSLaQcXYR9j8u21zfKDv7ERn1wEMJO49SFWgG13KD+b9uguWz/VPSnuP6YDptbCQpftJ3ZmOZ8FmJ4otRdVNqkEQWlbfk+9BYY2TfoOedetKrqYFuTB9cAe2rGhJ0771JsAqz4ANh4w+m1THWWfSoehHj4k8X+UqOxJkqwY5VNkadxZGuZ4IKPj5amkcmxH0s2YHdooOTrJiv+2oVMWRyw/j33oQlmsyfmvr9sb+ure0BqAORl+z4WB6p0o07aZBXzVqxe64kQdBJVNltbfAgNTAGznfzKvp+93daiiFs6C7PooViXQmYIQ2jihA8TlNxzgTG2nb25DMfgLQT9jWGB6iKQAAAAASUVORK5CYII=' },
+  vb: { cw: 34, ch: 42, base: 41, names: ['vprep', 'vjump', 'vpose'],   // vitória: preparo, salto e pose com a seringa
+    src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAAAqCAYAAABBRS51AAAEwUlEQVR42u1avW7bQAw+GdZUD/ULZCrQAhkcL1qyCH2AuEsnPUIfIQGKAn6VTFmSFygyZ7EypV2zdakzOEs8uENChaHIO96PFDfwAUIUWNJ94pEfP/JkzG68ynj3/mBj+32wM9F2jt3C7BZmNyiN2egs25mp/0X5dP6z+f/Xl8/m/q7OdhGT2Mhw+N47/5hbfx++JWXDeV6Xc59eXpnZ5NHAo/F044Pj5Pf67XorHVrvjfF0+pzz+oHFYbvn5s/f5ojFsLWLE2IY7bWxGOizsUPQY2s4tsuFsRlGujZmfgkDfbbP/MMYo6yWi+Z/4Ng+ed42ANtoPN10jQnyjIQDMNzf1RnORZ3lxhieTxUtNm+lHokjDO49rx+C8PrMTzHA/LaIiZbLF9frloeslgvTF73ZvNWFeTbJTVUW3h4Lisx3fmCZi+u1qcrCjMbTlv06l8s4hLuSqr5YQhcydozGU8DQnGOp3VviTal6QhMuPQ9RcCnmpxgonUrzD7r22D5pbRsGjg4X/c4muWifqBzTNy34UthrqkGsWKVz2xj0YZy+o0YyBHaki+u1GY2nUVJVStwQOXBo7wleGK0awWBsIR3SF6vKwvmSnFG0npoKw83+nrnZ38P1lFktFy27Sff/F91lkJlwYMNojRJLwzYMrigYjaeGYxlt9HgpkhBVlKqIxSpLgwWroBA1JmHgcFAsnIrTqLLMN4yNMca3uArlctpa5zyuKgvWG8GjoaDjftdg0mCYTXJ2Dom20FZBeI4D7U1bLjZPvT082tweHkXXMbh9oW19SNdizL7RIs1tw+TC4MKRhXoL5U3pmlCPoE1Sjpd98gTOM1pMGIOUD3wxgM1CWkFe3kL5FTwBN+18G5scp9P5bLyfogPhenfA4BNNSbZJXAnPZjxbayJ2YaSEqjFKqvfHiyLh4BK+D4bMN4yrsmhpc1vY4lDXUpsr4UrUIiXb0A4y925AiVKRLWH2pfWBBtRskjcHraoxd3PGitHq2nsBm6R+YgfGAe9flcWLWkbCkLxe8eFuLnQp3cBfHzrjOBznsMnxhqUTTZ2QoosMc0yOZQoNxTC0eYnL4ySFRD0kxGMg7KuyaGgN6hZjjPnw7dFzv589z/v9DM7yp/O8MbIvld3f1RnMrYnAgxM8Lx5hUTuMoRJc3OFCS2qZhC5QVRYvvtnSemA9N8bMw/f+6dw078G7rpaLp4Ux5sfXNXKUHFO+1/yZq9IHw2PP1BgE557Ty6tmsVLsaEriwFVbxXaTaWcdC6HnqHlenJj5hxoqwdRRz00LSMtLzYuvVOKKKUtriGv3J0u0jgg6vbxqKdJ6ztuk0+6u7fstVzMx1V6Mdq5U28gxNZ6tNZR8P8aVb2ye/Brby11GD/fsWKpMvjBUBHRpEJtxIMfgPAB4UhmNy2/0+U+U1609bGGJNbothLugMq5T6+rbpaZ0V5eYu16LRf1dGVen4KSOZWwfH2lgpSe1SFKKDs4O0j6M5t4kVAYPxGGpeWkI8cSqiF0kuiCpF4XzdKhjNHbAWKMj2KXGfFoYKZM/3Vbg2kF9qFLXPDHqbKAtpmIVS0plBl/O26KojxHzTq57M9/wpQWo9vpUVb8Ga1ffS4e8k68NYfwDNOvECrd82D0AAAAASUVORK5CYII=' },
   j: { cw: 66, ch: 23, base: 25, names: ['swim1', 'swim2', 'sbite'],
     src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAAAXCAYAAABQ+TDXAAAE5UlEQVR42u2bTU7bQBTH/2nTLIhArmFRKJsCUbuo1GyCKuUC9hVo7hKhXgV117V9gUgV2VCpi0oJ6QYoi4CsoiBBpaaLMM7MZD4dJ3HAT0JyEntm3s/vc2yAXHLJZUIKOYJcnpKUneqQHA+ik0LuGLnkTuFUh14QxZ9D35E6x7McVy6PweBJJqCPRU4R+k78nRdEEJ0LAEVZqlGlmSykwayuMWexuCwQ+uwxYUKzojOGcY/BTuJkCjafBrO4xpzFYjiEvgMZDxErE2ZF3cRZgE0rd/ThW/x9I/jIRIbHbgT8jX6qLHib6F+EAICNLY/JCjKnIOWUipW0x/CCCOuH99IaLGnan2Y82hAIBF3dmcb6Z1UCma6t7FSH/L14DCzSKCFV9qtyiv5FqBxrwjG+7L2Oj6+apVQUITe17FSHrUZPuSD+N3J9kmhC/rJiEDYsRIa8fnhvXCMvAwtdwyxybFWwJplDVjaRYDKITgobW54yYxT5Bs6tVIfXndc46J6DbmRMGjzZgkUOJju31eihfmTeLI1qTHYs/hpyziLKDF7Pq2Yprn1VLFqNHgAwLEyiZJZZCINdcxQgVLqOf9/BVbMEL4jQPl4Zl5HfP8ZGr8oSNpsVRVPgtIPozqOlfbyC2v7txAJ/r51NnLv5Z5sZi1aeACBlBD2XbRSdpyOQtbEc2HNELHpcpgAQX78sLHTB0gsihCgZ2UT9aIexC5oFzUPVS2xsecYBoSjyJDpr6AxfJ7X9W6EiIgAkMsiUV0HIyk2XMaJ14ffThSzQM2KeFRYyLmk6qsouTLKCTZZUZowve5POkUR4RVqNHjYfIoAoXXqfIul63Mpg7lFRFvXSWMeysUibixdEqPs7Iw4P2YFkDjpY6uzUxUBYoiYtGQsqpa87Zea7NJwk9B2psvWjHSlUelPArQyYZouOmrJIbAtoVlFvGVnoysRZcuBZ8BmDZ8GXY5t/thPpq22meedIw0lkN8zEEGghRiHamfj1vY43H1rQ7T6odnLSEF0ZacqCjGPD4rpTxr/y16lY0A4xy+ykKi1tWKTlHAVTKDIHIYu57pStUjsBYXK+zBhUQgwliVOsH94rjdB0fhPdTJ7QLoqFbZAQZTIbu7Bh0T5eQefgpVTf32tnePHzB/6+e884h2l5pd2VIoO4FfmOlBdEOOhG8ALz6MDXgzLQp91LnHYvAQC7e6+0N3/acmEQnRTQrA5DlOBCHIVV88teUZhWiNHNkwW5lt9FUwVJPii4ldlkmnD/Dgfdc3zG8wkWo/W9hbvlAdhG/yJE/2FXqn8RGu1OJa41SVQ1dYR2cBMr4FbGjZIOMm0MAFDzV1Otm9NoOG1YiCLrsrEQMWgHN6j5q1ZOwEd9mgU/Dp8peQ66isaWTzGpUySpHU+7l7Fz2BgCbQCLfheInj8pi9Pgkolypix4Z1gUC9G8Nd+eRTu4UfS1ZWMW5BGDLKPxn92KvpwqTgOIb4JEDeD64T2umiXqhg6Y8kxkEOw4q5l/a5TfJaE3JvimchCdFGp+dQiM635VSZlmWTQPIQ9lw/077O69UrIY2cS4PzUpr8c8WLugj1VOQuaZuvk2TaX04vhISl6DMB1rmd4QNXn3iH6KL2OhY/oYWPAZhX49hs/ENtnKZk2m1xfmAekp/0NRzmJ6I80ll1wyIv8B2VH8Bja3wywAAAAASUVORK5CYII=' } };
 for (const k in EXTRA_ART) { const A = EXTRA_ART[k], im = new Image(); im.onload = () => { const a = {}; A.names.forEach((n, i) => { a[n] = mk(A.cw, A.ch, (R, x) => x.drawImage(im, -i * A.cw, 0)); }); SPR['x' + k] = a; }; im.src = A.src; }
@@ -899,7 +903,7 @@ function hopOff() {   // pulo de novo no ar, montado: o Zé salta mais alto e de
   p.vy = -5.6; p.buf = 0; p.coy = 0; p.canCut = true; sfx('jump'); burst(p.x + w / 2, bottom - 6, '#fff', 5);
 }
 function hurt(fromX) {
-  const s = st, p = s.p; if (p.inv > 0 || p.dead) return;
+  const s = st, p = s.p; if (p.inv > 0 || p.dead || s.vic) return;
   const away = (p.x + p.w / 2 < fromX ? -1 : 1);
   if (p.ride) {   // montado: o golpe derruba o Zé e o jacaré foge para o lado oposto ao do golpe. Na água o Zé sobe mais, para dar tempo de cair de volta na sela
     const wet = overWater(p); dismount(true, away); p.inv = 90; p.vy = wet ? -4.4 : -3.2; p.vx = away * (wet ? 1.2 : 1.6); p.stun = 12; p.canCut = false; sfx('hurt'); txt(p.x, p.y - 6, 'O jacaré fugiu!', '#ffe27a'); return;
@@ -928,7 +932,7 @@ function respawn() {
   const s = st, p = s.p, cp = s.cps[s.cur];
   p.dead = false; p.drown = false; p.big = false; p.growT = 0; p.ammo = p.maxAmmo; p.plat = null; p.inv = 90; p.vx = p.vy = 0; p.shield = false; p.boost = 0; p.w = 10; p.h = 24; p.ride = null; p.stun = 0;
   p.x = (cp ? cp.x : 2) * T + 3; p.y = G * T - 24; p.face = 1;
-  s.shots.length = 0; s.eshots.length = 0; for (const g of s.gates) g.tm = null; if (mode === 'play') music('stage');
+  s.shots.length = 0; s.eshots.length = 0; for (const g of s.gates) g.tm = null; if (mode === 'play' && !s.boss.dead) music('stage');
   // os blocos de SUS à frente do posto voltam a valer, para não recomeçar sem chance
   for (const k in s.qb) if (s.qb[k] === 'sus') { const [x, y] = k.split(',').map(Number); if (x >= (cp ? cp.x : 0) && s.map[y][x] === 'U') s.map[y][x] = '?'; }
   s.items = s.items.filter(i => !(i.t === 'sus' && i.phys && !i.arena));
@@ -1031,7 +1035,7 @@ function stepJacs() {
       j.vy = Math.min(j.vy + .28, 5); const pb = j.y + j.h;
       j.vx = j.state === 'flee' ? j.dir * (j.inW ? 1.5 : 1.65) : 0; j.x += j.vx; collideX(j); if (j.hitWall) j.dir = -j.dir;   // só parede faz voltar: beirada não segura
       j.y += j.vy; collideY(j, pb);
-      if (!p.dead && !p.ride && (j.state === 'idle' ? j.t > 12 : j.t > (j.inW ? 20 : 34)) && overlap(p, j)) { mount(j); continue; }
+      if (!p.dead && !p.ride && !st.vic && (j.state === 'idle' ? j.t > 12 : j.t > (j.inW ? 20 : 34)) && overlap(p, j)) { mount(j); continue; }
       if ((j.state === 'flee' && (j.t > 540 || j.x < -40 || j.x > LW * T + 40)) || j.y > LH * T + 30) { burst(j.x + 11, j.y + 6, '#49c05a', 10); j.state = 'gone'; j.t = 0; }
     } else if (j.state === 'gone') { if (j.t > 120) { j.state = 'egg'; j.x = j.nest * T + 2; j.y = G * T - 14; j.vy = 0; } }
   }
@@ -1052,7 +1056,7 @@ function bossStart() {
 function damageBoss(d, kind) {
   const s = st, b = s.boss; if (b.st !== 'tired' || b.inv > 0) return false;
   b.hp -= d; b.inv = 10; b.hurtT = 24; b.hurtKind = kind === 'stomp' ? 'hurt1' : 'hurt2'; sfx('boss'); burst(b.x + b.w / 2, b.y + 14, '#ffd23f', 10); txt(b.x + b.w / 2, b.y - 2, 'AI!', '#ff8fa3');
-  if (b.hp <= 0) { b.hp = 0; b.st = 'dying'; b.t = 0; music(null); s.eshots.length = 0; for (const e of s.enemies) if (e.arena && !e.dead) { e.dead = true; burst(e.x + 6, e.y + 6, '#e0457b', 6); } }
+  if (b.hp <= 0) { b.hp = 0; b.st = 'dying'; b.t = 0; s.slow = SLOW_STEPS; music(null); s.eshots.length = 0; for (const e of s.enemies) if (e.arena && !e.dead) { e.dead = true; burst(e.x + 6, e.y + 6, '#e0457b', 6); } }
   return true;
 }
 function stepBoss() {
@@ -1091,7 +1095,7 @@ function stepBoss() {
     case 'rise': b.y += (hover - b.y) * .07; if (b.t > 60) { b.st = 'fly'; b.t = 0; b.tx = AL + Math.random() * (AR - AL); } break;
     case 'dying':
       if (b.t % 8 === 0) { burst(b.x + Math.random() * b.w, b.y + Math.random() * b.h, ['#ffd23f', '#e0457b', '#fff'][b.t / 8 % 3 | 0], 8); sfx('pop'); }
-      if (b.t > 110) { b.dead = true; b.active = false; s.finalT = s.time; s.winT = 110; sfx('win'); for (let y = 8; y <= 11; y++) s.map[y][153] = '.'; setMsg('<span><b class="tag">Vila do Zap livre.</b> A corrente quebrou.</span>', 'ok'); msgTTL = 400; }
+      if (b.t > 110) { b.dead = true; b.active = false; s.finalT = s.time; if (window.__mgNoIntro) { s.winT = 110; sfx('win'); } else s.vic = { t: 0, g: -1 }; for (let y = 8; y <= 11; y++) s.map[y][153] = '.'; setMsg('<span><b class="tag">Vila do Zap livre.</b> A corrente quebrou.</span>', 'ok'); msgTTL = 400; }
       return;
   }
   if (p.dead) return;
@@ -1168,13 +1172,33 @@ function stepOpening(jp, sp) {
   const k = clamp((o.t - OPEN_HOLD) / (OPEN_LEN - OPEN_HOLD - 8), 0, 1); s.cam.y = OPEN_Y + (44 - OPEN_Y) * (reduceMotion ? (o.t > OPEN_HOLD ? 1 : 0) : k * k * (3 - 2 * k));
 }
 
+/* ───────── Vitória sobre o chefão ─────────
+   O golpe final deixa o jogo em câmera lenta. Depois o Zé comemora (preparo, salto, pose), aparece "Fase N completa"
+   e a câmera sobe para o céu, o inverso da abertura. O tempo da partida já parou em finalT. Pulo ou seringa encerram antes. */
+const SLOW_STEPS = 40, SLOW_RATE = .3, V_PREP = 16, V_POSE = 44, V_TEXT = 60, V_RISE = 110, V_RISE_LEN = 150, V_END = 290;
+function stepVictory(jp, sp) {
+  const s = st, p = s.p, v = s.vic; v.t++;
+  if (p.ride) {   // montado: desce e o jacaré fica esperando atrás
+    const j = p.ride, bottom = p.y + p.h, w = p.big ? 14 : 10, h = p.big ? 32 : 24;
+    p.ride = null; p.x += (20 - w) / 2; p.w = w; p.h = h; p.y = bottom - h - 2; p.bite = 0;
+    j.x = p.x + w / 2 - j.w / 2 - p.face * 26; j.y = bottom - j.h; j.t = 0; j.dir = p.face; j.vx = 0; j.vy = 0; j.state = 'idle';
+  }
+  const kk = Object.assign({}, keys); for (const k in keys) keys[k] = false; stepPlayer(false, false); Object.assign(keys, kk);   // sem comando: só a física, até pousar
+  if (v.g < 0) { if (p.onG && Math.abs(p.vx) < .3 && v.t > 20) { v.g = 0; p.vx = 0; p.inv = 0; p.shootT = 0; p.growT = 0; p.boost = 0; } return; }
+  if (v.done) return;
+  v.g++; p.vx = 0;
+  if (v.g === V_PREP) sfx('jump');
+  if (v.g === V_POSE) { sfx('win'); burst(p.x + p.w / 2, p.y + p.h - 2, '#ffd23f', 10); burst(p.x + p.w / 2, p.y + 4, '#fff', 6); }
+  if (v.g >= V_END || (v.g > V_POSE + 30 && (jp || sp))) { v.done = true; win(); }
+}
+
 /* ───────── Passo do jogo ───────── */
 function step() {
   const s = st, p = s.p;
   const jp = keys.jump && !prev.jump, sp = keys.fire && !prev.fire; prev.jump = keys.jump; prev.fire = keys.fire;
   if (s.opening) { stepOpening(jp, sp); return; }
   if (s.intro) { stepIntro(jp, sp); return; }
-  s.time++; s.anim++;
+  s.time++; s.anim++; if (s.slow > 0) s.slow--;
   if (!p.dead) for (const e of s.enemies) {   // inimigo novo à vista e perto: apresenta
     if (e.dead || s.seen[e.t] || !BESTIARY[e.t]) continue;
     if (Math.abs(e.x + e.w / 2 - p.x - p.w / 2) < 118 && e.x > s.cam.x + 16 && e.x + e.w < s.cam.x + VW - 16 && e.y > s.cam.y + 8 && e.y + e.h < s.cam.y + VH) { if (introStart(e.t, e)) return; }
@@ -1188,6 +1212,7 @@ function step() {
   if (s.winT > 0) { if (--s.winT === 0) { win(); return; } }
   stepPlats();
   if (p.dead) { if (p.drown) { if (s.time % 9 === 0) s.parts.push({ x: p.x + 2 + Math.random() * 6, y: p.y + 2, vx: 0, vy: -1.2, t: 16, c: '#bfe3ff' }); } else p.vy += .28; p.y += p.vy; if (--p.deadT <= 0) respawn(); }
+  else if (s.vic) { stepVictory(jp, sp); if (s.vic.done) return; }
   else stepPlayer(jp, sp);
   stepEnemies(); stepJacs(); stepBoss(); stepShots(); stepItems(); stepFx();
   for (const g of s.gates) {
@@ -1212,6 +1237,10 @@ function step() {
   let tx = b.active || (b.dead && p.x > lockX) ? lockX : p.x + p.w / 2 - VW / 2 + p.face * 22;
   s.cam.x += (clamp(tx, 0, LW * T - VW) - s.cam.x) * .12;
   s.cam.y += (clamp(p.y + p.h / 2 - 104, 0, LH * T - VH) - s.cam.y) * .1;
+  if (s.vic && s.vic.g >= V_RISE) {   // a câmera sobe para o céu
+    const v = s.vic, k = clamp((v.g - V_RISE) / V_RISE_LEN, 0, 1); if (v.y0 == null) v.y0 = v.cy != null ? v.cy : s.cam.y;
+    s.cam.y = v.y0 + (OPEN_Y - v.y0) * (reduceMotion ? 1 : k * k * (3 - 2 * k));
+  } else if (s.vic) s.vic.cy = s.cam.y;
 }
 
 /* ───────── Pontuação ─────────
@@ -1356,7 +1385,11 @@ function render() {
   if (!(p.inv > 0 && !p.dead && (s.time >> 2) & 1)) {
     const x = Math.round(p.x) - camX, jsw = p.ride && p.inW && SPR.xj, y = Math.round(p.y) - camY + (p.ride && p.inW ? (jsw ? 10 : 5) + Math.round(Math.sin(s.time * .12)) : 0), fl = p.face < 0;
     const big = p.growT > 0 && (s.time >> 2) & 1 ? !p.big : p.big; // pisca entre os tamanhos ao mudar
-    if (p.ride) {
+    const VA = s.vic && s.vic.g >= 0 && !p.dead && !p.ride ? SPR[big ? 'xvb' : 'xvn'] : null;
+    if (VA) {   // comemoração: preparo, salto e pose
+      const g = s.vic.g, X = EXTRA_ART[big ? 'vb' : 'vn'], hop = g >= V_PREP && g < V_POSE ? Math.round(Math.sin(Math.PI * (g - V_PREP) / (V_POSE - V_PREP)) * 18) : 0;
+      spr(g < V_PREP ? VA.vprep : g < V_POSE ? VA.vjump : VA.vpose, x + p.w / 2 - X.cw / 2, y + p.h - X.base - hop, fl);
+    } else if (p.ride) {
       const ja = SPR.jacArt;
       if (jsw) spr(p.bite > 4 ? jsw.sbite : (s.time / 12 | 0) & 1 ? jsw.swim2 : jsw.swim1, x + 10 - EXTRA_ART.j.cw / 2, y + 28 - EXTRA_ART.j.base, fl);
       else if (ja) spr(p.bite > 4 ? ja.bite : Math.abs(p.vx) > .3 && p.onG ? ja['walk' + (1 + ((s.time / 6 | 0) & 3))] : ja.idle, x + 10 - JAC_ART.cw / 2, y + 28 - JAC_ART.base, fl);
@@ -1383,7 +1416,7 @@ function render() {
       } else if (big) spr(SPR.zeBig[fr], x + p.w / 2 - 12, y + p.h - 32, fl);
       else spr(SPR.ze[fr], x + p.w / 2 - 8, y + p.h - 24, fl);
     }
-    if (p.shield) {   // escudo de imunidade: anel com o brilho correndo pelo alto
+    if (p.shield && !VA) {   // escudo de imunidade: anel com o brilho correndo pelo alto
       const cx = Math.round(x + p.w / 2), cy = Math.round(y + p.h / 2 - (p.ride ? 4 : 2)), U = SPR.aura;
       if (U) { const im = U[p.ride || p.big ? 'b' : 's'][[0, 1, 2, 1][(s.time / 7 | 0) & 3]]; ctx.globalAlpha = .9; spr(im, cx - im.width / 2, cy - im.height / 2); ctx.globalAlpha = 1; }
       else { ctx.strokeStyle = '#46e0d0'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(cx, cy, p.ride ? 22 : p.big ? 23 : 17, 0, 7); ctx.stroke(); }
@@ -1418,6 +1451,15 @@ function render() {
   // painel do jogo (HUD), fora do zoom
   ctx.setTransform(S, 0, 0, S, 0, 0);
   if (I && I.k > .5) return;
+  if (s.vic && s.vic.g >= V_TEXT) {   // "Fase N completa": entra com o Zé na pose e fica enquanto a câmera sobe
+    if (s.vic.done) return;   // a tela seguinte já fala da fase
+    const a = clamp((s.vic.g - V_TEXT) / 14, 0, 1), y = 64 + Math.round((1 - a) * 8), t = 'FASE ' + PHASE.n + ' COMPLETA';
+    ctx.globalAlpha = a; label(PHASE.name, VW / 2, y - 26, '#ffd23f', 12);
+    let fs = 26; ctx.font = '700 ' + fs + 'px "Pixelify Sans","Courier New",monospace'; const w = ctx.measureText(t).width; if (w > VW - 28) { fs = Math.floor(fs * (VW - 28) / w); ctx.font = '700 ' + fs + 'px "Pixelify Sans","Courier New",monospace'; }
+    ctx.textAlign = 'center'; ctx.lineJoin = 'round';
+    ctx.lineWidth = 5; ctx.strokeStyle = K; ctx.strokeText(t, VW / 2, y + 2); ctx.fillStyle = '#1a3fb8'; ctx.fillText(t, VW / 2 + 2, y + 2); ctx.fillStyle = '#fff'; ctx.fillText(t, VW / 2, y);
+    ctx.globalAlpha = 1; return;
+  }
   if (s.opening) {   // nome da fase sobre o céu; some quando o chão chega
     const t = s.opening.t, a = clamp(t / 16, 0, 1) * clamp((OPEN_LEN - 40 - t) / 30, 0, 1), y = 92 + Math.round((1 - clamp(t / 16, 0, 1)) * 8);
     ctx.globalAlpha = a; label('FASE ' + PHASE.n, VW / 2, y - 26, '#ffd23f', 12);
@@ -1531,6 +1573,7 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyM') { setMute(!muted); return; }
   if (mode !== 'play') { if ((e.code === 'Enter' || e.code === 'Space') && mode === 'title' && scWin.hidden) { start(); e.preventDefault(); } return; }
   if (st.opening && e.code === 'Enter' && !e.repeat && st.opening.t > 30) st.opening.t = OPEN_LEN;
+  if (st.vic && e.code === 'Enter' && !e.repeat && st.vic.g > V_POSE + 30) st.vic.g = V_END;
   if (st.intro && (e.code === 'Enter' || KEYMAP[e.code] === 'jump' || KEYMAP[e.code] === 'fire')) introEnd();   // um toque rápido também fecha o cartão
   const k = KEYMAP[e.code]; if (k) { keys[k] = true; e.preventDefault(); }
 });
@@ -1581,7 +1624,7 @@ function frame(t) {
   requestAnimationFrame(frame);
   const dt = Math.min(60, t - last); last = t;
   try {
-    if (mode === 'play') { acc += dt; let n = 0; while (acc >= 16.667 && n < 4) { step(); acc -= 16.667; n++; } if (n === 4) acc = 0; }
+    if (mode === 'play') { acc += dt * (st && st.slow > 0 ? SLOW_RATE : 1); let n = 0; while (acc >= 16.667 && n < 4) { step(); acc -= 16.667; n++; } if (n === 4) acc = 0; }
     render();
   } catch (e) { console.error(e); }
 }

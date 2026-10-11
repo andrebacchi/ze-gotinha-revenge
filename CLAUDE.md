@@ -19,7 +19,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Servem de referência: dependem das imagens originais, que ficam com o André e não estão no repositório.
 - `tools/testes/`: testes com Playwright. `sh montar.sh` gera `page.html` (sem cartões nem abertura, para testar mecânica) e `page_intro.html` (jogo completo);
   depois `NODE_PATH=$(npm root -g) node t7.js` e os demais. O jogo expõe `window.__mg = { st, mode, keys, step, start, bossStart, tileAt, answer, introStart }`
-  e respeita `window.__mgNoIntro` (pula abertura e cartões).
+  e respeita `window.__mgNoIntro` (pula abertura, cartões e a comemoração do fim).
 
 ## Toda atualização
 
@@ -51,7 +51,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Os WAV foram feitos pelo André no jsfxr (originais em `tools/sons/`): `gota`, `hurt` (levar dano), `jump`, `sus` (crescer com o SUS), `power` (pegar os demais itens), `bite` (mordida do jacaré),
   `bump` (batida em bloco, inclusive ao abrir um `?`), `tick` (contador da pergunta), `slam` (mergulho do chefão), `kill` (derrotar inimigo) e `posto` (posto de vacinação).
   Alguns nomes existem só para separar eventos que dividiam um som; `SFX_ALT` diz qual som sintetizado eles usam quando não há arquivo: `nope` ("Sem seringas") usa o `bump` sintetizado,
-  e escudo quebrando, ovo e projétil estourando seguem com `pop`; os cartões, com `cp`. Ainda sintetizados: seringa, montar, golpe que não derrota, acerto e erro, golpe no chefão e vitória.
+  e escudo quebrando, ovo e projétil estourando seguem com `pop`; os cartões, com `cp`. Ainda sintetizados: seringa, montar, golpe que não derrota, acerto e erro, golpe no chefão e vitória (o André ficou de mandar o som de fase completa; hoje toca `win` sintetizado na pose).
 - **Estado:** tudo em `st`. Placar só no aparelho (localStorage `mg-placar`, `mg-nome`, `mg-mudo`).
 
 ## Regras do jogo (decisões do André)
@@ -67,7 +67,9 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   O resultado pausa o jogo com um cartão de explicação.
 - **Cartões de apresentação:** na primeira vez que cada inimigo, item, o jacaré e o portão aparecem, o jogo congela, dá zoom e explica. Voltam a cada partida nova.
 - **Abertura da fase:** a câmera desce do céu com o nome da fase. A tela de título não mostra nome de fase nem controles; os controles ficam no botão CONTROLES.
-- **Fim:** ao vencer o chefão aparece "Em construção" (novas fases em breve) e depois a pontuação.
+- **Fim:** o golpe final deixa o jogo em câmera lenta (`SLOW_STEPS` passos a `SLOW_RATE`, uns 2 segundos). Depois o Zé comemora (preparo, salto e pose com a seringa, em `EXTRA_ART.vn` e `.vb`),
+  aparece "Fase 1 completa" e a câmera sobe para o céu, o inverso da abertura (`stepVictory()`, constantes `V_*`). Pulo, seringa ou Enter encerram depois da pose.
+  Em seguida vêm a tela "Em construção" (novas fases em breve) e a pontuação. O tempo da partida para no golpe final. Com `window.__mgNoIntro` a comemoração é pulada (contador `winT`), para os testes de mecânica.
 - **Pontuação:** gotas 10, boato 50, fake news 80, vírus 100, chefão 1000, power-up 100, portão 600/200/50 conforme os erros, tempo até 2000. Inimigos soltos por erro e os da arena não pontuam.
 - **Textos:** na voz do André: diretos, ironia seca, fato concreto com data e lugar, sem travessão, sem rótulo solto abrindo frase e sem contraste de fórmula ("não X, mas Y").
   Os fatos das explicações do mito ou fato foram escritos sem checar fonte na hora e aguardam revisão dele.
