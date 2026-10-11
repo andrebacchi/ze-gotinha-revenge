@@ -12,6 +12,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 - `src/jogo.html` é a fonte: um arquivo só, com estilos, marcação, código e todas as artes em data URI. Não tem dependência além das fontes do Google.
   `sh build.sh` gera `index.html` e `sw.js` na raiz (arquivos gerados: não edite à mão). `sh build.sh artifact` gera `dist/artifact.html`, a versão de artefato
   (sem instalação nem service worker; o link do BACCHI LAB abre em nova aba). O build troca os marcadores `__PWA__`, `__VERSAO__`, `__QR__`, `__HUB__` e `__HUB_ALVO__`.
+- `audio/`: músicas em MP3 (96 kbps). `titulo.mp3` toca na tela de título e `fase1.mp3` na fase. No artefato, publique os dois como arquivos de apoio (`audio/...`).
 - `src/qr.svg`: QR code do endereço do jogo (fixo; gerado com o `qrcode.js` do repositório `bacchilab`, nível M, margem de 2 módulos).
 - `icons/`: ícones do app. `tools/icone.py` gera todos a partir do rosto do Zé (quadro parado do sprite, `tools/ze_2x.png` e `tools/head_1.png`) sobre o céu do jogo.
 - `tools/arte/`: scripts usados para recortar e reduzir as artes (chroma key, redução por maioria, contorno refeito, empacotamento em data URI).
@@ -39,6 +40,10 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Os desenhos feitos por código no começo continuam como reserva enquanto as imagens carregam.
 - **Fluxo de arte combinado com o André:** eu escrevo o prompt em inglês, ele gera a imagem em outra ferramenta e devolve; eu recorto, reduzo e encaixo.
   Fundo magenta `#FF00FF` (verde ou amarelo quando o desenho tem rosa ou roxo). Detalhes finos somem na redução: olhos, símbolos e blocos de 16 px costumam ser refeitos à mão com as cores da arte.
+- **Música:** `MUSIC` mapeia nome → arquivo e `music(nome)` troca a faixa (elemento `<audio>` em laço, volume 0,5). A do título só começa no primeiro toque ou tecla, porque o navegador não deixa antes.
+  `bossStart()` já chama `music('boss')`: quando a faixa da luta de chefe chegar, basta acrescentar `boss: 'audio/chefe.mp3'` em `MUSIC`, guardar o arquivo em `audio/` e publicar. Ao renascer volta a da fase; ao vencer, silêncio.
+  As faixas vieram de um gerador e não fecham laço: foram aparadas e terminam com um fade de 2 segundos antes de recomeçar (`ffmpeg ... afade`).
+  Sem internet: a página guarda os MP3 inteiros no cache `ze-gotinha-revenge-fixos-v1` e o `sw.js` responde os pedidos com `Range` cortando o arquivo guardado (`pedaco()`); sem isso o Safari não toca.
 - **Estado:** tudo em `st`. Placar só no aparelho (localStorage `mg-placar`, `mg-nome`, `mg-mudo`).
 
 ## Regras do jogo (decisões do André)
@@ -61,7 +66,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 
 ## Pendências e ideias em aberto
 
-- Músicas: o André vai gerar três faixas em estilo 16 bits (fase, título e luta de chefe, esta para todos os chefões). Ainda não há música no jogo, só efeitos sintetizados.
+- Música da luta de chefe: falta (a mesma para todos os chefões). O André pediu uma faixa mais arrastada e dramática que a da fase; o prompt combinado usa 110 BPM em meio-tempo. As do título e da fase já estão no jogo.
 - Placar online: hoje é só no aparelho. Fora do artefato dá para usar um banco externo (sugestão feita: Firebase); o André ainda não decidiu.
 - Cartões de apresentação só na primeira partida do aparelho (oferecido, sem resposta).
 - Revisão do André: textos do bestiário e das explicações; se 10 segundos bastam para as afirmações mais longas; dificuldade do golpe sobre a água.

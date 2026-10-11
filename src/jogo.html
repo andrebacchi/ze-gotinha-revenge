@@ -212,6 +212,7 @@ body.touch .pads{display:flex}
         <a class="hub" href="__HUB__"__HUB_ALVO__>‹ BACCHI LAB</a>
       </div>
       <div class="tbar r">
+        <button class="pill" id="som-btn" type="button" aria-pressed="true" title="Ligar ou desligar o som">Som</button>
         <button class="pill" id="instalar-btn" type="button" hidden>Instalar</button>
         <button class="pill" id="qr-btn" type="button">QR code</button>
       </div>
@@ -650,6 +651,24 @@ function stepIntro(jp, sp) {
 let ac = null, muted = false;
 try { muted = localStorage.getItem('mg-mudo') === '1'; } catch (e) {}
 const SND = { jump: ['square', 330, 620, .12, .05], shot: ['triangle', 880, 440, .08, .06], pop: ['square', 520, 120, .14, .06], hit: ['square', 240, 160, .07, .05], hurt: ['sawtooth', 300, 70, .3, .07], gota: ['triangle', 990, 1480, .07, .05], power: ['square', 440, 1320, .3, .05], bump: ['square', 160, 110, .08, .06], ok: ['triangle', 660, 1320, .35, .07], bad: ['sawtooth', 200, 90, .35, .06], mount: ['square', 260, 780, .2, .05], bite: ['square', 180, 90, .1, .07], slam: ['sawtooth', 120, 40, .4, .09], ploc: ['sine', 1200, 700, .06, .04], boss: ['square', 700, 200, .15, .07], cp: ['triangle', 520, 1040, .25, .06], tick: ['square', 1040, 1040, .05, .04], win: ['square', 520, 1560, .6, .06] };
+/* ───────── Música ─────────
+   Faixas em arquivos à parte (audio/). Cada uma termina em silêncio e recomeça: o navegador não emenda MP3 sem um pequeno vão.
+   Navegador nenhum deixa tocar antes do primeiro toque ou tecla; por isso a do título começa no primeiro gesto. */
+const MUSIC = { title: 'audio/titulo.mp3', stage: 'audio/fase1.mp3' };   // falta a da luta de chefe: acrescente `boss` aqui quando chegar
+const tracks = {}; let curMusic = null;
+function applyMusic() {
+  const a = curMusic && tracks[curMusic]; if (!a) return;
+  if (!muted && !document.hidden && mode !== 'pause') a.play().catch(() => {}); else a.pause();
+}
+function music(name) {   // troca a faixa (null = silêncio); pedir a mesma de novo não reinicia
+  if (name && !MUSIC[name]) name = curMusic === 'boss' ? null : curMusic;
+  if (name === curMusic) { applyMusic(); return; }
+  if (curMusic && tracks[curMusic]) tracks[curMusic].pause();
+  curMusic = name; if (!name) return;
+  let a = tracks[name]; if (!a) { a = tracks[name] = new Audio(MUSIC[name]); a.loop = true; a.preload = 'auto'; a.volume = .5; }
+  try { a.currentTime = 0; } catch (e) { /* ainda sem dados */ }
+  applyMusic();
+}
 function audioOn() { if (ac) { if (ac.state === 'suspended') ac.resume(); return; } try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; } }
 function sfx(n) {
   if (muted || !ac) return; const d = SND[n]; if (!d) return;
@@ -885,7 +904,7 @@ function respawn() {
   const s = st, p = s.p, cp = s.cps[s.cur];
   p.dead = false; p.drown = false; p.big = false; p.growT = 0; p.ammo = p.maxAmmo; p.plat = null; p.inv = 90; p.vx = p.vy = 0; p.shield = false; p.boost = 0; p.w = 10; p.h = 24; p.ride = null; p.stun = 0;
   p.x = (cp ? cp.x : 2) * T + 3; p.y = G * T - 24; p.face = 1;
-  s.shots.length = 0; s.eshots.length = 0; for (const g of s.gates) g.tm = null;
+  s.shots.length = 0; s.eshots.length = 0; for (const g of s.gates) g.tm = null; if (mode === 'play') music('stage');
   // os blocos de SUS à frente do posto voltam a valer, para não recomeçar sem chance
   for (const k in s.qb) if (s.qb[k] === 'sus') { const [x, y] = k.split(',').map(Number); if (x >= (cp ? cp.x : 0) && s.map[y][x] === 'U') s.map[y][x] = '?'; }
   s.items = s.items.filter(i => !(i.t === 'sus' && i.phys && !i.arena));
@@ -1001,6 +1020,7 @@ function arenaAmmo() {
   for (const tx of [158, 169]) if (!s.items.some(i => i.arena && !i.got && i.tx === tx)) s.items.push({ t: 'syr', x: tx * T + 2, y: 9 * T + 6, w: 12, h: 6, arena: true, tx });
 }
 function bossStart() {
+  music('boss');
   const s = st, b = s.boss; b.active = true; b.st = 'intro'; b.t = 0; b.x = 165 * T; b.y = -60; b.hp = b.max; b.throws = 0; b.bubble = true; b.inv = 0;
   for (let y = 8; y <= 11; y++) s.map[y][153] = 'B';
   b.gaveSus = false; arenaAmmo(); sfx('boss'); say('<span><b class="tag">Tio do Zap:</b> “Compartilhe antes que apaguem!”</span>', 260, 'boss');
@@ -1392,10 +1412,11 @@ function render() {
 const scTitle = $('#scTitle'), scPause = $('#scPause'), scWin = $('#scWin'), scHelp = $('#scHelp'), scSoon = $('#scSoon');
 const fmt = f => { const t = Math.floor(f / 60); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function show(el) { scHelp.hidden = true; for (const s of [scTitle, scPause, scWin, scSoon]) s.hidden = s !== el; $('.tools').hidden = !!el || !!(st && st.intro && st.intro.shown && !st.intro.out); }
-function start() { audioOn(); st = buildLevel(); if (!window.__mgNoIntro) { st.opening = { t: 0 }; st.cam.y = OPEN_Y; } setMsg(''); msgTTL = 0; mode = 'play'; $('#intro').hidden = true; show(null); document.activeElement?.blur?.(); }
+function start() { audioOn(); music('stage'); st = buildLevel(); if (!window.__mgNoIntro) { st.opening = { t: 0 }; st.cam.y = OPEN_Y; } setMsg(''); msgTTL = 0; mode = 'play'; $('#intro').hidden = true; show(null); document.activeElement?.blur?.(); }
 function pause(on) {
   if (mode === 'play' && on !== false) { mode = 'pause'; show(scPause); keys.left = keys.right = keys.jump = keys.fire = false; }
   else if (mode === 'pause' && on !== true) { audioOn(); mode = 'play'; show(null); document.activeElement?.blur?.(); }
+  applyMusic();
 }
 const num = n => n.toLocaleString('pt-BR');
 let board = [], lastRun = null;
@@ -1409,7 +1430,7 @@ function renderBoard(meId) {
   $('#sEmpty').hidden = board.length > 0;
 }
 function win() {
-  mode = 'win'; const s = st, sc = score(true); setMsg(''); msgTTL = 0;
+  music(null); mode = 'win'; const s = st, sc = score(true); setMsg(''); msgTTL = 0;
   lastRun = { sc, t: s.finalT || s.time, id: null };
   const first = s.gates.filter(g => g.open && !g.err).length, errs = s.gates.reduce((a, g) => a + (g.err || 0), 0), kills = s.kills.boato + s.kills.fake + s.kills.virus;
   const rows = [
@@ -1446,7 +1467,7 @@ $('#btStart').onclick = start; $('#btAgain').onclick = start; $('#btRestart').on
 $('#btResume').onclick = () => pause(false);
 $('#btPause').onclick = e => { e.currentTarget.blur(); pause(); };
 const btSom = $('#btSom');
-function setMute(m) { muted = m; btSom.setAttribute('aria-pressed', m ? 'true' : 'false'); btSom.setAttribute('aria-label', m ? 'Ligar o som' : 'Desligar o som'); try { localStorage.setItem('mg-mudo', m ? '1' : '0'); } catch (e) {} }
+function setMute(m) { muted = m; btSom.setAttribute('aria-pressed', m ? 'true' : 'false'); btSom.setAttribute('aria-label', m ? 'Ligar o som' : 'Desligar o som'); try { localStorage.setItem('mg-mudo', m ? '1' : '0'); } catch (e) {} const t = $('#som-btn'); t.textContent = m ? 'Sem som' : 'Som'; t.setAttribute('aria-pressed', m ? 'false' : 'true'); applyMusic(); }
 btSom.onclick = e => { e.currentTarget.blur(); audioOn(); setMute(!muted); };
 setMute(muted);
 if (isTouch) $('#howto2').textContent = 'Setas andam · A pula · B lança seringa';
@@ -1476,7 +1497,10 @@ addEventListener('keydown', e => {
 });
 addEventListener('keyup', e => { if (typing(e)) return; const k = KEYMAP[e.code]; if (k) { keys[k] = false; if (mode === 'play') e.preventDefault(); } });
 addEventListener('blur', () => { keys.left = keys.right = keys.jump = keys.fire = false; });
-document.addEventListener('visibilitychange', () => { if (document.hidden) pause(true); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(true); applyMusic(); });
+// música do título: começa no primeiro toque ou tecla (antes disso o navegador não deixa)
+for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, () => { if (mode === 'title' && !curMusic) music('title'); }, { capture: true });
+$('#som-btn').onclick = e => { e.currentTarget.blur(); audioOn(); setMute(!muted); };
 function hold(el, key) {
   const on = e => { e.preventDefault(); audioOn(); keys[key] = true; el.classList.add('on'); try { el.setPointerCapture(e.pointerId); } catch (x) {} };
   const off = e => { e.preventDefault(); keys[key] = false; el.classList.remove('on'); };
@@ -1580,13 +1604,17 @@ if (PWA) {
     if (adiado) { try { adiado.prompt(); const r = await adiado.userChoice; adiado = null; if (r && r.outcome === 'accepted') return; } catch (_) { /* segue para as instruções */ } }
     $('#instalar-fora').hidden = janela !== 'outra'; aba(plataforma()); $('#instalar').showModal();
   };
-  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+    // as músicas são guardadas inteiras, em segundo plano, para tocarem sem internet
+    setTimeout(async () => { try { const c = await caches.open('ze-gotinha-revenge-fixos-v1'); for (const f of Object.values(MUSIC)) { const u = new URL(f, location.href).href; if (!(await c.match(u))) await c.add(u); } } catch (_) { /* sem rede ou sem espaço: tenta na próxima visita */ } }, 4000);
+  }
 }
 
 let hot = null;
 try { hot = window.claude?.hot || null; hot?.snapshot?.(() => ({ playing: mode === 'play' || mode === 'pause', cp: st ? st.cur : -1 })); } catch (e) { hot = null; }
 try { if (hot?.ready) hot.ready(boot); else boot(hot?.data); } catch (e) { console.error(e); }
 setTimeout(() => boot(), 400); // se o visualizador não chamar de volta, começa do mesmo jeito
-window.__mg = { get st() { return st; }, get mode() { return mode; }, keys, step, start, bossStart, tileAt, answer, introStart };
+window.__mg = { get st() { return st; }, get mode() { return mode; }, keys, step, start, bossStart, tileAt, answer, introStart, tracks, get music() { return curMusic; } };
 })();
 </script>
