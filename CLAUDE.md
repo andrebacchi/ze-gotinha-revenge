@@ -36,10 +36,13 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Laço fixo de 60 passos por segundo. Telas e cartões são HTML por cima do canvas.
 - **Fase:** `buildLevel()` monta o mapa com os auxiliares `hl`, `vl`, `set`, `pit`, `water`, `gota(s)`, `syr`, `mplat`, `E`, `Q`, `gate`.
   Blocos: `#` chão, `B` tijolo, `?` surpresa, `U` usado, `=` madeira (só segura por cima), `^` espinhos, `G` grade, `M`/`F` mito e fato, `~` água, `L` vitória-régia.
-- **Artes:** cada conjunto tem um objeto com medidas e a folha em data URI (`ZE_ART`, `ZE_BIG`, `EXTRA_ART`, `JAC_ART`, `ITEM_ART`, `BOSS_ART`, `ENEMY_ART`, `SCENE_ART`, `BG_ART`).
+- **Artes:** cada conjunto tem um objeto com medidas e a folha em data URI (`ZE_ART`, `ZE_BIG`, `EXTRA_ART`, `JAC_ART`, `ITEM_ART`, `BOSS_ART`, `ENEMY_ART`, `SCENE_ART`, `BG_ART`, `AURA_ART`).
   Os desenhos feitos por código no começo continuam como reserva enquanto as imagens carregam.
 - **Fluxo de arte combinado com o André:** eu escrevo o prompt em inglês, ele gera a imagem em outra ferramenta e devolve; eu recorto, reduzo e encaixo.
   Fundo magenta `#FF00FF` (verde ou amarelo quando o desenho tem rosa ou roxo). Detalhes finos somem na redução: olhos, símbolos e blocos de 16 px costumam ser refeitos à mão com as cores da arte.
+- **Escudo e bolha de eco:** `AURA_ART` tem três linhas: `s` (escudo do Zé no tamanho original), `b` (sarado ou montado) e `eco` (bolha do chefão). Em cada uma, 3 quadros de laço e depois os de estourar.
+  Os anéis foram refeitos pixel a pixel com as cores e o desenho das artes do André (`tools/arte/escudo.py`): reduzir um aro de 40 px de espessura para 5 px apaga sombra, brilho e cruz. Só os estilhaços do escudo vêm da redução direta.
+  `auraFx()` toca os quadros de estourar como efeito solto (`st.fx` com `seq`). Quando o chefão se levanta, `b.bubIn` mostra os mesmos quadros de trás para frente. Sem a imagem carregada, vale o círculo desenhado por código.
 - **Música:** `MUSIC` mapeia nome → arquivo e `music(nome)` troca a faixa (elemento `<audio>` em laço, volume 0,5). A do título só começa no primeiro toque ou tecla, porque o navegador não deixa antes.
   `bossStart()` chama `music('boss')` (a mesma faixa serve para todos os chefões, por decisão do André). Ao renascer volta a da fase; ao vencer, silêncio.
   As faixas vieram de um gerador e não fecham laço: foram aparadas e terminam com um fade de 2 segundos antes de recomeçar (`ffmpeg ... afade`).
