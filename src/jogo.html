@@ -953,7 +953,7 @@ function stepPlayer(jp, sp) {
   if (sp && p.cd <= 0) {
     if (p.ride) { p.bite = 14; p.cd = 24; sfx('bite'); }
     else if (p.boost > 0 || p.ammo > 0) {
-      const mkShot = vy => s.shots.push({ x: p.face > 0 ? p.x + p.w : p.x - 10, y: p.ride ? p.y + 7 : p.y + p.h - (p.big ? 22 : 13), w: 10, h: 5, vx: 3.8 * p.face, vy, life: 46 });
+      const mkShot = vy => s.shots.push({ x: p.face > 0 ? p.x + p.w : p.x - 10, y: p.ride ? p.y + 7 : p.y + p.h - (p.big ? 16 : 13), w: 10, h: 5, vx: 3.8 * p.face, vy, life: 46 });
       mkShot(0); if (p.boost > 0) { mkShot(-.9); mkShot(.9); } else p.ammo--;
       p.cd = 13; p.shootT = 12; sfx('shot');
     } else { p.cd = 30; sfx('nope'); txt(p.x + 5, p.y - 6, 'Sem seringas', '#ffd23f'); }
@@ -1364,7 +1364,12 @@ function render() {
       if (p.dead && xa && (p.drown || xa.dead)) spr(p.drown ? ((s.time >> 3) & 1 ? xa.drownB : xa.drownA) : xa.dead, x + p.w / 2 - X.cw / 2, y + p.h - X.base + (p.drown ? 3 : 0), fl);
       else if (art) {
         const a = p.dead ? 'fall' : p.shootT > 0 ? 'throw' : !p.onG ? (p.vy < 0 ? 'jump' : 'fall') : Math.abs(p.vx) > .3 ? 'run' + (1 + ((s.time / 6 | 0) & 3)) : 'idle';
-        spr(art[a], x + p.w / 2 - A.cw / 2, y + p.h - A.base, fl);
+        const X = Math.round(x + p.w / 2 - A.cw / 2), Y = Math.round(y + p.h - A.base);
+        if (big && a === 'throw') {   // sarado: dobra os joelhos para a seringa sair na altura dos inimigos (o tronco desce por cima das pernas)
+          const im = art[a], top = A.base - A.legs, drop = p.shootT > 2 ? 6 : 3;
+          const part = (sy, sh, dy) => { if (fl) { ctx.save(); ctx.translate(X + A.cw, Y + sy + dy); ctx.scale(-1, 1); ctx.drawImage(im, 0, sy, A.cw, sh, 0, 0, A.cw, sh); ctx.restore(); } else ctx.drawImage(im, 0, sy, A.cw, sh, X, Y + sy + dy, A.cw, sh); };
+          part(top, A.ch - top, 0); part(0, top, drop);
+        } else spr(art[a], X, Y, fl);
       } else if (big) spr(SPR.zeBig[fr], x + p.w / 2 - 12, y + p.h - 32, fl);
       else spr(SPR.ze[fr], x + p.w / 2 - 8, y + p.h - 24, fl);
     }

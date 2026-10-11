@@ -7,7 +7,7 @@ A cada atualização publicada, aumente VERSAO: ela aparece na tela de título e
 import os, re, sys
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
-VERSAO = '1.5'
+VERSAO = '1.6'
 SITE = 'https://andrebacchi.github.io/ze-gotinha-revenge/'
 HUB = 'https://andrebacchi.github.io/bacchilab/'
 TITULO = "Zé Gotinha's Revenge"

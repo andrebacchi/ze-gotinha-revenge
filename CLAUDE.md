@@ -56,6 +56,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 - **Vida como no Mario:** no tamanho original, um golpe derruba. O SUS deixa o Zé "sarado" (não escreva "bombado" nos textos): ele aguenta um golpe e volta ao tamanho original. O escudo de imunidade é uma proteção extra, gasta antes do SUS.
 - **Gotas** são coletáveis e valem pontos; qualquer morte zera as gotas juntadas.
 - **Seringas:** no máximo 3; repostas pela fase e nos postos. A dose de reforço dá tiro triplo sem gastar por 10 segundos.
+  O Zé sarado dobra os joelhos ao lançar (o tronco é desenhado 6 px mais baixo, por cima das pernas) e a seringa sai a 16 px do chão: antes saía a 22 e passava por cima dos inimigos, que têm 16 de altura.
 - **Jacaré (montaria):** nasce do ovo no ninho. Atravessa a água nadando (o Zé sozinho se afoga). Qualquer golpe, em terra ou na água, faz o jacaré fugir: ele corre, não para na beirada,
   nada se cair na água e some se cair no buraco (o ovo volta ao ninho). Pulo de novo no ar, montado, é o pulo duplo: o Zé salta mais alto e desce, e o jacaré fica parado esperando.
   Há três plataformas altas que só o pulo duplo alcança (conferido por força bruta em `tools/testes/t37.js`). Com um jacaré, outro ovo vira bônus.
