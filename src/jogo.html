@@ -654,7 +654,7 @@ const SND = { jump: ['square', 330, 620, .12, .05], shot: ['triangle', 880, 440,
 /* ───────── Música ─────────
    Faixas em arquivos à parte (audio/). Cada uma termina em silêncio e recomeça: o navegador não emenda MP3 sem um pequeno vão.
    Navegador nenhum deixa tocar antes do primeiro toque ou tecla; por isso a do título começa no primeiro gesto. */
-const MUSIC = { title: 'audio/titulo.mp3', stage: 'audio/fase1.mp3' };   // falta a da luta de chefe: acrescente `boss` aqui quando chegar
+const MUSIC = { title: 'audio/titulo.mp3', stage: 'audio/fase1.mp3', boss: 'audio/chefe.mp3' };   // a de chefe vale para toda luta de chefe
 const tracks = {}; let curMusic = null;
 function applyMusic() {
   const a = curMusic && tracks[curMusic]; if (!a) return;
@@ -1028,7 +1028,7 @@ function bossStart() {
 function damageBoss(d, kind) {
   const s = st, b = s.boss; if (b.st !== 'tired' || b.inv > 0) return false;
   b.hp -= d; b.inv = 10; b.hurtT = 24; b.hurtKind = kind === 'stomp' ? 'hurt1' : 'hurt2'; sfx('boss'); burst(b.x + b.w / 2, b.y + 14, '#ffd23f', 10); txt(b.x + b.w / 2, b.y - 2, 'AI!', '#ff8fa3');
-  if (b.hp <= 0) { b.hp = 0; b.st = 'dying'; b.t = 0; s.eshots.length = 0; for (const e of s.enemies) if (e.arena && !e.dead) { e.dead = true; burst(e.x + 6, e.y + 6, '#e0457b', 6); } }
+  if (b.hp <= 0) { b.hp = 0; b.st = 'dying'; b.t = 0; music(null); s.eshots.length = 0; for (const e of s.enemies) if (e.arena && !e.dead) { e.dead = true; burst(e.x + 6, e.y + 6, '#e0457b', 6); } }
   return true;
 }
 function stepBoss() {
