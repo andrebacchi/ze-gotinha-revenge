@@ -118,7 +118,11 @@ morcego, miasma, pedra, retrato e poeira (`ATLAS2.mina`, fundo ciano); passarola
 ao carregar saem os recortes `pbasket` e `cfront`, a frente do cesto e do vagonete desenhada por cima do tronco do Zé);
 blocos do cenário (`ATLAS2.til`, `tools/arte/tiles2.py`: recorta por dentro do contorno, troca a franja arroxeada pela cor vizinha e sobe o trilho para o topo do bloco)
 e balança (`ATLAS2.bal`: evidência, tradição, prato desenhado inteiro sobre a balança, porta desenhada inteira a partir do bloco D de cima à esquerda, bloco ↺, lampião).
-Falta: fundo (céu, nuvens/serra/muro e casario). As paredes repetidas mostram uma emenda leve entre blocos.
+Fundo: céu e faixas de nuvens, serra com igrejas e muro da frente (`FUNDO2`, `tools/arte/fundo2.py`, escala 0,3); falta o casario (fica o provisório) e o fundo da mina.
+**Proporções (pedido do André):** porta, janela e barril têm tamanho próprio, não cabem num bloco de 16 px. A porta tem 36 px (um pouco mais alta que o Zé), a janela uns 22 (a cabeça dele),
+o barril uns 23 (altura do peito). Por isso os casarões têm 3 a 4 blocos de parede, e a fachada (`s.facade`) é desenhada solta por cima da parede lisa; sacadas de tábua servem de degrau para o telhado.
+**Varal:** plataforma `kind: 'varal'` entre dois postes; cede até 9 px onde o Zé pisa (mola, balança ao sair) e as roupas são desenhadas em código (`drawVaral`, seis tipos, dez cores).
+**Muro com caco de vidro:** só os cacos da arte (`cac`), sobre muro caiado. As paredes repetidas mostram uma emenda leve entre blocos.
 Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e frasco · morcego, pedra, miasma, retrato · passarola, balão do Barão, vagonete, sino · blocos do cenário · balança · fundo. A música da fase ainda é a da fase 1; a de chefe e a de vitória valem para todas.
 - **Trechos:** ruas e telhados (casarões `W`/`T`, telhas soltas `C` que caem 24 quadros depois do pisão e voltam em 5 s, varal `V`, muro com caco de vidro) · igreja em obra (sinos em pêndulo
   sobre o vão, boticário no balcão, andaime que sobe e desce, balança 1) · mina no vagonete (102 a 188) · rio com jacaré, miasmas e roda d'água · balança 2 · portão 3 e passarola. Postos em 57, 100, 202, 271, 286.
