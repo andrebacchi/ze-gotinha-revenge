@@ -5,7 +5,8 @@ Publicação: GitHub Pages, branch `main`, raiz. Endereço: https://andrebacchi.
 Pré-visualização como artefato (privada, do André): https://claude.ai/artifact/F7Wzi36G24LKyR5uPZKEQG
 
 Jogo de plataforma em estilo 16 bits (Mega Drive). O Zé Gotinha enfrenta a desinformação sobre vacinas.
-Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o André quer novas fases, cada uma com um chefão que represente um obstáculo à vacinação.
+Está em construção: fase 1 (Vila do Zap, chefão Tio do Zap, tema desinformação) e fase 2 em esboço no ramo `fase-2` (Arraial do Antigamente, chefão Barão do Sempre Foi Assim, tema apelo à tradição).
+Cada fase tem um chefão que representa um obstáculo à vacinação.
 
 ## Estrutura
 
@@ -97,9 +98,40 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Os fatos das explicações do mito ou fato foram escritos sem checar fonte na hora e aguardam revisão dele.
 - **Personagem:** o Zé Gotinha é do Ministério da Saúde (criado por Darlan Rosa). A tela de resultado traz o aviso de jogo educativo independente, sem vínculo oficial.
 
+## Várias fases
+
+- `PHASES` guarda cada fase (largura `lw`, nome, chefão, tema, perguntas `qs`, chave do placar). `buildLevel(n)` chama `buildLevel1()` ou `buildLevel2()` e acerta `PHASE` e `LW` (largura variável).
+- Fase 1 continua com os números fixos de antes (arena 153 a 175, `s.arena`). A fase 2 não tem arena: o chefão é no ar.
+- Vencer uma fase libera a seguinte (`mg-fases`) e grava o jogo salvo no começo dela; a tela depois da vitória diz "Fase 2 liberada" e o placar ganha o botão Próxima fase.
+  Com mais de uma fase liberada, a tela de modo mostra a escolha de fase. Na pré-visualização (artefato, `ESBOCO`) a fase 2 já vem liberada.
+- Placar por fase: fase 1 em `mg-placar`, fase 2 em `mg-placar-2`, com abas no placar da tela inicial.
+- Testes da fase 2: `t70.js` (capturas de cada trecho), `t71.js` (as duas balanças se resolvem), `t72.js` (robô atravessa a mina no vagonete, normal e fácil),
+  `t73.js` (força bruta nos sinos), `t74.js` (travessia do rio pela roda d'água), `t75.js` (decolagem, chefão e vitória), `t76.js` (telas de fase no computador e no celular).
+  `t56.js` e `t57.js` são de antes da tela de modo e já falhavam na versão publicada.
+
+## Fase 2: Arraial do Antigamente (esboço)
+
+Arraial colonial com cara de Minas. Tema: técnicas que se mantiveram só pela tradição. Sprites, cenário e fundo são provisórios, desenhados em código (`SPR2`, `SKY2`, `LAYERS2`);
+o fluxo de troca é o mesmo da fase 1. A música da fase ainda é a da fase 1; a de chefe e a de vitória valem para todas.
+- **Trechos:** ruas e telhados (casarões `W`/`T`, telhas soltas `C` que caem 24 quadros depois do pisão e voltam em 5 s, varal `V`, muro com caco de vidro) · igreja em obra (sinos em pêndulo
+  sobre o vão, boticário no balcão, andaime que sobe e desce, balança 1) · mina no vagonete (102 a 188) · rio com jacaré, miasmas e roda d'água · balança 2 · portão 3 e passarola. Postos em 57, 100, 202, 271, 286.
+- **Balança da evidência** (no máximo duas, decisão do André): blocos empurráveis (`s.blocks`); evidência (lupa) pesa 1, tradição (moldura dourada) pesa zero. O prato `P` conta as evidências apoiadas nele,
+  direto ou em pilha (`onPan`). Duas evidências abrem a porta `D`. O bloco cai quando o meio dele passa da beirada e encaixa no vão. Tradição que cai num buraco fundo é descartada; evidência volta ao lugar.
+  O bloco `O` recoloca os blocos. Balança 1: as tradições vão para o fundo do prato e as evidências descem do andaime (a que cai no prato precisa ser empurrada até o fim antes da segunda).
+  Balança 2: uma tradição vira aterro do buraco raso e outra vira degrau para a tábua da evidência alta. Montado no jacaré não empurra.
+- **Vagonete:** anda sozinho (`cartV`: 2 no normal, 1,85 no fácil; mais lento atrapalhava o pulo). O jogador só pula (pulo de 5,3, como montado). Buraco derruba; caixote é golpe e quebra.
+  Pedras do teto caem quando o Zé chega a 96 px; morcegos acordam a 150 px, cruzam o caminho e somem. Posições acertadas para o encontro cair em trecho livre (robô do `t72.js` passa sem morrer no normal).
+- **Inimigos novos:** sanguessuga (chão ou teto), os quatro humores (saltam), boticário (frascos em arco, 2 de vida), miasma (não morre, só desvia), morcego, pedra; voltam boato, fake news e vírus.
+- **Perguntas:** `QS2`, sobre tradição. Os fatos aguardam a revisão do André.
+- **Chefão no ar:** a passarola (Bartolomeu de Gusmão, 1709) decola com câmera subindo. No ar: setas movem, pulo esquenta o ar (segurar sobe sem parar), seringa normal; telhado embaixo machuca.
+  O Barão tem camadas de poeira dos séculos (3 no normal, 2 no fácil): cada seringa arranca uma; sem poeira ele fica exposto e aí seringa tira 1 e pisão 2 de vida (12 no normal, 8 no fácil).
+  Ataques: retratos de antepassados teleguiados e investida horizontal com aviso. Na segunda metade, SUS uma vez e retratos-inimigos. Seringas chegam em balõezinhos.
+  Morrer no ar volta ao posto 5, no chão. Vitória: o balão vai ao centro, "Fase 2 completa" e sobe.
+
 ## Pendências e ideias em aberto
+
+- Fase 2: artes definitivas (prompts a escrever depois que o André aprovar o esboço), música da fase, revisão das perguntas e dos cartões, sentir a dificuldade jogando.
 
 - Placar online: hoje é só no aparelho. Fora do artefato dá para usar um banco externo (sugestão feita: Firebase); o André ainda não decidiu.
 - Cartões de apresentação só na primeira partida do aparelho (oferecido, sem resposta).
 - Revisão do André: textos do bestiário e das explicações; se 10 segundos bastam para as afirmações mais longas; dificuldade do golpe sobre a água.
-- Novas fases: ainda sem roteiro. O código tem `PHASE = { n: 1, name: 'VILA DO ZAP' }` e uma fase só em `buildLevel()`.
