@@ -1218,7 +1218,7 @@ function stepPlayer(jp, sp) {
   if (p.vy >= 0) p.canCut = false;
   p.vy = Math.min(p.vy + .28, 5.2);
   const wasG = p.onG, vfall = p.vy;
-  const pb = p.y + p.h; p.x += p.vx; collideX(p); if (p.hitWall && p.hitWall === dir && p.onG && !p.ride && !p.cart) p.pushT = 6; /* forçando contra a parede: pose de empurrar, parada */ if (s.fase === 2) side2(p, dir, pb); p.y += p.vy; collideY(p, pb, true); platCollide(p, pb); if (s.fase === 2) land2(p, pb);
+  const pb = p.y + p.h; p.x += p.vx; collideX(p); if (s.fase === 2) side2(p, dir, pb); p.y += p.vy; collideY(p, pb, true); platCollide(p, pb); if (s.fase === 2) land2(p, pb);
   if (p.jT > 0) p.jT--; if (p.landT > 0) p.landT--; if (p.hurtT > 0) p.hurtT--;
   if (!wasG && p.onG && vfall > 1.6) {   // pouso: achata conforme a queda; queda alta levanta poeira
     p.landT = 8; p.landK = clamp((vfall - 1.6) / 3.4, .35, 1); p.jT = 0;

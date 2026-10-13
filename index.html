@@ -264,7 +264,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.34</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.35</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -333,7 +333,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win" id="winNote">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btNext" type="button" hidden>Próxima fase</button><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.34</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.35</p>
     </div>
   </section>
 
@@ -1244,7 +1244,7 @@ function stepPlayer(jp, sp) {
   if (p.vy >= 0) p.canCut = false;
   p.vy = Math.min(p.vy + .28, 5.2);
   const wasG = p.onG, vfall = p.vy;
-  const pb = p.y + p.h; p.x += p.vx; collideX(p); if (p.hitWall && p.hitWall === dir && p.onG && !p.ride && !p.cart) p.pushT = 6; /* forçando contra a parede: pose de empurrar, parada */ if (s.fase === 2) side2(p, dir, pb); p.y += p.vy; collideY(p, pb, true); platCollide(p, pb); if (s.fase === 2) land2(p, pb);
+  const pb = p.y + p.h; p.x += p.vx; collideX(p); if (s.fase === 2) side2(p, dir, pb); p.y += p.vy; collideY(p, pb, true); platCollide(p, pb); if (s.fase === 2) land2(p, pb);
   if (p.jT > 0) p.jT--; if (p.landT > 0) p.landT--; if (p.hurtT > 0) p.hurtT--;
   if (!wasG && p.onG && vfall > 1.6) {   // pouso: achata conforme a queda; queda alta levanta poeira
     p.landT = 8; p.landK = clamp((vfall - 1.6) / 3.4, .35, 1); p.jT = 0;
