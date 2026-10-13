@@ -103,10 +103,10 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
 - `PHASES` guarda cada fase (largura `lw`, nome, chefão, tema, perguntas `qs`, chave do placar). `buildLevel(n)` chama `buildLevel1()` ou `buildLevel2()` e acerta `PHASE` e `LW` (largura variável).
 - Fase 1 continua com os números fixos de antes (arena 153 a 175, `s.arena`). A fase 2 não tem arena: o chefão é no ar.
 - Vencer uma fase libera a seguinte (`mg-fases`) e grava o jogo salvo no começo dela; a tela depois da vitória diz "Fase 2 liberada" e o placar ganha o botão Próxima fase.
-  Com mais de uma fase liberada, a tela de modo mostra a escolha de fase. Na pré-visualização (artefato, `ESBOCO`) a fase 2 já vem liberada.
+  Com mais de uma fase liberada, a tela de modo mostra a escolha de fase e o título ganha o botão FASES (abre a escolha já na fase mais nova; CONTINUAR segue o jogo salvo). Na pré-visualização (artefato, `ESBOCO`) a fase 2 já vem liberada.
 - Placar por fase: fase 1 em `mg-placar`, fase 2 em `mg-placar-2`, com abas no placar da tela inicial.
 - Testes da fase 2: `t70.js` (capturas de cada trecho), `t71.js` (as duas balanças se resolvem), `t72.js` (robô atravessa a mina no vagonete, normal e fácil),
-  `t73.js` (força bruta nos sinos), `t74.js` (travessia do rio pela roda d'água), `t75.js` (decolagem, chefão e vitória), `t76.js` (telas de fase no computador e no celular).
+  `t73.js` (força bruta nos sinos), `t74.js` (travessia do rio pela roda d'água), `t75.js` (decolagem, chefão e vitória), `t76.js` (telas de fase no computador e no celular), `t77.js` (botão FASES no título com jogo salvo).
   `t56.js` e `t57.js` são de antes da tela de modo e já falhavam na versão publicada.
 
 ## Fase 2: Arraial do Antigamente (esboço)
