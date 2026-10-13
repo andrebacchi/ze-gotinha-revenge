@@ -147,8 +147,10 @@ Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e fras
   Sem escudo (o André tirou as camadas de poeira: eram o que deixava a luta difícil demais). Toda seringa tira 1; depois de cada investida ele cansa (`exposed`) e o pisão tira 2. Vida 10 no normal, 7 no fácil;
   retratos mais lentos e mais espaçados. Os retratos-inimigos da segunda metade vêm uma vez só.
   Ataques: retratos de antepassados teleguiados e investida horizontal com aviso. Na segunda metade, SUS uma vez e retratos-inimigos. Seringas chegam em balõezinhos.
-  O balão aguenta um golpe (`p.bHp`, 2 vidas, pedido do André): fura, ganha um remendo com ar escapando e as vidas aparecem embaixo das seringas; o segundo golpe murcha. Escudo e SUS continuam valendo por cima.
-  Morrer no ar volta ao posto 5, no chão. Vitória: o balão vai ao centro, "Fase 2 completa" e sobe.
+  O balão tem vidas (`p.bHp`, `b2Balloon`: 2 no normal, 4 no fácil, pedido do André): fura, ganha um remendo com ar escapando e as vidas aparecem embaixo das seringas; o segundo golpe murcha. Escudo e SUS continuam valendo por cima.
+  No fácil, além das 4 vidas, o telhado só devolve o balão para cima (`roofSafe`) e os retratos perseguem menos (`b2Home` 22 em vez de 45).
+  Morrer no ar volta ao posto 5, no chão. Vitória: o balão vai ao centro, abaixo de "Fase 2 completa", e a câmera sobe até só sobrar céu, como na fase 1 (`camAir()`; o céu desce pela metade e o resto vira o azul de cima).
+  No site publicado (fora do artefato) a fase 2 só aparece depois de vencer a fase 1: sem `mg-fases`, o título não tem FASES (conferido no `index.html`).
 
 ## Pendências e ideias em aberto
 
