@@ -259,7 +259,7 @@ body.touch .pads{display:flex}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.13</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.14</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -325,7 +325,7 @@ body.touch .pads{display:flex}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.13</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.14</p>
     </div>
   </section>
 
@@ -941,7 +941,7 @@ function answer(tx, c) {   // c: 'M', 'F' ou 'T' (tempo esgotado)
     if (!introStart('answer', at, { kind: 'Mito ou fato?', name: `Certo: é ${lab}`, quote: q.q, text: q.e, tipLabel: '', tip: 'O portão abriu.', zoom: 1.5, cls: 'ok', quiet: true, after: () => say('<span><b class="tag">Portão aberto.</b></span>', 110, 'ok') }))
       say(`<span><b class="tag">Certo, é ${lab}.</b> ${q.e}</span>`, 420, 'ok');
   } else {
-    g.first = false; g.err = (g.err || 0) + 1; g.lock = 170; s.shake = 6; sfx('bad');
+    g.first = false; g.err = (g.err || 0) + 1; g.lock = 170; shake(10, 2); sfx('bad');
     const head = c === 'T' ? `Tempo! Era ${lab}` : `Errou: é ${lab}`, tail = '<span><b class="tag">O boato se espalhou.</b> Vem outra afirmação.</span>';
     if (!introStart('answer', at, { kind: 'Mito ou fato?', name: head, quote: q.q, text: q.e, tipLabel: '', tip: 'O boato se espalhou. Vem outra afirmação.', zoom: 1.5, cls: 'bad', quiet: true, after: () => say(tail, 170, 'bad') }))
       say(`<span><b class="tag">${c === 'T' ? 'Tempo esgotado' : 'Errou'}, isso é ${lab}.</b> ${q.e}</span><small>O boato se espalhou. Vem outra afirmação.</small>`, 170, 'bad');
@@ -969,16 +969,21 @@ function hopOff() {   // pulo de novo no ar, montado: o Zé salta mais alto e de
   const p = st.p, j = p.ride; if (!j) return; const bottom = p.y + p.h, w = p.big ? 14 : 10, h = p.big ? 32 : 24, vy = p.vy;
   p.ride = null; p.x += (20 - w) / 2; p.w = w; p.h = h; p.y = bottom - h - 2; p.bite = 0;
   j.x = p.x + w / 2 - j.w / 2; j.y = bottom - j.h; j.t = 0; j.dir = p.face; j.vx = 0; j.vy = Math.max(vy, 0); j.state = 'idle';
-  p.vy = -5.6; p.buf = 0; p.coy = 0; p.canCut = true; sfx('jump'); burst(p.x + w / 2, bottom - 6, '#fff', 5);
+  p.vy = -5.6; p.buf = 0; p.coy = 0; p.canCut = true; p.jT = 12; p.landT = 0; sfx('jump'); burst(p.x + w / 2, bottom - 6, '#fff', 5);
 }
+/* ───────── "Juice": tremor de câmera, pausa no impacto, poeira ─────────
+   Quem pediu ao sistema para reduzir movimento não recebe tremor nem pausa. Nos testes de mecânica (__mgNoIntro) a pausa também fica de fora. */
+function shake(n, a) { const s = st; if (!(s.shake > 0)) s.shakeA = 0; s.shake = Math.max(s.shake, n); s.shakeA = Math.max(s.shakeA || 0, a); }
+function hitstop(n) { if (!reduceMotion && !window.__mgNoIntro) st.hitstop = Math.max(st.hitstop || 0, n); }
+function dust(x, y, n, spread = 8) { for (let i = 0; i < n; i++) st.parts.push({ x: x + (Math.random() - .5) * spread, y: y - 2 - Math.random() * 2, vx: (Math.random() - .5) * 1.4, vy: -Math.random() * .45, t: 12 + Math.random() * 9, c: i & 1 ? '#efe6cf' : '#c9b994', g: .015 }); }
 function hurt(fromX) {
   const s = st, p = s.p; if (p.inv > 0 || p.dead || s.vic) return;
   const away = (p.x + p.w / 2 < fromX ? -1 : 1);
   if (p.ride) {   // montado: o golpe derruba o Zé e o jacaré foge para o lado oposto ao do golpe. Na água o Zé sobe mais, para dar tempo de cair de volta na sela
-    const wet = overWater(p); dismount(true, away); p.inv = 90; p.vy = wet ? -4.4 : -3.2; p.vx = away * (wet ? 1.2 : 1.6); p.stun = 12; p.canCut = false; sfx('hurt'); txt(p.x, p.y - 6, 'O jacaré fugiu!', '#ffe27a'); return;
+    const wet = overWater(p); dismount(true, away); hitstop(6); shake(12, 3); p.hurtT = 16; p.inv = 90; p.vy = wet ? -4.4 : -3.2; p.vx = away * (wet ? 1.2 : 1.6); p.stun = 12; p.canCut = false; sfx('hurt'); txt(p.x, p.y - 6, 'O jacaré fugiu!', '#ffe27a'); return;
   }
-  if (p.shield) { p.shield = false; p.inv = 70; burst(p.x + 5, p.y + 10, '#46e0d0', 6); auraFx(p.big ? 'b' : 's', 3, 5, p.x + p.w / 2, p.y + p.h / 2 - 2); sfx('pop'); return; }
-  s.shake = 8;
+  if (p.shield) { p.shield = false; hitstop(5); shake(8, 2); p.hurtT = 12; p.inv = 70; burst(p.x + 5, p.y + 10, '#46e0d0', 6); auraFx(p.big ? 'b' : 's', 3, 5, p.x + p.w / 2, p.y + p.h / 2 - 2); sfx('pop'); return; }
+  hitstop(7); shake(14, 3); p.hurtT = 16;
   if (!p.big) { die(); return; }            // tamanho original: um golpe derruba
   setBig(false); p.inv = 110; p.canCut = false; sfx('hurt');   // sarado: volta ao tamanho original
   if (!p.ride) { p.vy = -3; p.vx = away * 1.8; p.stun = 14; }
@@ -1019,11 +1024,18 @@ function stepPlayer(jp, sp) {
   p.coy = p.onG ? 7 : p.coy - 1;
   if (jp && p.ride && !p.onG && p.coy <= 0) { hopOff(); jp = false; }
   if (jp) p.buf = 8; else p.buf--;
-  if (p.buf > 0 && p.coy > 0) { p.vy = p.ride ? -5.3 : -4.9; p.buf = 0; p.coy = 0; p.canCut = true; sfx('jump'); }
+  if (p.buf > 0 && p.coy > 0) { p.vy = p.ride ? -5.3 : -4.9; p.buf = 0; p.coy = 0; p.canCut = true; p.jT = 10; p.landT = 0; sfx('jump'); if (!p.ride) dust(p.x + p.w / 2, p.y + p.h, 3); }
   if (p.canCut && !keys.jump && p.vy < -1.8) p.vy = -1.8;
   if (p.vy >= 0) p.canCut = false;
   p.vy = Math.min(p.vy + .28, 5.2);
+  const wasG = p.onG, vfall = p.vy;
   const pb = p.y + p.h; p.x += p.vx; collideX(p); p.y += p.vy; collideY(p, pb, true); platCollide(p, pb);
+  if (p.jT > 0) p.jT--; if (p.landT > 0) p.landT--; if (p.hurtT > 0) p.hurtT--;
+  if (!wasG && p.onG && vfall > 1.6) {   // pouso: achata conforme a queda; queda alta levanta poeira
+    p.landT = 8; p.landK = clamp((vfall - 1.6) / 3.4, .35, 1); p.jT = 0;
+    if (vfall > 3.6 && !p.ride) { dust(p.x + p.w / 2, p.y + p.h, 7, 14); if (vfall > 4.9) shake(4, 1); }
+  }
+  if (p.onG && !p.ride && dir && Math.sign(p.vx) === -dir && Math.abs(p.vx) > 1.1 && s.time % 4 === 0) dust(p.x + p.w / 2 - dir * 3, p.y + p.h, 2, 4);   // freada
   if (p.y > LH * T + 24) { die(); p.deadT = 40; return; }
 
   if (p.cd > 0) p.cd--; if (p.growT > 0) p.growT--; if (p.inv > 0) p.inv--; if (p.boost > 0) p.boost--; if (p.bite > 0) p.bite--; if (p.shootT > 0) p.shootT--;
@@ -1051,12 +1063,13 @@ const biteBox = p => ({ x: p.face > 0 ? p.x + p.w - 2 : p.x - 20, y: p.y + 8, w:
 function hitEnemy(e, d, eaten, stomp) {
   e.hp -= d; e.fl = 8;
   if (e.hp <= 0) {
+    hitstop(stomp || eaten ? 4 : 3); shake(stomp ? 6 : 4, 1);
     e.dead = true; if (!e.minion && !e.arena) st.kills[e.t]++;
     const A = ENEMY_ART[e.t], art = SPR.en[e.t];
     if (art && !eaten) st.fx.push({ img: art[stomp ? A.hit : A.out], cw: A.cw, base: A.base, x: e.x + e.w / 2, y: e.y + e.h, t: 30, vy: stomp ? (e.t === 'fake' ? 1.6 : 0) : -.35, flip: e.t === 'fake' ? Math.cos(e.ph) < 0 : e.t === 'virus' ? e.face < 0 : e.dir < 0 }); // inimigos que nascem de erro ou do chefão não pontuam
     burst(e.x + e.w / 2, e.y + e.h / 2, e.t === 'virus' ? '#8a5cf0' : e.t === 'fake' ? '#f0eacc' : '#c4f6b4', 9);
     txt(e.x + e.w / 2, e.y - 4, eaten ? 'NHAC!' : e.t === 'virus' ? 'NEUTRALIZADO!' : 'DESMENTIDO!', '#fff'); sfx('kill');
-  } else { sfx('hit'); if (stomp) e.sq = 14; }
+  } else { sfx('hit'); hitstop(2); if (stomp) e.sq = 14; }
 }
 function stepEnemies() {
   const s = st, p = s.p;
@@ -1124,7 +1137,7 @@ function bossStart() {
 }
 function damageBoss(d, kind) {
   const s = st, b = s.boss; if (b.st !== 'tired' || b.inv > 0) return false;
-  b.hp -= d; b.inv = 10; b.hurtT = 24; b.hurtKind = kind === 'stomp' ? 'hurt1' : 'hurt2'; sfx('boss'); burst(b.x + b.w / 2, b.y + 14, '#ffd23f', 10); txt(b.x + b.w / 2, b.y - 2, 'AI!', '#ff8fa3');
+  b.hp -= d; b.inv = 10; b.hurtT = 24; hitstop(b.hp <= 0 ? 12 : 5); shake(b.hp <= 0 ? 26 : 8, b.hp <= 0 ? 4 : 2); b.hurtKind = kind === 'stomp' ? 'hurt1' : 'hurt2'; sfx('boss'); burst(b.x + b.w / 2, b.y + 14, '#ffd23f', 10); txt(b.x + b.w / 2, b.y - 2, 'AI!', '#ff8fa3');
   if (b.hp <= 0) { b.hp = 0; b.st = 'dying'; b.t = 0; s.slow = SLOW_STEPS; music(null); s.eshots.length = 0; for (const e of s.enemies) if (e.arena && !e.dead) { e.dead = true; burst(e.x + 6, e.y + 6, '#e0457b', 6); } }
   return true;
 }
@@ -1152,7 +1165,7 @@ function stepBoss() {
     case 'slam':
       b.vy = Math.min(b.vy + .6, 7); b.y += b.vy;
       if (b.y + b.h >= G * T) {
-        b.y = G * T - b.h; b.st = 'tired'; b.t = 0; b.bubble = false; s.shake = 14; sfx('slam'); auraFx('eco', 3, 7, b.x + b.w / 2, b.y + b.h / 2);
+        b.y = G * T - b.h; b.st = 'tired'; b.t = 0; b.bubble = false; shake(18, 4); sfx('slam'); auraFx('eco', 3, 7, b.x + b.w / 2, b.y + b.h / 2);
         for (const d of [-1, 1]) s.eshots.push({ t: 'wave', x: cx - 4 + d * 14, y: G * T - 12, w: 8, h: 12, vx: d * DF().waveV, vy: 0, life: 80 });
         hintOnce('tired', '<span><b class="tag">Bateria fraca.</b> A bolha de eco caiu. Agora!</span>', 200);
       } break;
@@ -1224,7 +1237,7 @@ function stepFx() {
   const s = st;
   for (const a of s.fx) { a.y = Math.min(a.y + a.vy, G * T); a.t--; }
   s.fx = s.fx.filter(a => a.t > 0);
-  for (const a of s.parts) { a.x += a.vx; a.y += a.vy; a.vy += .15; a.t--; }
+  for (const a of s.parts) { a.x += a.vx; a.y += a.vy; a.vy += a.g != null ? a.g : .15; a.t--; }
   s.parts = s.parts.filter(a => a.t > 0);
   for (const a of s.texts) { a.y -= .4; a.t--; }
   s.texts = s.texts.filter(a => a.t > 0);
@@ -1267,6 +1280,7 @@ function step() {
   const jp = keys.jump && !prev.jump, sp = keys.fire && !prev.fire; prev.jump = keys.jump; prev.fire = keys.fire;
   if (s.opening) { stepOpening(jp, sp); return; }
   if (s.intro) { stepIntro(jp, sp); return; }
+  if (s.hitstop > 0) { s.hitstop--; if (jp) p.buf = 8; return; }   // pausa no impacto: alguns quadros congelados dão peso ao golpe
   s.time++; s.anim++; if (s.slow > 0) s.slow--;
   if (!p.dead) for (const e of s.enemies) {   // inimigo novo à vista e perto: apresenta
     if (e.dead || s.seen[e.t] || !BESTIARY[e.t]) continue;
@@ -1341,8 +1355,9 @@ function label(s, x, y, col, size = 7, align = 'center') {
 function render() {
   const s = st, p = s.p;
   ctx.setTransform(S, 0, 0, S, 0, 0); ctx.imageSmoothingEnabled = false;
-  const sh = s.shake > 0 && !reduceMotion ? Math.round((Math.random() - .5) * 4) : 0;
-  camX = Math.round(s.cam.x) + sh; camY = Math.round(s.cam.y);
+  const sa = s.shake > 0 && !reduceMotion ? Math.min(s.shakeA || 2, 1 + s.shake / 3) : 0;
+  const sh = sa ? Math.round((Math.random() - .5) * 2 * sa) : 0, sv = sa ? -Math.round(Math.random() * .8 * sa) : 0;
+  camX = Math.round(s.cam.x) + sh; camY = Math.round(s.cam.y) + sv;
   const I = s.intro;
   if (I && I.k > 0) { // zoom: leva o inimigo para o lado esquerdo do palco e amplia em volta dele
     ctx.fillStyle = K; ctx.fillRect(0, 0, VW, VH);
@@ -1412,7 +1427,7 @@ function render() {
   // inimigos
   for (const e of s.enemies) {
     if (e.dead || (e.fl > 0 && (s.time & 1))) continue;
-    const f = (s.anim >> 3) & 1, x = e.x - camX, y = e.y - camY;
+    const f = (s.anim >> 3) & 1, x = e.x - camX + (e.fl > 0 ? ((e.fl >> 1) & 1 ? 1 : -1) : 0), y = e.y - camY;
     const A = ENEMY_ART[e.t], art = SPR.en[e.t];
     if (art && e.t === 'boato') spr(art[f ? 'walk1' : 'walk2'], x + e.w / 2 - A.cw / 2, y + e.h - A.base, e.dir < 0);
     else if (art && e.t === 'fake') spr(art[f ? 'fly1' : 'fly2'], x + e.w / 2 - A.cw / 2, y + e.h - A.base + 1, Math.cos(e.ph) < 0);
@@ -1424,7 +1439,7 @@ function render() {
   // chefão
   const b = s.boss;
   if (b.active) {
-    const bx = b.x - camX + (b.st === 'warn' ? ((b.t >> 1) & 1 ? 2 : -2) : 0), by = b.y - camY;
+    const bx = b.x - camX + (b.st === 'warn' ? ((b.t >> 1) & 1 ? 2 : -2) : b.hurtT > 12 ? ((b.hurtT >> 1) & 1 ? 2 : -2) : 0), by = b.y - camY;
     if (!(b.inv > 0 && (s.time & 1) && !SPR.bossArt) && !(b.st === 'dying' && (s.time & 2))) {
       const BA = SPR.bossArt;
       if (BA) {
@@ -1454,6 +1469,13 @@ function render() {
   if (!(p.inv > 0 && !p.dead && (s.time >> 2) & 1)) {
     const x = Math.round(p.x) - camX, jsw = p.ride && p.inW && SPR.xj, y = Math.round(p.y) - camY + (p.ride && p.inW ? (jsw ? 10 : 5) + Math.round(Math.sin(s.time * .12)) : 0), fl = p.face < 0;
     const big = p.growT > 0 && (s.time >> 2) & 1 ? !p.big : p.big; // pisca entre os tamanhos ao mudar
+    {   // estica no pulo, espreme no pouso (escala a partir dos pés) e treme ao levar golpe
+      let sx = 1, sy = 1; const free = !p.ride && !p.dead && !(s.vic && s.vic.g >= 0);
+      if (free && p.landT > 0) { const k = p.landT / 8 * (p.landK || .5); sx = 1 + .24 * k; sy = 1 - .2 * k; }
+      else if (free && p.jT > 0) { const k = p.jT / 10; sx = 1 - .12 * k; sy = 1 + .15 * k; }
+      const jit = p.hurtT > 0 && !p.dead ? ((p.hurtT >> 1) & 1 ? 1 : -1) : 0, fx = x + p.w / 2, fy = y + p.h;
+      ctx.save(); ctx.translate(fx + jit, fy); ctx.scale(sx, sy); ctx.translate(-fx, -fy);
+    }
     const VA = s.vic && s.vic.g >= 0 && !p.dead && !p.ride ? SPR[big ? 'xvb' : 'xvn'] : null;
     if (VA) {   // comemoração: preparo, salto e pose
       const g = s.vic.g, X = EXTRA_ART[big ? 'vb' : 'vn'], hop = g >= V_PREP && g < V_POSE ? Math.round(Math.sin(Math.PI * (g - V_PREP) / (V_POSE - V_PREP)) * 18) : 0;
@@ -1485,6 +1507,7 @@ function render() {
       } else if (big) spr(SPR.zeBig[fr], x + p.w / 2 - 12, y + p.h - 32, fl);
       else spr(SPR.ze[fr], x + p.w / 2 - 8, y + p.h - 24, fl);
     }
+    ctx.restore();
     if (p.shield && !VA) {   // escudo de imunidade: anel com o brilho correndo pelo alto
       const cx = Math.round(x + p.w / 2), cy = Math.round(y + p.h / 2 - (p.ride ? 4 : 2)), U = SPR.aura;
       if (U) { const im = U[p.ride || p.big ? 'b' : 's'][[0, 1, 2, 1][(s.time / 7 | 0) & 3]]; ctx.globalAlpha = .9; spr(im, cx - im.width / 2, cy - im.height / 2); ctx.globalAlpha = 1; }

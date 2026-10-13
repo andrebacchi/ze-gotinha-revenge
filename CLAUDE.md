@@ -58,6 +58,10 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Alguns nomes existem só para separar eventos que dividiam um som; `SFX_ALT` diz qual som sintetizado eles usam quando não há arquivo: `nope` ("Sem seringas") usa o `bump` sintetizado,
   e os cartões usam `cp`. Ainda sintetizados: `boss` (chegada do chefão e cada golpe que ele leva), `ploc` (seringa batendo na bolha de eco) e `cp` (cartão abrindo).
   O `win` sintetizado só toca com `__mgNoIntro`; no jogo, a vitória tem a fanfarra. Volumes acertados pela energia dos 100 ms mais fortes de cada arquivo, contra a mediana dos anteriores.
+- **Juice** (sugestão de um colega do André): o Zé estica no pulo (`p.jT`) e espreme no pouso conforme a queda (`p.landT`, `p.landK`), escalado a partir dos pés; queda alta e freada levantam poeira (`dust()`).
+  Golpes congelam o jogo por alguns quadros (`hitstop()`: 2 a 4 em inimigos, 5 no chefão, 12 no golpe final, 5 a 7 no Zé). O tremor de câmera tem intensidade (`shake(duração, amplitude)`) e também sobe e desce.
+  Inimigo, chefão e Zé tremem no lugar ao levar golpe (`e.fl`, `b.hurtT`, `p.hurtT`). Pulo coiote (7 quadros), pulo antecipado (8) e pulo curto ao soltar o botão já existiam.
+  Com "reduzir movimento" no sistema não há tremor nem pausa; com `__mgNoIntro` também não há pausa, para os testes de mecânica.
 - **Estado:** tudo em `st`. Placar só no aparelho (localStorage `mg-placar`, `mg-nome`, `mg-mudo`).
 
 ## Regras do jogo (decisões do André)
