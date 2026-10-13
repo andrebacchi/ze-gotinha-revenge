@@ -1,6 +1,6 @@
 /* Zé Gotinha's Revenge: funciona sem internet depois da primeira visita.
    Este arquivo é gerado pelo build (python3 build.py) a partir de src/sw.js; a versão vem de VERSAO no build.py. */
-const APP = 'ze-gotinha-revenge-app-1.25';   // página e ícones: troca a cada versão
+const APP = 'ze-gotinha-revenge-app-1.27';   // página e ícones: troca a cada versão
 const FIXOS = 'ze-gotinha-revenge-fixos-v1';       // fontes e músicas: raramente mudam
 // Todos os apps dividem andrebacchi.github.io: apague só os caches deste jogo.
 const PREFIXO = 'ze-gotinha-revenge-';

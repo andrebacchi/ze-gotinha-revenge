@@ -126,8 +126,9 @@ Objetos ainda provisórios (prompt 12 enviado): roda d'água, andaime, placa do 
 o barril uns 23 (altura do peito). Por isso os casarões têm 3 a 4 blocos de parede, e a fachada (`s.facade`) é desenhada solta por cima da parede lisa; sacadas de tábua servem de degrau para o telhado.
 **Varal:** plataforma `kind: 'varal'` entre dois postes; cede até 9 px onde o Zé pisa (mola, balança ao sair) e as roupas são desenhadas em código (`drawVaral`, seis tipos, dez cores).
 **Muro com caco de vidro:** só os cacos da arte (`cac`), sobre muro caiado. As paredes repetidas mostram uma emenda leve entre blocos.
-Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e frasco · morcego, pedra, miasma, retrato · passarola, balão do Barão, vagonete, sino · blocos do cenário · balança · fundo. A música da fase ainda é a da fase 1; a de chefe e a de vitória valem para todas.
-- **Trechos:** ruas e telhados (casarões `W`/`T`, telhas soltas `C` que caem 24 quadros depois do pisão e voltam em 5 s, varal `V`, muro com caco de vidro) · igreja em obra (sinos em pêndulo
+Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e frasco · morcego, pedra, miasma, retrato · passarola, balão do Barão, vagonete, sino · blocos do cenário · balança · fundo. A música da fase é `audio/fase2.mp3` ("Gold Rush at Sunset", do gerador, com fade de 2 s; `music('stage')` troca para `stage2` na fase 2); a de chefe e a de vitória valem para todas.
+  O céu (`FUNDO2.ceu`) teve a paleta deslocada uma faixa para o quente, para o laranja aparecer na descida da câmera (pedido do André).
+- **Trechos:** ruas e telhados (casarões `W`/`T`, telhas soltas `C` que caem 24 quadros depois do pisão e voltam em 5 s, varal `V`, muro com caco de vidro; tábuas em escada no vão antes do muro, porque quem caía ali não voltava) · igreja em obra (sinos em pêndulo
   sobre o vão, boticário no balcão, andaime que sobe e desce, balança 1) · mina no vagonete (102 a 188) · rio com jacaré, miasmas e roda d'água · balança 2 · portão 3 e passarola. Postos em 57, 100, 202, 271, 286.
 - **Balança da evidência** (no máximo duas, decisão do André): blocos empurráveis (`s.blocks`); evidência (lupa) pesa 1, tradição (moldura dourada) pesa zero. O prato `P` conta as evidências apoiadas nele,
   direto ou em pilha (`onPan`). Duas evidências abrem a porta `D`. O bloco cai quando o meio dele passa da beirada e encaixa no vão. Tradição que cai num buraco fundo é descartada; evidência volta ao lugar.
@@ -144,7 +145,7 @@ Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e fras
 
 ## Pendências e ideias em aberto
 
-- Fase 2: artes definitivas (prompts a escrever depois que o André aprovar o esboço), música da fase, revisão das perguntas e dos cartões, sentir a dificuldade jogando.
+- Fase 2: revisão das perguntas e dos cartões, sentir a dificuldade jogando, aprovação para levar o ramo `fase-2` ao `main`.
 
 - Placar online: hoje é só no aparelho. Fora do artefato dá para usar um banco externo (sugestão feita: Firebase); o André ainda não decidiu.
 - Cartões de apresentação só na primeira partida do aparelho (oferecido, sem resposta).
