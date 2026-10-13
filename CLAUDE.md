@@ -65,7 +65,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 - **Controle (gamepad):** `pollPad()` lê `navigator.getGamepads()` a cada quadro (padrão Xbox/PlayStation/GameSir): direcional ou alavanca andam, A pula, X ou B lançam, Start pausa.
   Nos menus (`padLayer()`, `padMenu()`), o direcional percorre os botões da camada visível, A confirma e B volta; no título, A sem foco começa. Só mexe em `keys` quando o controle muda, então teclado e controle convivem.
   Com o controle em uso, `body.pad-on` esconde os botões de toque e a tela de controles mostra os botões do controle; tocar na tela ou desligar o controle traz os botões de volta.
-  Golpes fortes vibram o controle (`rumble()`). O navegador só enxerga o controle depois do primeiro botão apertado. Testado com controle simulado (`t63.js`); o André confere com o GameSir dele.
+  Golpes fortes vibram o controle (`rumble()`). O navegador só enxerga o controle depois do primeiro botão apertado. Testado com controle simulado (`t63.js`) e conferido pelo André com um GameSir no celular (13/10/2026).
 - **Estado:** tudo em `st`. Placar só no aparelho (localStorage `mg-placar`, `mg-nome`, `mg-mudo`).
 
 ## Regras do jogo (decisões do André)
