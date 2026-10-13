@@ -124,7 +124,7 @@ Fundo: céu e faixas de nuvens, serra com igrejas e muro da frente (`FUNDO2`, `t
 (`CASA_COR`, tons apagados; o azul saturado ficou pesado, o André reprovou) e beiral com forro escuro. As manchas de cal em traço foram reprovadas (e um índice negativo as espalhava pelo telhado).
 Objetos com a arte do André (`ATLAS2.obj`): roda d'água, andaime, placa do peso, poste do varal (desenhado 1,4 vez mais largo; o recorte tinha um bloco preto em volta do poste e da travessa, reduzido a contorno de 1 px) e entrada da mina (`drawBoca()`: armação numa encosta de pedra com o vão escuro; `bocaFrente()` redesenha o pilar do lado do túnel por cima do Zé e do vagonete, para dar profundidade, pedido do André).
 **Barril** é degrau: plataforma `kind: 'barril'` no topo de cada barril de enfeite.
-**Alcance (o André cobrou):** todo salto obrigatório precisa dar a pé, com o Zé normal, sem o jacaré, salvo o que é bônus do pulo duplo (tábua do escudo em 239 a 241, conferida montado).
+**Alcance (o André cobrou):** todo salto obrigatório precisa dar a pé, com o Zé normal, sem o jacaré, salvo o que é bônus do pulo duplo (tábua do escudo em 239 a 241, linha 7: na linha 6 o pico do pulo duplo passava só 5 px acima e o André não conseguiu; conferida montado dos dois lados e impossível a pé).
 Conferir com robô de força bruta antes de publicar (`t73.js`, `t74.js`).
 **Proporções (pedido do André):** porta, janela e barril têm tamanho próprio, não cabem num bloco de 16 px. A porta tem 36 px (um pouco mais alta que o Zé), a janela uns 22 (a cabeça dele),
 o barril uns 23 (altura do peito). Por isso os casarões têm 3 a 4 blocos de parede, e a fachada (`s.facade`) é desenhada solta por cima da parede lisa; sacadas de tábua servem de degrau para o telhado.

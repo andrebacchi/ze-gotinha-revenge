@@ -1546,7 +1546,7 @@ function buildLevel2() {
   Q(223, 8, 'boost'); E('boato', 224); E('humor', 227, null, { v: 3 }); hl(226, 228, 6, 'B'); E('sangue', 230, 7, { ceil: true }); hl(229, 231, 6, 'B');   // reforço antes do boticário e do vírus
   hl(232, 234, 9, '='); E('boti', 233, 9); E('virus', 236); gotas(224, 226, 10);
   water(238, 243); set(240, 12, 'L'); set(242, 12, 'L'); gotas(239, 243, 10, 2);
-  hl(239, 241, 6, '='); items.push({ t: 'shield', x: 241 * T + 3, y: 5 * T + 4, w: 10, h: 10, src: 'alto-241' }); gota(239, 5); gota(240, 5);   // só o pulo duplo do jacaré chega
+  hl(239, 241, 7, '='); items.push({ t: 'shield', x: 241 * T + 3, y: 6 * T + 4, w: 10, h: 10, src: 'alto-241' }); gota(239, 6); gota(240, 6);   // só o pulo duplo do jacaré chega (na linha 6 o pico passava 5 px acima: quase impossível)
   syr(245, 10); Q(246, 8, 'gotas'); gotas(244, 245, 10);
   blk('ev', 252, 11, 1, 'DADOS'); blk('tr', 254, 11, 1, 'TODO MUNDO SABE'); set(256, 12, '.');   // buraco raso: a linha 13 continua chão
   blk('tr', 258, 11, 1, '200 ANOS DE USO'); hl(260, 262, 9, '='); blk('ev', 262, 8, 1, 'ENSAIO CONTROLADO');
