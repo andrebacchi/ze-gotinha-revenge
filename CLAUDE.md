@@ -68,6 +68,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 - **Jogo salvo:** ao tocar uma bandeira (posto), o jogo grava em localStorage `mg-salvo` a fase, a bandeira, o modo, o tempo, inimigos, power-ups, portões e cartões já vistos.
   Um jogo novo grava a partida no começo da fase. A tela de título mostra CONTINUAR (com fase, posto e modo) e NOVO JOGO; sem jogo salvo, PRESS START leva à escolha do modo.
   Ao continuar, inimigos e itens antes da bandeira ficam resolvidos e os portões para trás, abertos (`applySave()`). Vencer a fase apaga o jogo salvo.
+  A pausa tem "Tela inicial" (`goTitle()`): volta ao título com a música dele; o progresso depois da última bandeira se perde, e a pausa avisa em qual posto o jogo fica guardado.
 
 - **Vida como no Mario:** no tamanho original, um golpe derruba. O SUS deixa o Zé "sarado" (não escreva "bombado" nos textos): ele aguenta um golpe e volta ao tamanho original. O escudo de imunidade é uma proteção extra, gasta antes do SUS.
 - **Gotas** são coletáveis e valem pontos; qualquer morte zera as gotas juntadas.

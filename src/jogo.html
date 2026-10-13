@@ -273,7 +273,9 @@ body.touch .pads{display:flex}
       <div class="row">
         <button class="btn" id="btResume" type="button">Continuar</button>
         <button class="btn ghost" id="btRestart" type="button">Recomeçar a fase</button>
+        <button class="btn ghost" id="btHome" type="button">Tela inicial</button>
       </div>
+      <p class="fine" id="homeNote"></p>
       <p class="fine" id="howto2">Setas andam · Espaço pula · X lança seringa</p>
     </section>
   </div>
@@ -1566,9 +1568,13 @@ function start(diff, sv) {
   if (sv) applySave(sv); else writeSave();
   if (!window.__mgNoIntro) { st.opening = { t: 0 }; st.cam.y = OPEN_Y; } setMsg(''); msgTTL = 0; mode = 'play'; $('#intro').hidden = true; show(null); document.activeElement?.blur?.(); }
 function pause(on) {
-  if (mode === 'play' && on !== false) { mode = 'pause'; show(scPause); keys.left = keys.right = keys.jump = keys.fire = false; }
+  if (mode === 'play' && on !== false) { mode = 'pause'; show(scPause); $('#homeNote').textContent = st.cur >= 0 ? `Voltar à tela inicial guarda o jogo no posto ${st.cur + 1}.` : 'Voltar à tela inicial guarda o jogo no começo da fase.'; keys.left = keys.right = keys.jump = keys.fire = false; }
   else if (mode === 'pause' && on !== true) { audioOn(); mode = 'play'; show(null); document.activeElement?.blur?.(); }
   applyMusic();
+}
+function goTitle() {   // da pausa para a tela inicial; o jogo salvo continua na última bandeira
+  mode = 'title'; st = buildLevel(); setMsg(''); msgTTL = 0; $('#intro').hidden = true; keys.left = keys.right = keys.jump = keys.fire = false;
+  music('title'); show(scTitle); $(loadSave() ? '#btCont' : '#btStart').focus({ preventScroll: true });
 }
 const num = n => n.toLocaleString('pt-BR');
 let board = [], lastRun = null;
@@ -1630,7 +1636,7 @@ for (const ev of ['fullscreenchange', 'webkitfullscreenchange']) document.addEve
 $('#btFull').hidden = $('#fs-pill').hidden = !fsOk;
 refreshTitle();
 $('#btFull').onclick = e => { e.currentTarget.blur(); toggleFull(); }; $('#fs-pill').onclick = e => { e.currentTarget.blur(); toggleFull(); };
-$('#btResume').onclick = () => pause(false);
+$('#btResume').onclick = () => pause(false); $('#btHome').onclick = goTitle;
 $('#btPause').onclick = e => { e.currentTarget.blur(); pause(); };
 const btSom = $('#btSom');
 function setMute(m) { muted = m; btSom.setAttribute('aria-pressed', m ? 'true' : 'false'); btSom.setAttribute('aria-label', m ? 'Ligar o som' : 'Desligar o som'); try { localStorage.setItem('mg-mudo', m ? '1' : '0'); } catch (e) {} const t = $('#som-btn'); t.textContent = m ? 'Sem som' : 'Som'; t.setAttribute('aria-pressed', m ? 'false' : 'true'); applyMusic(); }
