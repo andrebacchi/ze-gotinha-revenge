@@ -113,7 +113,7 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
 
 Arraial colonial com cara de Minas. Tema: técnicas que se mantiveram só pela tradição. Sprites, cenário e fundo são provisórios, desenhados em código (`SPR2`, `SKY2`, `LAYERS2`);
 o fluxo de troca é o mesmo da fase 1. Artes já trocadas: Barão (`BARAO_ART`, 6 quadros: flutuar, arremessar, investida, exposto, dor, derrota; `tools/arte/barao.py`, fundo verde, escala 0,145);
-humores, sanguessuga, boticário e frasco (`ATLAS2.hum` e `.bot`, recortados com `tools/arte/fase2.py`, escalas 0,058 e 0,06; olhos dos humores agachados refeitos à mão);
+humores, sanguessuga, boticário e frasco (`ATLAS2.hum` e `.bot`, recortados com `tools/arte/fase2.py`, escalas 0,058 e 0,1: o André pediu a cabeça do boticário do tamanho da do Zé; área de golpe 18 × 40; olhos dos humores agachados refeitos à mão);
 morcego, miasma, pedra, retrato e poeira (`ATLAS2.mina`, fundo ciano); passarola, balão do Barão, vagonete e sino (`ATLAS2.vei`, recortados com `tapa=False` para as cordas ficarem vazadas;
 ao carregar saem os recortes `pbasket` e `cfront`, a frente do cesto e do vagonete desenhada por cima do tronco do Zé);
 blocos do cenário (`ATLAS2.til`, `tools/arte/tiles2.py`: recorta por dentro do contorno, troca a franja arroxeada pela cor vizinha e sobe o trilho para o topo do bloco)
