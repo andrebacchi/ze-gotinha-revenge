@@ -50,9 +50,11 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Sem internet: a página guarda os MP3 inteiros no cache `ze-gotinha-revenge-fixos-v1` e o `sw.js` responde os pedidos com `Range` cortando o arquivo guardado (`pedaco()`); sem isso o Safari não toca.
 - **Efeitos sonoros:** `sfx('nome')`. Os que têm WAV em `SFX_WAV` tocam o arquivo, embutido em base64; os outros são sintetizados por oscilador (`SND`).
   Os WAV foram feitos pelo André no jsfxr (originais em `tools/sons/`): `gota`, `hurt` (levar dano), `jump`, `sus` (crescer com o SUS), `power` (pegar os demais itens), `bite` (mordida do jacaré),
-  `bump` (batida em bloco, inclusive ao abrir um `?`), `tick` (contador da pergunta), `slam` (mergulho do chefão), `kill` (derrotar inimigo) e `posto` (posto de vacinação).
+  `bump` (batida em bloco, inclusive ao abrir um `?`), `tick` (contador da pergunta), `slam` (mergulho do chefão), `kill` (derrotar inimigo), `posto` (posto de vacinação),
+  `shot` (lançar seringa), `hit` (golpe que não derrota), `mount` (montar no jacaré), `ok` e `bad` (acerto e erro no portão) e `pop` (escudo quebrando, ovo chocando, balão de fake news e explosões do chefão).
   Alguns nomes existem só para separar eventos que dividiam um som; `SFX_ALT` diz qual som sintetizado eles usam quando não há arquivo: `nope` ("Sem seringas") usa o `bump` sintetizado,
-  e escudo quebrando, ovo e projétil estourando seguem com `pop`; os cartões, com `cp`. Ainda sintetizados: seringa, montar, golpe que não derrota, acerto e erro, golpe no chefão. O `win` sintetizado só toca com `__mgNoIntro`; no jogo, a vitória tem a fanfarra.
+  e os cartões usam `cp`. Ainda sintetizados: `boss` (chegada do chefão e cada golpe que ele leva), `ploc` (seringa batendo na bolha de eco) e `cp` (cartão abrindo).
+  O `win` sintetizado só toca com `__mgNoIntro`; no jogo, a vitória tem a fanfarra. Volumes acertados pela energia dos 100 ms mais fortes de cada arquivo, contra a mediana dos anteriores.
 - **Estado:** tudo em `st`. Placar só no aparelho (localStorage `mg-placar`, `mg-nome`, `mg-mudo`).
 
 ## Regras do jogo (decisões do André)
