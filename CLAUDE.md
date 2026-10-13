@@ -113,7 +113,9 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
 
 Arraial colonial com cara de Minas. Tema: técnicas que se mantiveram só pela tradição. Sprites, cenário e fundo são provisórios, desenhados em código (`SPR2`, `SKY2`, `LAYERS2`);
 o fluxo de troca é o mesmo da fase 1. Artes já trocadas: Barão (`BARAO_ART`, 6 quadros: flutuar, arremessar, investida, exposto, dor, derrota; `tools/arte/barao.py`, fundo verde, escala 0,145);
-humores, sanguessuga, boticário e frasco (`ATLAS2.hum` e `.bot`, recortados com `tools/arte/fase2.py`, escalas 0,058 e 0,06; olhos dos humores agachados refeitos à mão).
+humores, sanguessuga, boticário e frasco (`ATLAS2.hum` e `.bot`, recortados com `tools/arte/fase2.py`, escalas 0,058 e 0,06; olhos dos humores agachados refeitos à mão);
+morcego, miasma, pedra, retrato e poeira (`ATLAS2.mina`, fundo ciano); passarola, balão do Barão, vagonete e sino (`ATLAS2.vei`, recortados com `tapa=False` para as cordas ficarem vazadas;
+ao carregar saem os recortes `pbasket` e `cfront`, a frente do cesto e do vagonete desenhada por cima do tronco do Zé).
 Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e frasco · morcego, pedra, miasma, retrato · passarola, balão do Barão, vagonete, sino · blocos do cenário · balança · fundo. A música da fase ainda é a da fase 1; a de chefe e a de vitória valem para todas.
 - **Trechos:** ruas e telhados (casarões `W`/`T`, telhas soltas `C` que caem 24 quadros depois do pisão e voltam em 5 s, varal `V`, muro com caco de vidro) · igreja em obra (sinos em pêndulo
   sobre o vão, boticário no balcão, andaime que sobe e desce, balança 1) · mina no vagonete (102 a 188) · rio com jacaré, miasmas e roda d'água · balança 2 · portão 3 e passarola. Postos em 57, 100, 202, 271, 286.

@@ -17,7 +17,7 @@ def franja(a, fundo):
     if fundo == 'verde': return (g > r + 35) & (g > b + 35)
     if fundo == 'magenta': return (r > g + 50) & (b > g + 50)
     return (g > r + 50) & (b > r + 50)
-def corta(caminho, fundo, nomes, escala, grade=None, cores=24, limiar_escuro=45, escalas=None):
+def corta(caminho, fundo, nomes, escala, grade=None, cores=24, limiar_escuro=45, escalas=None, tapa=True):   # tapa=False mantém vazados os vãos fechados (cordas da passarola)
     a = np.asarray(Image.open(caminho).convert('RGB')).astype(float); H, W = a.shape[:2]
     fg = ndi.binary_opening(~mascara_fundo(a, fundo), iterations=1)
     lum = 0.3 * a[..., 0] + 0.59 * a[..., 1] + 0.11 * a[..., 2]
@@ -43,7 +43,7 @@ def corta(caminho, fundo, nomes, escala, grade=None, cores=24, limiar_escuro=45,
         sc = (escalas or {}).get(nm, escala)
         ids = [k + 1 for k in range(n) if sizes[k] > 25 and y0 <= cents[k][0] < y1 and x0 <= cents[k][1] < x1]
         m = np.isin(lab, ids); ys, xs = np.nonzero(m); o = (slice(ys.min(), ys.max() + 1), slice(xs.min(), xs.max() + 1)); m = m[o]
-        dk = dark[o] & m; col = m & ~dk; inner = ndi.binary_fill_holes(m); h, w = m.shape; nh, nw = max(1, round(h * sc)), max(1, round(w * sc))
+        dk = dark[o] & m; col = m & ~dk; inner = ndi.binary_fill_holes(m) if tapa else m; h, w = m.shape; nh, nw = max(1, round(h * sc)), max(1, round(w * sc))
         ds = lambda z: np.asarray(Image.fromarray((z * 255).astype(np.uint8)).resize((nw, nh), Image.BOX)).astype(float) / 255
         I = ds(inner); D = ds(dk & inner); votes = np.stack([ds(col & (cls[o] == k)) for k in range(len(pal))], -1)
         body = I >= 0.5; out = np.zeros((nh + 2, nw + 2, 4), np.uint8)
