@@ -20,6 +20,8 @@ O jogo está em construção: por enquanto tem a fase 1. Novas fases e atualiza�
 | Pausar | P | botão no canto da tela |
 | Tela cheia | F | botão no canto da tela (Android) |
 
+Com controle (Xbox, PlayStation, GameSir e parecidos): direcional ou alavanca andam, A pula, X ou B lançam seringa, Start pausa. Nos menus, o direcional escolhe e A confirma. No celular, os botões da tela somem enquanto o controle está em uso.
+
 Nos portões, a afirmação aparece e você tem 10 segundos (15 no modo fácil) para bater a cabeça no bloco M (mito) ou F (fato).
 
 Ao começar, escolha o modo: Normal ou Fácil. O jogo salva na última bandeira tocada; na tela inicial, CONTINUAR retoma dali.

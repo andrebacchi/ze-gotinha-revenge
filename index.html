@@ -211,6 +211,9 @@ dialog.dlg::backdrop{background:rgba(5,8,24,.8)}
 .pads{position:absolute;left:0;right:0;bottom:calc(16px + 4vh + env(safe-area-inset-bottom,0px));z-index:5;display:none;
   justify-content:space-between;align-items:flex-end;padding-inline:16px;pointer-events:none}
 body.touch .pads{display:flex}
+body.touch.pad-on .pads{display:none}   /* controle ligado: some o controle desenhado na tela */
+body.pad-on button:focus{outline:3px solid #fff;outline-offset:2px}
+body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
 .dpad{display:flex;gap:10px;pointer-events:auto;touch-action:none}
 .dpad span,.ab button{width:68px;height:68px;display:grid;place-items:center;border-radius:14px;
   background:rgba(43,55,128,.55);border:2px solid var(--linha);color:var(--texto);touch-action:none}
@@ -259,7 +262,7 @@ body.touch .pads{display:flex}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.14</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.15</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -325,7 +328,7 @@ body.touch .pads{display:flex}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.14</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.15</p>
     </div>
   </section>
 
@@ -375,6 +378,7 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const overlap = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 const coarse = matchMedia('(pointer: coarse)').matches, isTouch = coarse || 'ontouchstart' in window;
 if (isTouch) document.body.classList.add('touch');
+let padOn = false;   // controle (gamepad) em uso: ver pollPad()
 
 /* ───────── Sprites provisórios ─────────
    Cada entrada de SPR é um canvas pequeno desenhado em código. Para trocar pela arte final,
@@ -974,7 +978,7 @@ function hopOff() {   // pulo de novo no ar, montado: o Zé salta mais alto e de
 /* ───────── "Juice": tremor de câmera, pausa no impacto, poeira ─────────
    Quem pediu ao sistema para reduzir movimento não recebe tremor nem pausa. Nos testes de mecânica (__mgNoIntro) a pausa também fica de fora. */
 function shake(n, a) { const s = st; if (!(s.shake > 0)) s.shakeA = 0; s.shake = Math.max(s.shake, n); s.shakeA = Math.max(s.shakeA || 0, a); }
-function hitstop(n) { if (!reduceMotion && !window.__mgNoIntro) st.hitstop = Math.max(st.hitstop || 0, n); }
+function hitstop(n) { if (n >= 5) rumble(n * 22, n >= 10 ? .9 : .55); if (!reduceMotion && !window.__mgNoIntro) st.hitstop = Math.max(st.hitstop || 0, n); }
 function dust(x, y, n, spread = 8) { for (let i = 0; i < n; i++) st.parts.push({ x: x + (Math.random() - .5) * spread, y: y - 2 - Math.random() * 2, vx: (Math.random() - .5) * 1.4, vy: -Math.random() * .45, t: 12 + Math.random() * 9, c: i & 1 ? '#efe6cf' : '#c9b994', g: .015 }); }
 function hurt(fromX) {
   const s = st, p = s.p; if (p.inv > 0 || p.dead || s.vic) return;
@@ -1691,12 +1695,16 @@ const btSom = $('#btSom');
 function setMute(m) { muted = m; btSom.setAttribute('aria-pressed', m ? 'true' : 'false'); btSom.setAttribute('aria-label', m ? 'Ligar o som' : 'Desligar o som'); try { localStorage.setItem('mg-mudo', m ? '1' : '0'); } catch (e) {} const t = $('#som-btn'); t.textContent = m ? 'Sem som' : 'Som'; t.setAttribute('aria-pressed', m ? 'false' : 'true'); applyMusic(); }
 btSom.onclick = e => { e.currentTarget.blur(); audioOn(); setMute(!muted); };
 setMute(muted);
-if (isTouch) $('#howto2').textContent = 'Setas andam · A pula · B lança seringa';
-{ // tela de controles, aberta pelo botão do título: mostra só os comandos do aparelho em uso
-  const rows = isTouch ? [['Andar', 'setas na tela'], ['Pular', 'A'], ['Lançar seringa', 'B'], ['Morder, montado no jacaré', 'B'], ['Descer do jacaré', 'A de novo, no ar'], ['Pausar', 'botão no canto da tela']]
-    : [['Andar', '← →'], ['Pular', 'Espaço'], ['Lançar seringa', 'X'], ['Morder, montado no jacaré', 'X'], ['Descer do jacaré', 'Espaço de novo, no ar'], ['Pausar', 'P'], ['Ligar ou desligar o som', 'M']];
-  const dl = $('#helpKeys'); for (const [a, k] of rows) { const dt = document.createElement('dt'), dd = document.createElement('dd'), kb = document.createElement('kbd'); dt.textContent = a; kb.textContent = k; dd.append(kb); dl.append(dt, dd); }
-  $('#btHelp').onclick = () => { scHelp.hidden = false; $('#btHelpStart').focus({ preventScroll: true }); };
+function renderHelp() {   // tela de controles: só os comandos do aparelho em uso (com controle ligado, os botões dele)
+  const rows = padOn ? [['Andar', 'direcional ou alavanca'], ['Pular', 'A (Xbox) · ✕ (PlayStation)'], ['Lançar seringa', 'X ou B (Xbox) · ▢ ou ○ (PlayStation)'], ['Morder, montado no jacaré', 'o mesmo da seringa'], ['Descer do jacaré', 'pulo de novo, no ar'], ['Pausar', 'Start'], ['Menus', 'direcional escolhe, A confirma, B volta']]
+    : isTouch ? [['Andar', 'setas na tela'], ['Pular', 'A'], ['Lançar seringa', 'B'], ['Morder, montado no jacaré', 'B'], ['Descer do jacaré', 'A de novo, no ar'], ['Pausar', 'botão no canto da tela']]
+    : [['Andar', '← →'], ['Pular', 'Espaço'], ['Lançar seringa', 'X'], ['Morder, montado no jacaré', 'X'], ['Descer do jacaré', 'Espaço de novo, no ar'], ['Pausar', 'P'], ['Ligar ou desligar o som', 'M'], ['Tela cheia', 'F']];
+  const dl = $('#helpKeys'); dl.textContent = ''; for (const [a, k] of rows) { const dt = document.createElement('dt'), dd = document.createElement('dd'), kb = document.createElement('kbd'); dt.textContent = a; kb.textContent = k; dd.append(kb); dl.append(dt, dd); }
+  $('#howto2').textContent = padOn ? 'Direcional anda · A pula · X lança seringa · Start pausa' : isTouch ? 'Setas andam · A pula · B lança seringa' : 'Setas andam · Espaço pula · X lança seringa';
+}
+{
+  renderHelp();
+  $('#btHelp').onclick = () => { renderHelp(); scHelp.hidden = false; $('#btHelpStart').focus({ preventScroll: true }); };
   $('#btHelpBack').onclick = () => { scHelp.hidden = true; $('#btHelp').focus({ preventScroll: true }); };
   $('#btHelpStart').onclick = () => titleMain();
 }
@@ -1748,8 +1756,8 @@ function layout() {
   const full = isFull(), aw = Math.max(200, (app.clientWidth || innerWidth || 320) - (full ? 0 : 32));
   let ah = (app.clientHeight || innerHeight || 0) - (full ? 0 : 20); if (ah < 150) ah = aw * 9 / 16;
   let w = full ? aw : Math.min(aw, 1600); const msgH = w < 520 ? 126 : 88;
-  const need = msgH + 22 + (isTouch ? 150 : 0), room = ah - need;
-  const stacked = coarse && room >= 190;   // painel embaixo só no celular em pé; no computador e no celular deitado os textos ficam sobre o jogo
+  const room = ah - (msgH + 22 + (isTouch && !padOn ? 150 : 0));   // com controle ligado, o espaço dos botões de toque vai para o palco
+  const stacked = coarse && ah - (msgH + 22 + (isTouch ? 150 : 0)) >= 190;   // a decisão em pé × deitado não muda com o controle   // painel embaixo só no celular em pé; no computador e no celular deitado os textos ficam sobre o jogo
   const h = Math.min(w * 9 / 16, stacked ? room : ah); w = h * 16 / 9;
   stage.style.width = w + 'px'; stage.style.setProperty('--msg-h', msgH + 'px');
   stage.style.marginBottom = stacked ? (msgH + 14) + 'px' : '0';
@@ -1760,12 +1768,71 @@ function layout() {
 addEventListener('resize', layout);
 try { new ResizeObserver(() => layout()).observe(app); } catch (e) {}
 
+/* ───────── Controle (Gamepad API) ─────────
+   Padrão Xbox/PlayStation/GameSir: direcional ou alavanca andam, A pula, X ou B lançam, Start pausa. Nos menus, o direcional escolhe, A confirma e B volta.
+   O navegador só mostra o controle depois do primeiro botão apertado com a página aberta. Com controle em uso, o controle desenhado na tela some. */
+let padPrev = {}, padRep = 0;
+function setPadOn(on) { if (padOn === on) return; padOn = on; document.body.classList.toggle('pad-on', on); renderHelp(); layout(); }
+function rumble(ms, a) { try { for (const g of navigator.getGamepads ? navigator.getGamepads() : []) if (g && g.vibrationActuator && padOn) g.vibrationActuator.playEffect('dual-rumble', { duration: ms, strongMagnitude: a, weakMagnitude: a * .6 }).catch(() => {}); } catch (e) {} }
+function padLayer() {   // camada de botões em uso agora, de cima para baixo
+  const vis = el => el && !el.hidden && el.offsetParent !== null;
+  for (const el of [document.querySelector('dialog[open]'), scWin, scMode, scHelp, $('#intro'), scPause, scSoon, scTitle]) if (vis(el)) return el;
+  return null;
+}
+function padMenu(dir, ok, back) {
+  const L = padLayer(); if (!L) return false;
+  if (L.id === 'intro') { if (ok || back) introEnd(); return true; }
+  let bs = [...L.querySelectorAll('button, a[href]')].filter(b => !b.disabled && !b.hidden && b.offsetParent !== null && b.getClientRects().length && getComputedStyle(b).visibility !== 'hidden');
+  if (L === scTitle) bs = [...bs.filter(b => b.closest('.tmenu')), ...bs.filter(b => !b.closest('.tmenu'))];   // no título, o menu vem antes das pílulas e do link
+  if (!bs.length) return true;
+  let i = bs.indexOf(document.activeElement);
+  if (L === scTitle && i < 0 && ok) { titleMain(); return true; }
+  if (dir) { i = i < 0 ? 0 : (i + dir + bs.length) % bs.length; bs[i].focus({ preventScroll: false }); }
+  else if (ok) { if (i < 0) { bs[0].focus(); } else bs[i].click(); }
+  else if (back) {
+    if (L.tagName === 'DIALOG') L.close();
+    else if (L === scMode) $('#btModeBack').click();
+    else if (L === scHelp) $('#btHelpBack').click();
+    else if (L === scWin && scWin.dataset.mode === 'board') scWin.hidden = true;
+    else if (L === scPause) pause(false);
+  }
+  return true;
+}
+function pollPad() {
+  if (!navigator.getGamepads) return;
+  let g = null; try { for (const x of navigator.getGamepads()) if (x && x.connected) { g = x; break; } } catch (e) { return; }
+  if (!g) { if (padOn) setPadOn(false); padPrev = {}; return; }
+  const b = i => !!(g.buttons[i] && g.buttons[i].pressed), ax = g.axes[0] || 0, ay = g.axes[1] || 0;
+  const now = { left: b(14) || ax < -.45, right: b(15) || ax > .45, up: b(12) || ay < -.6, down: b(13) || ay > .6, jump: b(0), fire: b(2) || b(1), back: b(1), start: b(9), any: g.buttons.some(x => x.pressed) || Math.abs(ax) > .45 || Math.abs(ay) > .6 };
+  const edge = k => now[k] && !padPrev[k];
+  if (now.any && !padOn) setPadOn(true);
+  if (now.any) audioOn();
+  const inMenu = mode !== 'play' || !!padLayer();
+  if (inMenu) {
+    // nos menus: a navegação pede repetição ao segurar
+    const dirNow = now.up || now.left ? -1 : now.down || now.right ? 1 : 0;
+    let dir = 0; if (dirNow && (edge('up') || edge('down') || edge('left') || edge('right'))) { dir = dirNow; padRep = 22; } else if (dirNow && --padRep <= 0) { dir = dirNow; padRep = 9; }
+    if (mode === 'title' && padLayer() === scTitle && (edge('start'))) titleMain();
+    else if (mode === 'pause' && padLayer() === scPause && edge('start')) pause(false);
+    else padMenu(dir, edge('jump'), edge('back'));
+    for (const k of ['left', 'right', 'jump', 'fire']) if (padPrev['k_' + k]) { keys[k] = false; now['k_' + k] = false; }
+  } else {
+    if (edge('start')) pause();
+    for (const k of ['left', 'right', 'jump', 'fire']) { if (now[k] !== !!padPrev['k_' + k]) keys[k] = now[k]; now['k_' + k] = now[k]; }   // só mexe na tecla quando o controle muda: teclado e controle convivem
+    if (st && st.opening && edge('jump') && st.opening.t > 30) st.opening.t = OPEN_LEN;
+  }
+  padPrev = now;
+}
+addEventListener('gamepaddisconnected', () => { let any = false; try { any = [...navigator.getGamepads()].some(x => x && x.connected); } catch (e) {} if (!any) setPadOn(false); });
+addEventListener('pointerdown', e => { if (e.pointerType === 'touch' && padOn) setPadOn(false); }, { capture: true });   // tocou na tela: volta o controle desenhado
+
 /* ───────── Laço principal ───────── */
 let last = 0, acc = 0;
 function frame(t) {
   requestAnimationFrame(frame);
   const dt = Math.min(60, t - last); last = t;
   try {
+    pollPad();
     if (mode === 'play') { acc += dt * (st && st.slow > 0 ? SLOW_RATE : 1); let n = 0; while (acc >= 16.667 && n < 4) { step(); acc -= 16.667; n++; } if (n === 4) acc = 0; }
     render();
   } catch (e) { console.error(e); }
