@@ -18,8 +18,11 @@ O jogo está em construção: por enquanto tem a fase 1. Novas fases e atualiza�
 | Morder, montado no jacaré | X | B |
 | Descer do jacaré | Espaço de novo, no ar | A de novo, no ar |
 | Pausar | P | botão no canto da tela |
+| Tela cheia | F | botão no canto da tela (Android) |
 
-Nos portões, a afirmação aparece e você tem 10 segundos para bater a cabeça no bloco M (mito) ou F (fato).
+Nos portões, a afirmação aparece e você tem 10 segundos (15 no modo fácil) para bater a cabeça no bloco M (mito) ou F (fato).
+
+Ao começar, escolha o modo: Normal ou Fácil. O jogo salva na última bandeira tocada; na tela inicial, CONTINUAR retoma dali.
 
 ## Para quem for mexer
 

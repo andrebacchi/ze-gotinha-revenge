@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
     await p.click('#btHelp'); await p.waitForTimeout(200); await p.screenshot({ path: `o-help-${n}.png` });
     out['ajuda_' + n] = await p.evaluate(() => { const h = document.querySelector('#scHelp'), st = document.querySelector('#stage').getBoundingClientRect(), row = h.querySelector('.row').getBoundingClientRect(), h2 = h.querySelector('h2').getBoundingClientRect(); return { aberta: !h.hidden, linhas: h.querySelectorAll('dt').length, cabe: h2.top >= st.top - 1 && row.bottom <= st.bottom + 1, sobra: Math.round(st.bottom - row.bottom) }; });
     if (n === 'd') { await p.keyboard.press('Escape'); out.esc = await p.evaluate(() => document.querySelector('#scHelp').hidden); await p.click('#btHelp'); }
-    await p.click('#btHelpStart'); await p.waitForTimeout(100);
+    await p.click('#btHelpStart'); await p.waitForTimeout(100); if (await p.isVisible('#btNormal')) await p.click('#btNormal'); await p.waitForTimeout(100);
     out['inicio_' + n] = await p.evaluate(() => { document.querySelector('#btPause').click(); const s = __mg.st; return { mode: __mg.mode, abertura: !!s.opening, camY: Math.round(s.cam.y), ajuda: document.querySelector('#scHelp').hidden, titulo: document.querySelector('#scTitle').hidden }; });
     if (n === 'd') { await p.addStyleTag({ content: '#scPause{display:none!important}' }); const cv = p.locator('canvas').first();
       for (const t of [25, 110, 150, 185, 215]) { const r = await p.evaluate(`(()=>{const g=__mg,s=g.st;while(s.opening&&s.opening.t<${t})g.step();return [s.opening?s.opening.t:null,Math.round(s.cam.y),s.time]})()`); await p.waitForTimeout(80); await cv.screenshot({ path: `o-open-${t}.png` }); out['t' + t] = r; }

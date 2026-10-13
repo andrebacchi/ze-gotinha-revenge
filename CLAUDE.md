@@ -19,7 +19,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Servem de referência: dependem das imagens originais, que ficam com o André e não estão no repositório.
 - `tools/testes/`: testes com Playwright. `sh montar.sh` gera `page.html` (sem cartões nem abertura, para testar mecânica) e `page_intro.html` (jogo completo);
   depois `NODE_PATH=$(npm root -g) node t7.js` e os demais. O jogo expõe `window.__mg = { st, mode, keys, step, start, bossStart, tileAt, answer, introStart }`
-  e respeita `window.__mgNoIntro` (pula abertura, cartões e a comemoração do fim).
+  e respeita `window.__mgNoIntro` (pula abertura, cartões e a comemoração do fim) e `window.__mgNoSave` (não grava jogo salvo).
 
 ## Toda atualização
 
@@ -34,6 +34,9 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 
 - **Tela:** canvas 2D com resolução interna de 320 × 180, ampliado por fator inteiro, sem suavização. Blocos de 16 px; a fase tem 176 × 14 blocos e o chão fica na linha 12.
   Laço fixo de 60 passos por segundo. Telas e cartões são HTML por cima do canvas.
+  O painel de mensagens fica embaixo do palco só no celular em pé (`pointer: coarse` com sobra de altura). No computador e no celular deitado (`.app.wide`) as mensagens e a pergunta
+  do portão ficam sobre o jogo, como o André pediu. Palco de até 1600 px fora da tela cheia.
+  **Tela cheia:** pílula "Tela cheia" no título, botão no canto do jogo e tecla F (`toggleFull()`, classe `.app.full`). Some onde o navegador não deixa (iPhone).
 - **Fase:** `buildLevel()` monta o mapa com os auxiliares `hl`, `vl`, `set`, `pit`, `water`, `gota(s)`, `syr`, `mplat`, `E`, `Q`, `gate`.
   Blocos: `#` chão, `B` tijolo, `?` surpresa, `U` usado, `=` madeira (só segura por cima), `^` espinhos, `G` grade, `M`/`F` mito e fato, `~` água, `L` vitória-régia.
 - **Artes:** cada conjunto tem um objeto com medidas e a folha em data URI (`ZE_ART`, `ZE_BIG`, `EXTRA_ART`, `JAC_ART`, `ITEM_ART`, `BOSS_ART`, `ENEMY_ART`, `SCENE_ART`, `BG_ART`, `AURA_ART`).
@@ -59,6 +62,13 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 
 ## Regras do jogo (decisões do André)
 
+- **Modos:** escolhidos em "Modo de jogo" ao começar um jogo novo (`DIFF`, `DF()`, `st.diff`). Normal é a fase e o chefão como foram feitos. Fácil: chefão com 8 de vida em vez de 12,
+  mais lento, com menos tiros e mais tempo cansado; 15 segundos nas perguntas; escudo de imunidade a cada vida; sem os boatos que caem na segunda metade da luta. O placar marca "· fácil".
+  "Jogar de novo" e "Recomeçar a fase" mantêm o modo da partida.
+- **Jogo salvo:** ao tocar uma bandeira (posto), o jogo grava em localStorage `mg-salvo` a fase, a bandeira, o modo, o tempo, inimigos, power-ups, portões e cartões já vistos.
+  Um jogo novo grava a partida no começo da fase. A tela de título mostra CONTINUAR (com fase, posto e modo) e NOVO JOGO; sem jogo salvo, PRESS START leva à escolha do modo.
+  Ao continuar, inimigos e itens antes da bandeira ficam resolvidos e os portões para trás, abertos (`applySave()`). Vencer a fase apaga o jogo salvo.
+
 - **Vida como no Mario:** no tamanho original, um golpe derruba. O SUS deixa o Zé "sarado" (não escreva "bombado" nos textos): ele aguenta um golpe e volta ao tamanho original. O escudo de imunidade é uma proteção extra, gasta antes do SUS.
 - **Gotas** são coletáveis e valem pontos; qualquer morte zera as gotas juntadas.
 - **Seringas:** no máximo 3; repostas pela fase e nos postos. A dose de reforço dá tiro triplo sem gastar por 10 segundos.
@@ -66,7 +76,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 - **Jacaré (montaria):** nasce do ovo no ninho. Atravessa a água nadando (o Zé sozinho se afoga). Qualquer golpe, em terra ou na água, faz o jacaré fugir: ele corre, não para na beirada,
   nada se cair na água e some se cair no buraco (o ovo volta ao ninho). Pulo de novo no ar, montado, é o pulo duplo: o Zé salta mais alto e desce, e o jacaré fica parado esperando.
   Há três plataformas altas que só o pulo duplo alcança (conferido por força bruta em `tools/testes/t37.js`). Com um jacaré, outro ovo vira bônus.
-- **Mito ou fato:** três portões. A afirmação aparece, o jogador tem 10 segundos e responde batendo a cabeça no bloco M ou F. Erro ou tempo esgotado soltam boatos e trocam a afirmação.
+- **Mito ou fato:** três portões. A afirmação aparece, o jogador tem 10 segundos (15 no fácil) e responde batendo a cabeça no bloco M ou F. Erro ou tempo esgotado soltam boatos e trocam a afirmação.
   O resultado pausa o jogo com um cartão de explicação.
 - **Cartões de apresentação:** na primeira vez que cada inimigo, item, o jacaré e o portão aparecem, o jogo congela, dá zoom e explica. Voltam a cada partida nova.
 - **Abertura da fase:** a câmera desce do céu com o nome da fase. A tela de título não mostra nome de fase nem controles; os controles ficam no botão CONTROLES.
