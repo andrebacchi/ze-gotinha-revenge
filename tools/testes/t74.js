@@ -1,11 +1,17 @@
-// Fase 2: travessia do rio a pé pela roda d'água (pula na pá, dá a volta por cima, pula para as tábuas e a margem)
+// Fase 2: travessia do rio a pé pela roda d'água, com os miasmas vivos: em quantos momentos dá para embarcar na pá, e desses quantos chegam à tábua do outro lado (normal e sarado)
 const { chromium } = require('playwright');
 (async () => { const b = await chromium.launch(); const p = await (await b.newContext()).newPage(); await p.addInitScript('window.__mgNoSave=1');
-  await p.goto('file://' + __dirname + '/page.html'); await p.waitForTimeout(700);
-  console.log(await p.evaluate(() => { const g = window.__mg, K = g.keys, T = 16; g.startFase(2); const s0 = g.st; s0.opening = null; for (const e of s0.enemies) e.dead = true; for (const j of s0.jacs) j.state = 'spent';
-    s0.p.x = 205 * T + 2; s0.p.y = 12 * T - 24; for (let i = 0; i < 3; i++) g.step(); const root = structuredClone(g.st); const out = [];
-    const pas = g.st.plats.filter(q => q.kind === 'pa').map(q => [Math.round(q.x), Math.round(q.y)]); out.push('pas ' + JSON.stringify(pas));
-    K.right = true; let jt = -1; for (let i = 0; i < 160; i++) { const P = g.st.p; if (jt < 0 && P.x >= 208 * T + 4) { jt = i; K.jump = true; } if (i === jt + 16) K.jump = false; g.step(); if (jt >= 0 && i > jt + 4 && P.onG) break; } K.right = K.jump = false;
-    for (let i = 0; i < 336; i++) { g.step(); const P = g.st.p; if (i % 80 === 0) out.push(i + ' x=' + (P.x / T).toFixed(2) + ' pe=' + ((P.y + P.h) / T).toFixed(2) + ' plat=' + !!P.plat + ' dead=' + P.dead); if (P.dead) break; }
-    K.right = true; K.jump = true; for (let i = 0; i < 200; i++) { if (i === 14) K.jump = false; if (i === 60 || i === 110) K.jump = true; if (i === 74 || i === 124) K.jump = false; g.step(); const P = g.st.p; if (i % 10 === 0) out.push('salto ' + i + ' x=' + (P.x / T).toFixed(2) + ' pe=' + ((P.y + P.h) / T).toFixed(2) + ' onG=' + P.onG + ' dead=' + P.dead); if (P.dead) break; } K.right = false;
-    return out.join('\n'); })); await b.close(); })();
+  await p.goto('file://' + __dirname + '/page.html'); await p.waitForTimeout(800);
+  const r = await p.evaluate(() => { const g = window.__mg, K = g.keys, T = 16, out = {};
+    let RR = 10; const run = (big, d, w) => { g.startFase(2); const s = g.st; s.opening = null; s.hints.move = s.hints.fire = 1; for (const e of s.enemies) if (e.t !== 'miasma') e.dead = true; for (const j of s.jacs) j.state = 'spent';
+      s.p.big = big; s.p.h = big ? 32 : 24; s.p.w = big ? 14 : 10; s.p.x = 207.6 * T; s.p.y = 12 * T - s.p.h; for (let i = 0; i < d; i++) g.step();
+      K.right = true; K.jump = true; let on = false; for (let i = 0; i < 70; i++) { if (i === 16) K.jump = false; g.step(); const P = s.p; if (P.plat && P.plat.kind === 'pa') { on = true; break; } if (P.dead || (P.onG && i > 3)) break; } K.right = K.jump = false;
+      if (!on) return 0; for (let i = 0; i < w; i++) { g.step(); if (s.p.dead) return 1; }
+      const st0 = g.st; let best = 1; for (const rr of [6, 10, 14, 18, 24, 32]) { /* sem clonar: cada rr refaz do zero */ }
+      K.right = true; K.jump = true; for (let i = 0; i < 90; i++) { if (i === 16) K.jump = false; if (i === RR) K.right = false; g.step(); if (s.p.dead) return 1; if (s.p.onG && i > 4) break; }
+      K.right = K.jump = false; return !s.p.dead && s.p.onG && Math.abs(s.p.y + s.p.h - 9 * T) < 1 && s.p.x > 215.5 * T ? 2 : 1; };
+    for (const big of [false, true]) { let emb = 0, atr = 0, tot = 0, pares = 0;
+      for (let d = 0; d < 524; d += 12) { tot++; let best = 0; for (let w = 0; w < 330; w += 10) for (const rr of [8, 14, 20, 28]) { RR = rr; const r = run(big, d, w); if (r === 0) { w = 999; break; } best = Math.max(best, r); if (r === 2) pares++; } if (best >= 1) emb++; if (best === 2) atr++; }
+      out[big ? 'sarado' : 'normal'] = { tot, embarca: emb, atravessa: atr, pares }; }
+    return out; });
+  console.log(JSON.stringify(r)); await b.close(); })();

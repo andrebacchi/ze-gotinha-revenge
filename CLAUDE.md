@@ -106,7 +106,7 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
   Com mais de uma fase liberada, a tela de modo mostra a escolha de fase e o título ganha o botão FASES (abre a escolha já na fase mais nova; CONTINUAR segue o jogo salvo). Na pré-visualização (artefato, `ESBOCO`) a fase 2 já vem liberada.
 - Placar por fase: fase 1 em `mg-placar`, fase 2 em `mg-placar-2`, com abas no placar da tela inicial.
 - Testes da fase 2: `t70.js` (capturas de cada trecho), `t71.js` (as duas balanças se resolvem), `t72.js` (robô atravessa a mina no vagonete, normal e fácil),
-  `t73.js` (força bruta nos sinos), `t74.js` (travessia do rio pela roda d'água), `t75.js` (decolagem, chefão e vitória), `t76.js` (telas de fase no computador e no celular), `t77.js` (botão FASES no título com jogo salvo).
+  `t73.js` (força bruta nos sinos), `t74.js` (força bruta na roda d'água a pé, com os miasmas: embarque e chegada à tábua), `t75.js` (decolagem, chefão e vitória), `t76.js` (telas de fase no computador e no celular), `t77.js` (botão FASES no título com jogo salvo).
   `t56.js` e `t57.js` são de antes da tela de modo e já falhavam na versão publicada.
 
 ## Fase 2: Arraial do Antigamente (esboço)
@@ -120,16 +120,20 @@ blocos do cenário (`ATLAS2.til`, `tools/arte/tiles2.py`: recorta por dentro do 
 e balança (`ATLAS2.bal`: evidência, tradição, prato desenhado inteiro sobre a balança, porta desenhada inteira a partir do bloco D de cima à esquerda, bloco ↺, lampião).
 Fundo: céu e faixas de nuvens, serra com igrejas e muro da frente (`FUNDO2`, `tools/arte/fundo2.py`, escala 0,3); casario (escala 0,19, as duas faixas emendadas) e parede da mina
 (`FUNDO_MINA`, escala 0,29, escurecida 42%), ambos com `tools/arte/faixas2.py`.
-**Casarões:** `drawCasa()` pinta por cima dos blocos W e T: parede lisa com manchas de cal, cunhais (5 px), barrado (7 px) e cimalha na cor do casarão (`CASA_COR`, tons apagados; o azul saturado ficou pesado, o André reprovou) e beiral com ponta de caibros.
-Objetos ainda provisórios (prompt 12 enviado): roda d'água, andaime, placa do peso, poste do varal, entrada da mina. Música da fase: prompt 13 enviado.
+**Casarões:** `drawCasa()` pinta por cima dos blocos W e T: parede lisa, umidade em pontilhado perto do chão, um remendo de reboco caído com adobe, cunhais (6 px, com luz, sombra e capitel), barrado e cimalha na cor do casarão
+(`CASA_COR`, tons apagados; o azul saturado ficou pesado, o André reprovou) e beiral com forro escuro. As manchas de cal em traço foram reprovadas (e um índice negativo as espalhava pelo telhado).
+Objetos com a arte do André (`ATLAS2.obj`): roda d'água, andaime, placa do peso, poste do varal (desenhado 1,4 vez mais largo) e entrada da mina (`drawBoca()`: armação numa encosta de pedra com o vão escuro).
+**Barril** é degrau: plataforma `kind: 'barril'` no topo de cada barril de enfeite.
+**Alcance (o André cobrou):** todo salto obrigatório precisa dar a pé, com o Zé normal, sem o jacaré, salvo o que é bônus do pulo duplo (tábua do escudo em 239 a 241, conferida montado).
+Conferir com robô de força bruta antes de publicar (`t73.js`, `t74.js`).
 **Proporções (pedido do André):** porta, janela e barril têm tamanho próprio, não cabem num bloco de 16 px. A porta tem 36 px (um pouco mais alta que o Zé), a janela uns 22 (a cabeça dele),
 o barril uns 23 (altura do peito). Por isso os casarões têm 3 a 4 blocos de parede, e a fachada (`s.facade`) é desenhada solta por cima da parede lisa; sacadas de tábua servem de degrau para o telhado.
-**Varal:** plataforma `kind: 'varal'` entre dois postes; cede até 9 px onde o Zé pisa (mola, balança ao sair) e as roupas são desenhadas em código (`drawVaral`, seis tipos, dez cores).
+**Varal:** plataforma `kind: 'varal'` entre dois postes; cede até 9 px onde o Zé pisa (mola, balança ao sair) e as roupas são desenhadas em código (`drawVaral`, seis tipos, dez cores, 1,5 vez o tamanho do primeiro esboço e contorno na cor da peça: o contorno preto foi reprovado).
 **Muro com caco de vidro:** só os cacos da arte (`cac`), sobre muro caiado. As paredes repetidas mostram uma emenda leve entre blocos.
 Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e frasco · morcego, pedra, miasma, retrato · passarola, balão do Barão, vagonete, sino · blocos do cenário · balança · fundo. A música da fase é `audio/fase2.mp3` ("Gold Rush at Sunset", do gerador, com fade de 2 s; `music('stage')` troca para `stage2` na fase 2); a de chefe e a de vitória valem para todas.
   O céu (`FUNDO2.ceu`) teve a paleta deslocada uma faixa para o quente, para o laranja aparecer na descida da câmera (pedido do André).
 - **Trechos:** ruas e telhados (casarões `W`/`T`, telhas soltas `C` que caem 24 quadros depois do pisão e voltam em 5 s, varal `V`, muro com caco de vidro; tábuas em escada no vão antes do muro, porque quem caía ali não voltava) · igreja em obra (sinos em pêndulo
-  sobre o vão, boticário no balcão, andaime que sobe e desce, balança 1) · mina no vagonete (102 a 188) · rio com jacaré, miasmas e roda d'água · balança 2 · portão 3 e passarola. Postos em 57, 100, 202, 271, 286.
+  sobre o vão, boticário no balcão, andaime que sobe e desce, balança 1) · mina no vagonete (102 a 188) · rio com jacaré, miasmas e roda d'água (pá de baixo 14 px acima do chão, rente à margem; a dose de reforço fica no `?` em 223, antes do boticário, e não junto da balança) · balança 2 · portão 3 e passarola. Postos em 57, 100, 202, 271, 286.
 - **Balança da evidência** (no máximo duas, decisão do André): blocos empurráveis (`s.blocks`); evidência (lupa) pesa 1, tradição (moldura dourada) pesa zero. O prato `P` conta as evidências apoiadas nele,
   direto ou em pilha (`onPan`). Duas evidências abrem a porta `D`. O bloco cai quando o meio dele passa da beirada e encaixa no vão. Tradição que cai num buraco fundo é descartada; evidência volta ao lugar.
   O bloco `O` recoloca os blocos. Balança 1: as tradições vão para o fundo do prato e as evidências descem do andaime (a que cai no prato precisa ser empurrada até o fim antes da segunda).
@@ -139,7 +143,8 @@ Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e fras
 - **Inimigos novos:** sanguessuga (chão ou teto), os quatro humores (saltam), boticário (frascos em arco, 2 de vida), miasma (não morre, só desvia), morcego, pedra; voltam boato, fake news e vírus.
 - **Perguntas:** `QS2`, sobre tradição. Os fatos aguardam a revisão do André.
 - **Chefão no ar:** a passarola (Bartolomeu de Gusmão, 1709) decola com câmera subindo. No ar: setas movem, pulo esquenta o ar (segurar sobe sem parar), seringa normal; telhado embaixo machuca.
-  O Barão tem camadas de poeira dos séculos (3 no normal, 2 no fácil): cada seringa arranca uma; sem poeira ele fica exposto e aí seringa tira 1 e pisão 2 de vida (12 no normal, 8 no fácil).
+  Sem escudo (o André tirou as camadas de poeira: eram o que deixava a luta difícil demais). Toda seringa tira 1; depois de cada investida ele cansa (`exposed`) e o pisão tira 2. Vida 10 no normal, 7 no fácil;
+  retratos mais lentos e mais espaçados. Os retratos-inimigos da segunda metade vêm uma vez só.
   Ataques: retratos de antepassados teleguiados e investida horizontal com aviso. Na segunda metade, SUS uma vez e retratos-inimigos. Seringas chegam em balõezinhos.
   Morrer no ar volta ao posto 5, no chão. Vitória: o balão vai ao centro, "Fase 2 completa" e sobe.
 
