@@ -120,7 +120,7 @@ blocos do cenário (`ATLAS2.til`, `tools/arte/tiles2.py`: recorta por dentro do 
 e balança (`ATLAS2.bal`: evidência, tradição, prato desenhado inteiro sobre a balança, porta desenhada inteira a partir do bloco D de cima à esquerda, bloco ↺, lampião).
 Fundo: céu e faixas de nuvens, serra com igrejas e muro da frente (`FUNDO2`, `tools/arte/fundo2.py`, escala 0,3); casario (escala 0,19, as duas faixas emendadas) e parede da mina
 (`FUNDO_MINA`, escala 0,29, escurecida 42%), ambos com `tools/arte/faixas2.py`.
-**Casarões:** `drawCasa()` pinta por cima dos blocos W e T: parede lisa com manchas de cal, cunhais, barrado e cimalha na cor do casarão (`CASA_COR`, varia de um para outro) e beiral com ponta de caibros.
+**Casarões:** `drawCasa()` pinta por cima dos blocos W e T: parede lisa com manchas de cal, cunhais (5 px), barrado (7 px) e cimalha na cor do casarão (`CASA_COR`, tons apagados; o azul saturado ficou pesado, o André reprovou) e beiral com ponta de caibros.
 Objetos ainda provisórios (prompt 12 enviado): roda d'água, andaime, placa do peso, poste do varal, entrada da mina. Música da fase: prompt 13 enviado.
 **Proporções (pedido do André):** porta, janela e barril têm tamanho próprio, não cabem num bloco de 16 px. A porta tem 36 px (um pouco mais alta que o Zé), a janela uns 22 (a cabeça dele),
 o barril uns 23 (altura do peito). Por isso os casarões têm 3 a 4 blocos de parede, e a fachada (`s.facade`) é desenhada solta por cima da parede lisa; sacadas de tábua servem de degrau para o telhado.

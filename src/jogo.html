@@ -1924,15 +1924,15 @@ function plat2(pl) {
 }
 /* Casarão colonial desenhado por cima dos blocos W e T: parede lisa com manchas leves, cunhais nos cantos, barrado embaixo,
    cimalha sob o telhado e beiral para fora da parede, com a ponta dos caibros. Cores variam de um casarão para o outro. */
-const CASA_COR = [['#f1ead8', '#d9cfb6', '#2f6fb3', '#1d4c80'], ['#efd690', '#d4b86a', '#3f7a3a', '#28542a'], ['#dce8ee', '#bccdd6', '#8a2f2a', '#5e1f1c'], ['#f1ead8', '#d9cfb6', '#c99a3a', '#8a6420']];
+const CASA_COR = [['#f1ead8', '#ddd3bb', '#7593b0', '#55718e'], ['#ecd79c', '#d6bd7e', '#6f8f62', '#506d46'], ['#e3e9ea', '#c8d2d5', '#9c5a48', '#764234'], ['#f1ead8', '#ddd3bb', '#c4a466', '#9a7f48']];   // tons apagados de cal e de tinta antiga
 function drawCasa(h) {
   const [parede, mancha, cor, sombra] = CASA_COR[h.n % CASA_COR.length], x0 = h.a * T - camX, x1 = (h.b + 1) * T - camX, yr = h.top * T - camY, y0 = (h.top + 1) * T - camY, yb = G * T - camY;
   if (x1 < -12 || x0 > VW + 12) return;
   const R = (x, y, w, hh, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, hh); };
   R(x0, y0, x1 - x0, yb - y0, parede);
   for (let i = 0; i < (x1 - x0) * (yb - y0) / 60; i++) { const k = (i * 2654435761 + h.a * 97) >>> 0; R(x0 + 5 + k % (x1 - x0 - 10), y0 + 6 + (k >> 8) % (yb - y0 - 18), 2 + (k >> 3) % 3, 1, mancha); }   // manchas de cal
-  R(x0, yb - 10, x1 - x0, 10, cor); R(x0, yb - 10, x1 - x0, 1, sombra); R(x0, yb - 11, x1 - x0, 1, mancha);   // barrado
-  for (const cx of [x0, x1 - 6]) { R(cx, y0, 6, yb - y0, cor); R(cx + (cx === x0 ? 5 : 0), y0, 1, yb - y0, sombra); R(cx + (cx === x0 ? 1 : 4), y0, 1, yb - y0, parede); }   // cunhais
+  R(x0, yb - 7, x1 - x0, 7, cor); R(x0, yb - 7, x1 - x0, 1, sombra);   // barrado
+  for (const cx of [x0, x1 - 5]) { R(cx, y0, 5, yb - y0, cor); R(cx + (cx === x0 ? 4 : 0), y0, 1, yb - y0, sombra); }   // cunhais
   R(x0 - 2, y0, x1 - x0 + 4, 3, parede); R(x0 - 2, y0 + 3, x1 - x0 + 4, 1, mancha); R(x0 - 2, y0 + 4, x1 - x0 + 4, 2, 'rgba(40,24,16,.35)');   // cimalha e a sombra do beiral
   if (SPR2.T) { const rt = SPR2.T; ctx.drawImage(rt, 0, 0, 8, T, x0 - 7, yr + 2, 8, T - 2); ctx.drawImage(rt, 8, 0, 8, T, x1 - 1, yr + 2, 8, T - 2); }   // beiral para fora das paredes
   R(x0 - 7, yr + T, x1 - x0 + 14, 1, K); for (let x = x0 - 5; x < x1 + 5; x += 5) R(x, yr + T + 1, 2, 2, '#5a3a22');   // ponta dos caibros
