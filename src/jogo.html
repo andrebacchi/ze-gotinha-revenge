@@ -1171,6 +1171,10 @@ function hurt(fromX) {
     const wet = overWater(p); dismount(true, away); hitstop(6); shake(12, 3); p.hurtT = 16; p.inv = 90; p.vy = wet ? -4.4 : -3.2; p.vx = away * (wet ? 1.2 : 1.6); p.stun = 12; p.canCut = false; sfx('hurt'); txt(p.x, p.y - 6, 'O jacaré fugiu!', '#ffe27a'); return;
   }
   if (p.shield) { p.shield = false; hitstop(5); shake(8, 2); p.hurtT = 12; p.inv = 70; burst(p.x + 5, p.y + 10, '#46e0d0', 6); auraFx(p.big ? 'b' : 's', 3, 5, p.x + p.w / 2, p.y + p.h / 2 - 2); sfx('pop'); return; }
+  if (p.air && p.bHp > 1) {   // o balão aguenta um golpe: fura e segue voando; o segundo murcha
+    p.bHp--; hitstop(7); shake(14, 3); p.hurtT = 16; p.inv = 110; p.vx = away * 1.4; p.vy = .6; sfx('hurt'); burst(p.x + p.w / 2, p.y - 30, '#e8dcc2', 8); txt(p.x + p.w / 2, p.y - 50, 'O balão furou!', '#ff8fa3');
+    hintOnce('furo', '<span><b class="tag">Furou.</b> Mais um golpe e o balão murcha.</span>', 220); return;
+  }
   hitstop(7); shake(14, 3); p.hurtT = 16;
   if (!p.big) { die(); return; }            // tamanho original: um golpe derruba
   setBig(false); p.inv = 110; p.canCut = false; sfx('hurt');   // sarado: volta ao tamanho original
@@ -1687,7 +1691,7 @@ function camAir() {
 }
 function startAir() {
   const s = st, p = s.p; s.launch = null; s.air = { t: 0, spawn: 150, sup: 0 };
-  p.air = true; p.x = 50; p.y = 110; p.vx = 0; p.vy = -1; p.inv = 60; p.w = 18; p.h = 20; p.face = 1; p.onG = false; p.plat = null; p.flapT = 0;
+  p.air = true; p.bHp = 2; p.x = 50; p.y = 110; p.vx = 0; p.vy = -1; p.inv = 60; p.w = 18; p.h = 20; p.face = 1; p.onG = false; p.plat = null; p.flapT = 0;
   s.cam.x = 0; s.cam.y = 0; s.shots.length = 0; s.eshots.length = 0;
   baronStart(); writeSave();
 }
@@ -2098,6 +2102,10 @@ function drawZeBalloon() {
   if (V) spr(V.passarola, Math.round(cx - V.passarola.width / 2), y + p.h - V.passarola.height + 1);
   else { spr(SPR2.envelope, cx - 20, y - 46); ctx.fillStyle = '#5a3a22'; ctx.fillRect(cx - 9, y - 3, 1, 14); ctx.fillRect(cx + 8, y - 3, 1, 14); }
   if (p.flapT > 7) { ctx.fillStyle = (s.time >> 1) & 1 ? '#ffd23f' : '#ff8a3a'; ctx.fillRect(cx - 1, y - 4, 3, 5); }
+  if (V && p.bHp === 1) {   // furado: remendo com pontos e ar escapando
+    const px = cx + 5, py = y + p.h - V.passarola.height + 16; ctx.fillStyle = K; ctx.fillRect(px - 1, py - 1, 8, 8); ctx.fillStyle = '#c9b994'; ctx.fillRect(px, py, 6, 6); ctx.fillStyle = '#7a5a3a'; for (let i = 0; i < 3; i++) { ctx.fillRect(px + 1 + i * 2, py - 2, 1, 2); ctx.fillRect(px + 1 + i * 2, py + 6, 1, 2); }
+    if (!s.vic && s.time % 12 === 0) s.parts.push({ x: px + 7 + camX, y: py + 2 + camY, vx: .7, vy: -.2, t: 18, c: '#e8dcc2', g: 0 });
+  }
   const big = p.growT > 0 && (s.time >> 2) & 1 ? !p.big : p.big;
   drawZeVehicle(x, y, big, p.face < 0);
   if (p.shield) { const U = SPR.aura; if (U) { const im = U.b[[0, 1, 2, 1][(s.time / 7 | 0) & 3]]; ctx.globalAlpha = .9; spr(im, cx - im.width / 2, y + 4 - im.height / 2); ctx.globalAlpha = 1; } }
@@ -2145,7 +2153,12 @@ function renderAir() {
   for (const a of s.parts) { ctx.fillStyle = a.c; ctx.fillRect(Math.round(a.x - camX), Math.round(a.y - camY), 2, 2); }
   for (const a of s.texts) label(a.s, Math.round(a.x - camX), Math.round(a.y - camY), a.c, 7);
 }
-function hud2() {   // camadas de poeira que ainda cobrem o Barão
+function hud2() {   // camadas de poeira que ainda cobrem o Barão (hoje zero) e as vidas do balão
+  { const p = st.p; if (p.air) for (let i = 0; i < 2; i++) {   // vidas do balão, embaixo das seringas
+    const x = 6 + i * 11, y = 26, on = i < p.bHp, R = (a, b, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x + a, y + b, w, h); };
+    R(1, 0, 6, 1, K); R(0, 1, 8, 6, K); R(1, 7, 6, 1, K); R(2, 8, 4, 1, K); R(3, 9, 2, 3, K);
+    R(1, 1, 6, 6, on ? '#e8c26a' : '#3a2a55'); R(2, 7, 4, 1, on ? '#c9953a' : '#3a2a55'); R(3, 1, 2, 6, on ? '#3f8f7a' : '#2b2238'); if (on) R(2, 2, 1, 2, '#fff3c4'); R(3, 10, 2, 1, '#8a5a32');
+  } }
   const b = st.boss; for (let i = 0; i < DF().b2Layers; i++) { ctx.fillStyle = K; ctx.fillRect(VW / 2 + 56 + i * 7, 13, 6, 6); ctx.fillStyle = i < b.layers && b.st !== 'exposed' ? '#c9b994' : '#3a2a55'; ctx.fillRect(VW / 2 + 57 + i * 7, 14, 4, 4); }
 }
 

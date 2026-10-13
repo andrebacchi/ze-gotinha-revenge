@@ -147,6 +147,7 @@ Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e fras
   Sem escudo (o André tirou as camadas de poeira: eram o que deixava a luta difícil demais). Toda seringa tira 1; depois de cada investida ele cansa (`exposed`) e o pisão tira 2. Vida 10 no normal, 7 no fácil;
   retratos mais lentos e mais espaçados. Os retratos-inimigos da segunda metade vêm uma vez só.
   Ataques: retratos de antepassados teleguiados e investida horizontal com aviso. Na segunda metade, SUS uma vez e retratos-inimigos. Seringas chegam em balõezinhos.
+  O balão aguenta um golpe (`p.bHp`, 2 vidas, pedido do André): fura, ganha um remendo com ar escapando e as vidas aparecem embaixo das seringas; o segundo golpe murcha. Escudo e SUS continuam valendo por cima.
   Morrer no ar volta ao posto 5, no chão. Vitória: o balão vai ao centro, "Fase 2 completa" e sobe.
 
 ## Pendências e ideias em aberto
