@@ -662,10 +662,10 @@ const SND = { jump: ['square', 330, 620, .12, .05], shot: ['triangle', 880, 440,
 /* ───────── Música ─────────
    Faixas em arquivos à parte (audio/). Cada uma termina em silêncio e recomeça: o navegador não emenda MP3 sem um pequeno vão.
    Navegador nenhum deixa tocar antes do primeiro toque ou tecla; por isso a do título começa no primeiro gesto. */
-const MUSIC = { title: 'audio/titulo.mp3', stage: 'audio/fase1.mp3', boss: 'audio/chefe.mp3' };   // a de chefe vale para toda luta de chefe
+const MUSIC = { title: 'audio/titulo.mp3', stage: 'audio/fase1.mp3', boss: 'audio/chefe.mp3', vic: 'audio/vitoria.mp3' };   // a de chefe vale para toda luta de chefe; a de vitória toca uma vez só
 const tracks = {}; let curMusic = null;
 function applyMusic() {
-  const a = curMusic && tracks[curMusic]; if (!a) return;
+  const a = curMusic && tracks[curMusic]; if (!a || (a.ended && !a.loop)) return;   // a fanfarra que já acabou não recomeça
   if (!muted && !document.hidden && mode !== 'pause') a.play().catch(() => {}); else a.pause();
 }
 function music(name) {   // troca a faixa (null = silêncio); pedir a mesma de novo não reinicia
@@ -673,7 +673,7 @@ function music(name) {   // troca a faixa (null = silêncio); pedir a mesma de n
   if (name === curMusic) { applyMusic(); return; }
   if (curMusic && tracks[curMusic]) tracks[curMusic].pause();
   curMusic = name; if (!name) return;
-  let a = tracks[name]; if (!a) { a = tracks[name] = new Audio(MUSIC[name]); a.loop = true; a.preload = 'auto'; a.volume = .5; }
+  let a = tracks[name]; if (!a) { a = tracks[name] = new Audio(MUSIC[name]); a.loop = name !== 'vic'; a.preload = 'auto'; a.volume = .5; }
   try { a.currentTime = 0; } catch (e) { /* ainda sem dados */ }
   applyMusic();
 }
@@ -1175,7 +1175,7 @@ function stepOpening(jp, sp) {
 /* ───────── Vitória sobre o chefão ─────────
    O golpe final deixa o jogo em câmera lenta. Depois o Zé comemora (preparo, salto, pose), aparece "Fase N completa"
    e a câmera sobe para o céu, o inverso da abertura. O tempo da partida já parou em finalT. Pulo ou seringa encerram antes. */
-const SLOW_STEPS = 40, SLOW_RATE = .3, V_PREP = 16, V_POSE = 44, V_TEXT = 60, V_RISE = 110, V_RISE_LEN = 150, V_END = 290;
+const SLOW_STEPS = 40, SLOW_RATE = .3, V_PREP = 16, V_POSE = 44, V_TEXT = 60, V_RISE = 110, V_RISE_LEN = 270, V_END = 470;   // fanfarra: o acorde final cai 6,3 s depois do preparo (passo 379), quando a câmera chega ao céu
 function stepVictory(jp, sp) {
   const s = st, p = s.p, v = s.vic; v.t++;
   if (p.ride) {   // montado: desce e o jacaré fica esperando atrás
@@ -1184,11 +1184,11 @@ function stepVictory(jp, sp) {
     j.x = p.x + w / 2 - j.w / 2 - p.face * 26; j.y = bottom - j.h; j.t = 0; j.dir = p.face; j.vx = 0; j.vy = 0; j.state = 'idle';
   }
   const kk = Object.assign({}, keys); for (const k in keys) keys[k] = false; stepPlayer(false, false); Object.assign(keys, kk);   // sem comando: só a física, até pousar
-  if (v.g < 0) { if (p.onG && Math.abs(p.vx) < .3 && v.t > 20) { v.g = 0; p.vx = 0; p.inv = 0; p.shootT = 0; p.growT = 0; p.boost = 0; } return; }
+  if (v.g < 0) { if (p.onG && Math.abs(p.vx) < .3 && v.t > 20) { v.g = 0; p.vx = 0; p.inv = 0; p.shootT = 0; p.growT = 0; p.boost = 0; music('vic'); } return; }
   if (v.done) return;
   v.g++; p.vx = 0;
   if (v.g === V_PREP) sfx('jump');
-  if (v.g === V_POSE) { sfx('win'); burst(p.x + p.w / 2, p.y + p.h - 2, '#ffd23f', 10); burst(p.x + p.w / 2, p.y + 4, '#fff', 6); }
+  if (v.g === V_POSE) { burst(p.x + p.w / 2, p.y + p.h - 2, '#ffd23f', 10); burst(p.x + p.w / 2, p.y + 4, '#fff', 6); }
   if (v.g >= V_END || (v.g > V_POSE + 30 && (jp || sp))) { v.done = true; win(); }
 }
 
@@ -1511,7 +1511,7 @@ function renderBoard(meId) {
   $('#sEmpty').hidden = board.length > 0;
 }
 function win() {
-  music(null); mode = 'win'; const s = st, sc = score(true); setMsg(''); msgTTL = 0;
+  if (curMusic !== 'vic') music(null); mode = 'win'; const s = st, sc = score(true); setMsg(''); msgTTL = 0;
   lastRun = { sc, t: s.finalT || s.time, id: null };
   const first = s.gates.filter(g => g.open && !g.err).length, errs = s.gates.reduce((a, g) => a + (g.err || 0), 0), kills = s.kills.boato + s.kills.fake + s.kills.virus;
   const rows = [

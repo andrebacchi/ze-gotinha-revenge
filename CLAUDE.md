@@ -12,7 +12,7 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
 - `src/jogo.html` é a fonte: um arquivo só, com estilos, marcação, código e todas as artes em data URI. Não tem dependência além das fontes do Google.
   `sh build.sh` gera `index.html` e `sw.js` na raiz (arquivos gerados: não edite à mão). `sh build.sh artifact` gera `dist/artifact.html`, a versão de artefato
   (sem instalação nem service worker; o link do BACCHI LAB abre em nova aba). O build troca os marcadores `__PWA__`, `__VERSAO__`, `__QR__`, `__HUB__` e `__HUB_ALVO__`.
-- `audio/`: músicas em MP3 (96 kbps). `titulo.mp3` toca na tela de título, `fase1.mp3` na fase e `chefe.mp3` em toda luta de chefe. No artefato, publique os três como arquivos de apoio (`audio/...`).
+- `audio/`: músicas em MP3 (96 kbps). `titulo.mp3` toca na tela de título, `fase1.mp3` na fase, `chefe.mp3` em toda luta de chefe e `vitoria.mp3` (uma vez, sem laço) na comemoração do fim de fase. No artefato, publique os quatro como arquivos de apoio (`audio/...`).
 - `src/qr.svg`: QR code do endereço do jogo (fixo; gerado com o `qrcode.js` do repositório `bacchilab`, nível M, margem de 2 módulos).
 - `icons/`: ícones do app. `tools/icone.py` gera todos a partir do rosto do Zé (quadro parado do sprite, `tools/ze_2x.png` e `tools/head_1.png`) sobre o céu do jogo.
 - `tools/arte/`: scripts usados para recortar e reduzir as artes (chroma key, redução por maioria, contorno refeito, empacotamento em data URI).
@@ -44,14 +44,15 @@ Está em construção: hoje tem a fase 1 (Vila do Zap, chefão Tio do Zap); o An
   Os anéis foram refeitos pixel a pixel com as cores e o desenho das artes do André (`tools/arte/escudo.py`): reduzir um aro de 40 px de espessura para 5 px apaga sombra, brilho e cruz. Só os estilhaços do escudo vêm da redução direta.
   `auraFx()` toca os quadros de estourar como efeito solto (`st.fx` com `seq`). Quando o chefão se levanta, `b.bubIn` mostra os mesmos quadros de trás para frente. Sem a imagem carregada, vale o círculo desenhado por código.
 - **Música:** `MUSIC` mapeia nome → arquivo e `music(nome)` troca a faixa (elemento `<audio>` em laço, volume 0,5). A do título só começa no primeiro toque ou tecla, porque o navegador não deixa antes.
-  `bossStart()` chama `music('boss')` (a mesma faixa serve para todos os chefões, por decisão do André). Ao renascer volta a da fase; ao vencer, silêncio.
+  `bossStart()` chama `music('boss')` (a mesma faixa serve para todos os chefões, por decisão do André). Ao renascer volta a da fase. Ao vencer, silêncio na câmera lenta e a fanfarra (`music('vic')`) quando o Zé pousa para comemorar; ela segue tocando na tela seguinte até acabar.
+  `vitoria.mp3` saiu de uma faixa de 2 minutos do gerador (original "Victory_Fanfare"): os 4 primeiros compassos (152 BPM, até 6,32 s) emendados no ataque do acorde final (122,32 s), que soa até o fim. O acorde cai no passo 379 depois do pouso, e `V_RISE_LEN` faz a câmera chegar ao céu nessa hora.
   As faixas vieram de um gerador e não fecham laço: foram aparadas e terminam com um fade de 2 segundos antes de recomeçar (`ffmpeg ... afade`).
   Sem internet: a página guarda os MP3 inteiros no cache `ze-gotinha-revenge-fixos-v1` e o `sw.js` responde os pedidos com `Range` cortando o arquivo guardado (`pedaco()`); sem isso o Safari não toca.
 - **Efeitos sonoros:** `sfx('nome')`. Os que têm WAV em `SFX_WAV` tocam o arquivo, embutido em base64; os outros são sintetizados por oscilador (`SND`).
   Os WAV foram feitos pelo André no jsfxr (originais em `tools/sons/`): `gota`, `hurt` (levar dano), `jump`, `sus` (crescer com o SUS), `power` (pegar os demais itens), `bite` (mordida do jacaré),
   `bump` (batida em bloco, inclusive ao abrir um `?`), `tick` (contador da pergunta), `slam` (mergulho do chefão), `kill` (derrotar inimigo) e `posto` (posto de vacinação).
   Alguns nomes existem só para separar eventos que dividiam um som; `SFX_ALT` diz qual som sintetizado eles usam quando não há arquivo: `nope` ("Sem seringas") usa o `bump` sintetizado,
-  e escudo quebrando, ovo e projétil estourando seguem com `pop`; os cartões, com `cp`. Ainda sintetizados: seringa, montar, golpe que não derrota, acerto e erro, golpe no chefão e vitória (o André ficou de mandar o som de fase completa; hoje toca `win` sintetizado na pose).
+  e escudo quebrando, ovo e projétil estourando seguem com `pop`; os cartões, com `cp`. Ainda sintetizados: seringa, montar, golpe que não derrota, acerto e erro, golpe no chefão. O `win` sintetizado só toca com `__mgNoIntro`; no jogo, a vitória tem a fanfarra.
 - **Estado:** tudo em `st`. Placar só no aparelho (localStorage `mg-placar`, `mg-nome`, `mg-mudo`).
 
 ## Regras do jogo (decisões do André)

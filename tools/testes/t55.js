@@ -14,7 +14,7 @@ const { chromium } = require('playwright');
   // 3) no ar na hora da vitória: espera pousar; e comandos não mexem o Zé
   await prep(); out.noAr = await p.evaluate(`(()=>{${pre}${kill}s.p.y-=60;s.p.onG=false;s.p.vy=-3;K.right=true;run(10);const ar=[s.vic.g,s.p.onG];for(let i=0;i<200&&s.vic.g<0;i++)g.step();const x0=s.p.x;run(30);K.right=false;return {ar,pousou:[s.vic.g,s.p.onG],andou:Math.round(s.p.x-x0)}})()`);
   // 4) pontuação igual ao tempo do golpe final
-  out.tempo = await p.evaluate(`(()=>{${pre}const f=s.finalT;run(300);return [f>0,s.finalT===f,g.mode]})()`);
+  out.tempo = await p.evaluate(`(()=>{${pre}const f=s.finalT;run(520);return [f>0,s.finalT===f,g.mode]})()`);
   // 5) laço real: câmera lenta
   await prep(); const t0 = await p.evaluate(`(()=>{${pre}s.p.face=1;s.p.ammo=3;s.p.cd=0;K.fire=true;g.step();K.fire=false;for(let i=0;i<60&&s.boss.st!=='dying';i++)g.step();document.querySelector('#scPause .btn')?.click();return [g.mode,s.slow,s.time]})()`);
   await p.waitForTimeout(100); const m1 = await p.evaluate(`[__mg.mode,__mg.st.slow,__mg.st.time]`); await p.waitForTimeout(1000); const m2 = await p.evaluate(`[__mg.mode,__mg.st.slow,__mg.st.time]`); await p.waitForTimeout(2500); const m3 = await p.evaluate(`[__mg.mode,__mg.st.slow,__mg.st.time]`);
