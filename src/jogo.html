@@ -865,9 +865,11 @@ const BESTIARY = {
     list: ['Você tem 10 segundos para responder.', 'Errar ou deixar o tempo acabar solta boatos e troca a afirmação.', 'Acertar de primeira vale mais pontos.'] },
   boss: { name: 'Tio do Zap', kind: 'Chefão', zoom: 2.1, text: 'Repassa tudo o que recebe para todos os grupos, de preferência antes de ler. Sua bolha o torna resistente a correções e à informação verdadeira.', tip: 'Desvie até a bateria do celular acabar. Aí a bolha cai.' },
 };
+/* Fase em que cada cartão estreia. O jogo é linear: inimigo, item ou desafio apresentado numa fase não é apresentado de novo nas seguintes (pedido do André). */
+const CARD_FASE = {}; for (const k in BESTIARY) CARD_FASE[k] = 1;
 /* Com `spec`, o cartão é avulso (resultado de uma pergunta) e aparece sempre; sem ele, vale o cartão do tipo, uma vez por partida. */
 function introStart(type, obj, spec) {
-  const s = st; if (s.intro) return false; if (!spec) { if (s.seen[type]) return false; s.seen[type] = 1; }
+  const s = st; if (s.intro) return false; if (!spec) { if (s.seen[type]) return false; s.seen[type] = 1; if ((CARD_FASE[type] || s.fase) < s.fase) return false; }
   if (window.__mgNoIntro) return false; s.intro = { type, e: obj, card: spec || BESTIARY[type], k: 0, t: 0, out: false, shown: false }; keys.left = keys.right = false; return true;
 }
 function introCard(I) {
@@ -1478,6 +1480,7 @@ Object.assign(BESTIARY, {
     list: [`${isTouch ? 'A' : 'Espaço'} esquenta o ar e o balão sobe. Segure para subir sem parar.`, `${isTouch ? 'B' : 'X'} lança seringa.`, 'Encostar nos telhados machuca.'] },
   baron: { name: 'Barão do Sempre Foi Assim', kind: 'Chefão', zoom: 2, text: 'Nunca leu um estudo e nunca precisou. O avô fazia, o bisavô fazia, então está provado. Joga retratos de antepassados e investe de cabeça baixa.', tip: 'Cada seringa conta. Depois da investida ele cansa: aí o pisão tira 2.' },
 });
+for (const k in BESTIARY) CARD_FASE[k] = CARD_FASE[k] || 2;
 
 function buildLevel2() {
   const m = []; for (let y = 0; y < LH; y++) m.push(new Array(LW).fill('.'));
@@ -2339,6 +2342,7 @@ Object.assign(BESTIARY, {
   prof: { name: 'Prof. Dr. PhD Magnus Aurum', kind: 'Chefão', zoom: 2, text: 'Palestrante de auditório lotado, voz mansa e uma pilha de livros próprios à venda na saída. Os diplomas fazem o trabalho que os dados não fazem.',
     list: ['Os diplomas giram em volta dele: derrube um por um com seringas.', 'Sem diplomas, toda seringa conta e o pisão tira 2.', 'No telão, as barras do gráfico viram plataformas.'], quote: 'Confiem em mim, eu sou doutor.' },
 });
+for (const k in BESTIARY) CARD_FASE[k] = CARD_FASE[k] || 3;
 const AR3 = { bomb: 101, guru: 283, prof: 316 };   // primeira coluna de cada arena (20 blocos, a largura da tela)
 const VEIC3 = { corr: [125, 211], bonus: [340, 427] };
 const HOLE3 = [270, 271], PIPE3 = 277;
@@ -2541,7 +2545,6 @@ function resetMaq() {
 function intro3(near) {
   const s = st, p = s.p;
   for (const v of s.vehs) if (v.state === 'park' && !s.seen[v.k] && near(v) && introStart(v.k, v)) return true;
-  for (const bl of s.bals) if (!bl.solved && !s.seen.bal3 && near({ x: bl.x0 * T, y: 10 * T, w: bl.n * T, h: 2 * T }) && introStart('bal3', { x: (bl.x0 - 6) * T, y: 6 * T, w: (bl.n + 8) * T, h: 6 * T })) return true;
   const M = s.maq; if (M && !M.done && !s.seen.maq && p.x > 245 * T && introStart('maq', { x: 246 * T, y: 6 * T, w: 14 * T, h: 6 * T })) return true;
   return false;
 }

@@ -90,6 +90,7 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
 - **Mito ou fato:** três portões. A afirmação aparece, o jogador tem 10 segundos (15 no fácil) e responde batendo a cabeça no bloco M ou F. Erro ou tempo esgotado soltam boatos e trocam a afirmação.
   O resultado pausa o jogo com um cartão de explicação.
 - **Cartões de apresentação:** na primeira vez que cada inimigo, item, o jacaré e o portão aparecem, o jogo congela, dá zoom e explica. Voltam a cada partida nova.
+  O jogo é linear: o que estreou numa fase não é apresentado de novo nas seguintes (`CARD_FASE`, pedido do André em 14/10/2026). Na fase 3, boato, vírus, fake news, itens, portão e balança não têm cartão.
 - **Abertura da fase:** a câmera desce do céu com o nome da fase. A tela de título não mostra nome de fase nem controles; os controles ficam no botão CONTROLES.
 - **Fim:** o golpe final deixa o jogo em câmera lenta (`SLOW_STEPS` passos a `SLOW_RATE`, uns 2 segundos). Depois o Zé comemora (preparo, salto e pose com a seringa, em `EXTRA_ART.vn` e `.vb`),
   aparece "Fase 1 completa" e a câmera sobe para o céu, o inverso da abertura (`stepVictory()`, constantes `V_*`). Pulo, seringa ou Enter encerram depois da pose.
