@@ -264,7 +264,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.38</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.39</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -333,7 +333,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win" id="winNote">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btNext" type="button" hidden>Próxima fase</button><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.38</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.39</p>
     </div>
   </section>
 
@@ -1922,7 +1922,7 @@ function tile2(c, tx, ty, up, x, y) {
     case 'C': { const k = s.crumb[tx + ',' + ty], j = k && k.t > 0 ? ((s.time >> 1) & 1 ? 1 : -1) : 0; ctx.drawImage(SPR2.C, x + j, y + (k && k.t < 8 ? 1 : 0), T, SPR2.C.height); return 1; }
     case 'V': return SPR2.V[tx % 4];
     case 'R': return SPR2.R; case 'K': return SPR2.K; case 'X': return SPR2.X; case 'B': return SPR2.B;
-    case '^': ctx.drawImage(SPR2.spike, x, y + T - SPR2.spike.height); return 1;
+    case '^': return (SPR.sc && SPR.sc.spike) || SPR.spike;   // espinho da fase 1 (o André preferiu ao caco de vidro)
     case 'O': ctx.drawImage(SPR2.O, x + 8 - (SPR2.O.width >> 1), y + 8 - (SPR2.O.height >> 1)); return 1;
     case 'D': { if (!SPR2.door) return SPR2.D; if (s.map[ty][tx - 1] !== 'D' && s.map[ty - 1][tx] !== 'D') ctx.drawImage(SPR2.door, x - 4, y, 2 * T + 8, 4 * T); return 1; }   // a porta inteira sai do bloco de cima à esquerda
     case 'P': { const bl = s.bals.find(b => tx >= b.x0 && tx < b.x0 + b.n), sk = bl ? Math.round(bl.sink) : 0; ctx.fillStyle = '#2a1f16'; ctx.fillRect(x, y, T, sk); if (SPR2.dish) { ctx.drawImage(SPR2.terra, x, y + sk); ctx.fillStyle = 'rgba(20,12,8,.45)'; ctx.fillRect(x, y + sk, T, T); } else ctx.drawImage(SPR2.P, x, y + sk); return 1; }
