@@ -1,0 +1,20 @@
+// Fase 3: capturas dos chefes e dos momentos especiais (t82-*.png), sem cartões
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const errs = [];
+  const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage(); p.on('pageerror', e => errs.push('PAGEERR ' + e.message));
+  await p.addInitScript('window.__mgNoSave=1'); await p.goto('file://' + __dirname + '/page.html'); await p.waitForTimeout(800);
+  const shot = async (n, fn) => { const r = await p.evaluate(fn); await p.screenshot({ path: __dirname + '/t82-' + n + '.png' }); console.log(n, JSON.stringify(r)); };
+  const prep = `const g = window.__mg, s0 = () => g.st, T = 16; const go = (x, f) => { g.startFase(3, 'normal'); const s = g.st; s.opening = null; s.p.x = x * T + 3; s.p.y = 12 * T - 24; s.cam.x = Math.max(0, x * T - 150); if (f) f(s); }; const run = (n, f) => { for (let i = 0; i < n; i++) { g.st.p.inv = 2; if (f) f(); g.step(); } };`;
+  await shot('bomb-throw', new Function(prep + `go(105, s => { s.bossDone.x = 1; }); run(100); const b = g.st.boss; b.st = 'throw'; b.t = 0; run(14); return b.st;`));
+  await shot('bomb-tired', new Function(prep + `go(105); run(100); const b = g.st.boss; b.st = 'tired'; b.t = 0; b.hurtT = 0; run(20); return b.st;`));
+  await shot('bomb-dano', new Function(prep + `go(105); run(100); const b = g.st.boss; b.st = 'tired'; b.t = 0; for (let i = 0; i < 3; i++) { b.inv = 0; b.hurtT = 0; } run(2); b.inv = 0; const s = g.st; s.p.x = b.x - 30; const o = { x: b.x + 2, y: b.y + 10, w: 10, h: 5, life: 10 }; for (let k = 0; k < 3; k++) { b.inv = 0; o.life = 10; s.shots.push(Object.assign({}, o, { vx: 0, vy: 0 })); run(2); } run(10); return { hp: b.hp, grana: s.items.filter(i => i.t === 'grana' && !i.got).length };`));
+  await shot('guru-vela', new Function(prep + `go(287); run(100); const b = g.st.boss; b.st = 'vela'; b.t = 0; run(70); return g.st.eshots.map(f => f.t + (f.lit ? '*' : ''));`));
+  await shot('guru-medita', new Function(prep + `go(287); run(100); const b = g.st.boss; b.st = 'medita'; b.t = 0; run(50); return b.st;`));
+  await shot('prof-diplomas', new Function(prep + `go(320); run(100); run(60); const b = g.st.boss; return { st: b.st, dip: b.dip };`));
+  await shot('prof-grafico', new Function(prep + `go(320); run(100); const b = g.st.boss; b.dip = 0; b.st = 'toPod'; b.t = 0; run(220); return { st: b.st, y: b.y / T, bars: g.st.plats.filter(p => p.kind === 'bar').map(p => +(p.y / T).toFixed(1)) };`));
+  await shot('prof-fim', new Function(prep + `go(320); run(100); const b = g.st.boss; b.dip = 0; b.hp = 1; b.st = 'tired'; b.inv = 0; const s = g.st; s.shots.push({ x: b.x + 4, y: b.y + 10, w: 10, h: 5, vx: 0, vy: 0, life: 10 }); run(200); return { dead: b.dead, placas: s.placas, winT: s.winT };`));
+  await shot('maquina-fim', new Function(prep + `go(250, s => {}); const s = g.st; const M = s.maq; s.p.x = 249 * T; s.p.y = 12 * T - 24; run(3); for (const o of ['vaso', 'banana', 'pedra']) { const k = s.blocks.find(k => k.obj === o); k.x = 253 * T; k.y = 11 * T; k.onG = true; run(30); k.x = 255 * T + 2 + ['vaso', 'banana', 'pedra'].indexOf(o) * 16; k.y = 11 * T; run(20); } s.intro = null; run(30); return { luzes: M.lights, done: M.done };`));
+  await shot('lounge-soro', new Function(prep + `go(62, s => { s.p.y = 10 * T - 24; }); run(300, () => { g.st.p.x = 62 * T + 3; g.st.p.y = 10 * T - 24; g.st.p.vy = 0; }); return g.st.eshots.map(f => f.t + f.v);`));
+  await shot('poste', new Function(prep + `go(125); const K = g.keys; K.right = true; run(60); K.right = false; run(240); return { cart: g.st.p.cart, x: g.st.p.x / T };`));
+  await shot('xicara', new Function(prep + `go(268); const K = g.keys; K.right = true; run(120); K.right = false; run(80); return { cart: g.st.p.cart, x: g.st.p.x / T };`));
+  console.log('ERRS', errs); await b.close(); })();

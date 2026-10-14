@@ -6,6 +6,7 @@ Pré-visualização como artefato (privada, do André): https://claude.ai/artifa
 
 Jogo de plataforma em estilo 16 bits (Mega Drive). O Zé Gotinha enfrenta a desinformação sobre vacinas.
 Está em construção: fase 1 (Vila do Zap, chefão Tio do Zap, tema desinformação) e fase 2 (Arraial do Antigamente, chefão Barão do Sempre Foi Assim, tema apelo à tradição), publicada em 13/10/2026 com aprovação do André; no site ela só abre depois de vencer a fase 1.
+Fase 3 (Clínica Vitta Prime, tema apelo à autoridade e ao preço) em rascunho jogável no branch `fase-3`, só na pré-visualização: não vai para o `main` sem a aprovação do André.
 Cada fase tem um chefão que representa um obstáculo à vacinação.
 
 ## Estrutura
@@ -104,7 +105,7 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
 - Fase 1 continua com os números fixos de antes (arena 153 a 175, `s.arena`). A fase 2 não tem arena: o chefão é no ar.
 - Vencer uma fase libera a seguinte (`mg-fases`) e grava o jogo salvo no começo dela; a tela depois da vitória diz "Fase 2 liberada" e o placar ganha o botão Próxima fase.
   Com mais de uma fase liberada, a tela de modo mostra a escolha de fase e o título ganha o botão FASES (abre a escolha já na fase mais nova; CONTINUAR segue o jogo salvo). Na pré-visualização (artefato, `ESBOCO`) a fase 2 já vem liberada.
-- Placar por fase: fase 1 em `mg-placar`, fase 2 em `mg-placar-2`, com abas no placar da tela inicial.
+- Placar por fase: fase 1 em `mg-placar`, fase 2 em `mg-placar-2`, fase 3 em `mg-placar-3`, com abas no placar da tela inicial. Na pré-visualização as três fases já vêm liberadas.
 - Testes da fase 2: `t70.js` (capturas de cada trecho), `t71.js` (as duas balanças se resolvem), `t72.js` (robô atravessa a mina no vagonete, normal e fácil),
   `t73.js` (força bruta nos sinos), `t74.js` (força bruta na roda d'água a pé, com os miasmas: embarque e chegada à tábua), `t75.js` (decolagem, chefão e vitória), `t76.js` (telas de fase no computador e no celular), `t77.js` (botão FASES no título com jogo salvo).
   `t56.js` e `t57.js` são de antes da tela de modo e já falhavam na versão publicada.
@@ -153,7 +154,36 @@ Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e fras
   Morrer no ar volta ao posto 5, no chão. Vitória: o balão vai ao centro, abaixo de "Fase 2 completa", e a câmera sobe até só sobrar céu, como na fase 1 (`camAir()`; o céu desce pela metade e o resto vira o azul de cima).
   No site publicado (fora do artefato) a fase 2 só aparece depois de vencer a fase 1: sem `mg-fases`, o título não tem FASES (conferido no `index.html`).
 
+## Fase 3: Clínica Vitta Prime (rascunho)
+
+Consultório "high-ticket" de médicos picaretas. Tema: apelo à autoridade e preço como prova de qualidade. Pedido do André em 14/10/2026: perguntas de mito ou fato, uma balança, um puzzle novo (a máquina quântica),
+três chefes com visual levemente inspirado em figuras reais da pseudomedicina (o médico grisalho e musculoso de terno apertado, o palestrante de auditório, a guru do bem-estar) e soros coloridos.
+Os nomes são inventados e os desenhos ficam no nível do tipo, sem copiar rosto, bordão ou marca de ninguém. A placa da recepção cita o Dr. Charles Latão e a Dra. Pikha Aretha, do *Manual Prático do Picareta em Saúde* do André.
+Tudo provisório, desenhado em código (`SPR3`, `tile3`, `bg3`, `wallBg3`, `deco3`, `world3`); a música é a da fase 1 (`stage3`) até a fase ganhar a dela.
+- **Trechos** (`buildLevel3`, 430 blocos): recepção de mármore (recepcionista, lustres em pêndulo sobre o espelho d'água, com a geometria dos sinos da fase 2) · lounge da soroterapia (suportes de soro como degraus sobre o vão,
+  bolsas pingando, pacientes VIP: boato, vírus e fake news da fase 1 nas poltronas) · arena do Dr. Soro Platinum (101 a 120) · corredor no suporte de soro (a geometria da mina da fase 2, 125 a 211) ·
+  farmácia premium com a balança (a geometria da balança 1 da fase 2, deslocada 148 blocos) · sala do diagnóstico quântico · spa detox com o buraco atrás da cafeteira (270 e 271) ·
+  arena da Guru Glow (283 a 302) · auditório do Prof. Magnus Aurum (316 a 335, palco em 332 a 335). Postos em 52, 122, 225, 262, 305. Portões em 48, 222 e 313.
+- **Área bônus:** o intestino de café fica em 340 a 427, atrás de uma parede. Cair no buraco do spa (`fall3()`) solta o Zé direto na xícara; a xícara anda como o vagonete (geometria da mina de novo) e no fim o cano (277) devolve o Zé ao spa.
+  Na área bônus nenhum posto conta. Morrer lá volta ao último posto.
+- **Veículos:** `s.vehs` (suporte de soro e xícara), `board3()`, `leave3()`, desenho em `drawZeVehicle3()`. Usam o `p.cart` do vagonete, então pulo, caixote (`X`) e câmera funcionam igual.
+- **Soros coloridos** (`SORO_COR`): laranja (vitamina C), verde (detox), rosa (beleza), azul (energia), dourada (longevidade). As bolsas (`s.drips`) pingam gotas `gota3`: laranja cai reto, verde deixa poça, rosa quica, azul faz zigue-zague, dourada persegue.
+  As gotinhas de grife (inimigo `gotinha`) têm o mesmo código de cores: laranja anda, verde deixa poça, rosa pula, azul corre em zigue-zague, dourada persegue e aguenta dois golpes.
+  Poça (`s.pocas`) escorrega (`p.slip`); o adesivo da Guru deixa o Zé lento sem tirar vida (`p.slowT`).
+- **Máquina quântica** (`s.maq`): blocos `qo` (pedra, banana, vaso) empurrados até a plataforma `Y` (253 e 254); depois de 24 quadros parado ali sai o laudo, sempre o mesmo. Cada objeto diferente acende uma luz;
+  três abrem a porta (259 e 260). O fosso raso (255 a 257) recebe as amostras. O Zé na plataforma também ganha laudo e não acende luz. O bloco ↺ em 250, 8 recoloca as amostras (`resetAt` = 'maq').
+- **Chefes** (`BOSS3`, `boss3Start()`, `stepBoss3()`): um de cada vez no mesmo `s.boss`, com `b.who`. Entrar na arena fecha a parede de trás; vencer um subchefe abre a porta da frente (`bossOpen3()`) e o jogo continua.
+  Dr. Soro Platinum: arremessa bolsas que viram poça, faz supino que chove soro e dá investida; depois dela cansa e o pisão tira 2; cada golpe solta dinheiro (`grana`, não vale ponto; no fim, "reembolso aos pacientes").
+  Guru Glow: flutua, joga cristais, acende velas no chão e solta adesivos; a cada ciclo desce para meditar e o pisão tira 2. Prof. Magnus Aurum: diplomas giram em volta dele e seguram as seringas até caírem um por um;
+  sem diplomas toda seringa conta e o pisão tira 2; ele joga os próprios livros e, no palco, as barras do gráfico do telão viram plataformas. Na vitória a plateia levanta placas de "Qual a evidência?" e o Barão, que estava na plateia aplaudindo, sai de fininho.
+  Seringas na arena a cada 4 s (3 s no fácil). Vida: 10, 8 e 12 no normal; 7, 6 e 8 no fácil; o fácil tem 3 diplomas em vez de 5.
+- **Perguntas:** `QS3`, sobre autoridade, preço, soro e detox. Os fatos aguardam a revisão do André.
+- **Testes:** `t80.js` (capturas de cada trecho), `t81.js` (força bruta nos lustres e suportes, robô no suporte de soro e na xícara, balança, máquina e os três chefes; aceita `pe`, `veic`, `puz` ou `boss`),
+  `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura).
+
 ## Pendências e ideias em aberto
+
+- Fase 3: o André jogar e sentir a dificuldade; artes de todos os sprites, cenário e fundo; música própria; revisão das perguntas e dos cartões.
 
 - Fase 2 (no ar): revisão das perguntas e dos cartões pelo André, sentir a dificuldade jogando; sons próprios para sino, telha, porta da balança, vagonete e passarola, se ele quiser.
 - Depois da fase 2 ainda aparece "Em construção, novas fases em breve": trocar por uma prévia quando houver fase 3.

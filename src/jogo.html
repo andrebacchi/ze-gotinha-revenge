@@ -257,7 +257,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
 
     <section class="screen modo" id="scMode" hidden>
       <h2>Modo de jogo</h2>
-      <div class="tabs fases" id="faseRow" hidden><button class="chip" type="button" data-fase="1" aria-pressed="true">Fase 1 · Vila do Zap</button><button class="chip" type="button" data-fase="2" aria-pressed="false">Fase 2 · Arraial do Antigamente</button></div>
+      <div class="tabs fases" id="faseRow" hidden><button class="chip" type="button" data-fase="1" aria-pressed="true">Fase 1 · Vila do Zap</button><button class="chip" type="button" data-fase="2" aria-pressed="false">Fase 2 · Arraial do Antigamente</button><button class="chip" type="button" data-fase="3" aria-pressed="false">Fase 3 · Clínica Vitta Prime</button></div>
       <div class="modes">
         <button class="mode" id="btNormal" type="button"><b>Normal</b><span>Para quem está habituado a jogar.</span></button>
         <button class="mode" id="btFacil" type="button"><b>Fácil</b><span>Para quem é iniciante nos jogos.</span></button>
@@ -302,7 +302,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
       </form>
       <p class="only-win" id="sReg" role="status" hidden></p>
       <h3>Placar deste aparelho</h3>
-      <div class="tabs" id="boardTabs" hidden><button class="chip" type="button" data-f="1" aria-pressed="true">Fase 1</button><button class="chip" type="button" data-f="2" aria-pressed="false">Fase 2</button></div>
+      <div class="tabs" id="boardTabs" hidden><button class="chip" type="button" data-f="1" aria-pressed="true">Fase 1</button><button class="chip" type="button" data-f="2" aria-pressed="false">Fase 2</button><button class="chip" type="button" data-f="3" aria-pressed="false">Fase 3</button></div>
       <ol class="board" id="sBoard"></ol>
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win" id="winNote">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
@@ -894,14 +894,14 @@ const SND = { jump: ['square', 330, 620, .12, .05], shot: ['triangle', 880, 440,
 /* ───────── Música ─────────
    Faixas em arquivos à parte (audio/). Cada uma termina em silêncio e recomeça: o navegador não emenda MP3 sem um pequeno vão.
    Navegador nenhum deixa tocar antes do primeiro toque ou tecla; por isso a do título começa no primeiro gesto. */
-const MUSIC = { title: 'audio/titulo.mp3', stage: 'audio/fase1.mp3', stage2: 'audio/fase2.mp3', boss: 'audio/chefe.mp3', vic: 'audio/vitoria.mp3' };   // stage2: "Gold Rush at Sunset", da fase 2   // a de chefe vale para toda luta de chefe; a de vitória toca uma vez só
+const MUSIC = { title: 'audio/titulo.mp3', stage: 'audio/fase1.mp3', stage2: 'audio/fase2.mp3', stage3: 'audio/fase1.mp3', boss: 'audio/chefe.mp3', vic: 'audio/vitoria.mp3' };   // stage2: "Gold Rush at Sunset", da fase 2   // a de chefe vale para toda luta de chefe; a de vitória toca uma vez só
 const tracks = {}; let curMusic = null;
 function applyMusic() {
   const a = curMusic && tracks[curMusic]; if (!a || (a.ended && !a.loop)) return;   // a fanfarra que já acabou não recomeça
   if (!muted && !document.hidden && mode !== 'pause') a.play().catch(() => {}); else a.pause();
 }
 function music(name) {   // troca a faixa (null = silêncio); pedir a mesma de novo não reinicia
-  if (name === 'stage' && st && st.fase === 2) name = 'stage2';   // cada fase com a sua
+  if (name === 'stage' && st && st.fase >= 2) name = 'stage' + st.fase;   // fase 3 usa a da fase 1 até ganhar a dela   // cada fase com a sua
   if (name && !MUSIC[name]) name = curMusic === 'boss' ? null : curMusic;
   if (name === curMusic) { applyMusic(); return; }
   if (curMusic && tracks[curMusic]) tracks[curMusic].pause();
@@ -947,15 +947,16 @@ function sfx(n) {
 
 /* ───────── Fase ───────── */
 let st = null, mode = 'title';
-const SOLID = new Set('#B?UMFGWTRKXDOP'), ONEWAY = new Set('=VC');
+const SOLID = new Set('#B?UMFGWTRKXDOPYJZ'), ONEWAY = new Set('=VC');
 /* Fase 2: W parede de casarão, T telhado, R rocha da mina, K trilho, X caixote, D porta da balança, O bloco que recoloca os blocos da balança, P prato da balança.
-   De mão única (só seguram por cima): = tábua, V varal, C telha solta (cai logo depois do pisão). */
+   De mão única (só seguram por cima): = tábua, V varal, C telha solta (cai logo depois do pisão).
+   Fase 3: Y plataforma de leitura da máquina quântica, J café (chão do intestino), Z parede do intestino. */
 const solid = c => SOLID.has(c);
 function tileAt(tx, ty) { if (tx < 0 || tx >= LW) return '#'; if (ty < 0 || ty >= LH) return '.'; return st.map[ty][tx]; }
 
 function buildLevel(n) {   // monta a fase n (sem n, a atual)
   n = PHASES[n] ? n : PHASE.n; PHASE = PHASES[n]; LW = PHASE.lw;
-  const s = n === 2 ? buildLevel2() : buildLevel1();
+  const s = n === 3 ? buildLevel3() : n === 2 ? buildLevel2() : buildLevel1();
   s.fase = n; s.qs = PHASE.qs; return s;
 }
 function buildLevel1() {
@@ -1207,14 +1208,14 @@ function respawn() {
   for (const it of s.items) if (it.fixed) it.got = false;
   const b = s.boss;
   if (b.active && !b.dead) { b.active = false; b.st = 'wait'; b.hp = b.max; if (s.arena) for (let y = 8; y <= 11; y++) s.map[y][s.arena.door] = '.'; s.enemies = s.enemies.filter(e => !e.arena); s.items = s.items.filter(i => !i.arena); }
-  if (s.fase === 2) respawn2();
+  if (s.fase === 2) respawn2(); else if (s.fase === 3) respawn3();
   s.cam.x = clamp(p.x - VW / 2, 0, LW * T - VW);
 }
 
 function stepPlayer(jp, sp) {
   const s = st, p = s.p;
   const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
-  const maxv = p.ride ? (p.inW ? 1.5 : 1.95) : 1.75, acc = p.onG ? .2 : .14;
+  const maxv = p.ride ? (p.inW ? 1.5 : 1.95) : p.slowT > 0 ? 1.05 : 1.75, acc = p.onG ? (p.slip > 0 ? .035 : .2) : .14;   // fase 3: poça de soro escorrega, adesivo energético deixa lento
   if (p.cart) { p.vx = DF().cartV; p.face = 1; } else if (p.stun > 0) p.stun--; else { p.vx += clamp(dir * maxv - p.vx, -acc, acc); if (dir) p.face = dir; }
   p.coy = p.onG ? 7 : p.coy - 1;
   if (jp && p.ride && !p.onG && p.coy <= 0) { hopOff(); jp = false; }
@@ -1224,13 +1225,14 @@ function stepPlayer(jp, sp) {
   if (p.vy >= 0) p.canCut = false;
   p.vy = Math.min(p.vy + .28, 5.2);
   const wasG = p.onG, vfall = p.vy;
-  const pb = p.y + p.h; p.x += p.vx; collideX(p); if (s.fase === 2) side2(p, dir, pb); p.y += p.vy; collideY(p, pb, true); platCollide(p, pb); if (s.fase === 2) land2(p, pb);
+  const pb = p.y + p.h; p.x += p.vx; collideX(p); if (s.fase >= 2) side2(p, dir, pb); p.y += p.vy; collideY(p, pb, true); platCollide(p, pb); if (s.fase >= 2) land2(p, pb);
   if (p.jT > 0) p.jT--; if (p.landT > 0) p.landT--; if (p.hurtT > 0) p.hurtT--;
   if (!wasG && p.onG && vfall > 1.6) {   // pouso: achata conforme a queda; queda alta levanta poeira
     p.landT = 8; p.landK = clamp((vfall - 1.6) / 3.4, .35, 1); p.jT = 0;
     if (vfall > 3.6 && !p.ride && !p.cart) { dust(p.x + p.w / 2, p.y + p.h, 7, 14); if (vfall > 4.9) shake(4, 1); }
   }
   if (p.onG && !p.ride && dir && Math.sign(p.vx) === -dir && Math.abs(p.vx) > 1.1 && s.time % 4 === 0) dust(p.x + p.w / 2 - dir * 3, p.y + p.h, 2, 4);   // freada
+  if (s.fase === 3 && fall3(p)) return;
   if (p.y > LH * T + 24) { die(); p.deadT = 40; return; }
 
   if (p.cd > 0) p.cd--; if (p.growT > 0) p.growT--; if (p.inv > 0) p.inv--; if (p.boost > 0) p.boost--; if (p.bite > 0) p.bite--; if (p.shootT > 0) p.shootT--; if (p.pushT > 0) p.pushT--;
@@ -1249,9 +1251,9 @@ function stepPlayer(jp, sp) {
   }
   if (!p.ride && tileAt(Math.floor((p.x + p.w / 2) / T), Math.floor((p.y + p.h - 4) / T)) === '~') { drown(); return; }
   if (!p.ride && s.waterHint && p.x > s.waterHint[0] * T && p.x < s.waterHint[1] * T) hintOnce('water', 'Água funda. Sozinho, o Zé Gotinha se afoga. Vá pelas plataformas ou atravesse montado no jacaré.', 320);
-  // postos de vacinação
-  if (s.fase === 2) after2(p);
-  s.cps.forEach((c, i) => { if (!c.on && p.x > c.x * T) { c.on = true; s.cur = i; sfx('posto'); txt(c.x * T + 8, G * T - 40, 'Posto: seringas repostas', '#9fd4ff'); p.ammo = p.maxAmmo; writeSave(); } });
+  // postos de vacinação (na área bônus da fase 3 nenhum conta)
+  if (s.fase === 2) after2(p); else if (s.fase === 3) after3(p);
+  s.cps.forEach((c, i) => { if (!c.on && p.x > c.x * T && !(s.fase === 3 && p.x > VEIC3.bonus[0] * T)) { c.on = true; s.cur = i; sfx('posto'); txt(c.x * T + 8, G * T - 40, 'Posto: seringas repostas', '#9fd4ff'); p.ammo = p.maxAmmo; writeSave(); } });
 }
 const biteBox = p => ({ x: p.face > 0 ? p.x + p.w - 2 : p.x - 20, y: p.y + 8, w: 22, h: 20 });
 
@@ -1343,6 +1345,7 @@ function damageBoss(d, kind) {
 }
 function stepBoss() {
   if (st.fase === 2) return stepBaron();
+  if (st.fase === 3) return stepBoss3();
   const s = st, b = s.boss, p = s.p;
   if (!b.active && !b.dead && !p.dead && p.x > 155 * T) bossStart();
   if (!b.active) return;
@@ -1399,8 +1402,9 @@ function stepShots() {
     if (s.blocks.some(k => !k.gone && overlap(o, k))) { o.life = 0; burst(o.x + 5, o.y + 2, '#46e0d0', 4); sfx('bump'); continue; }
     for (const e of s.enemies) if (!e.dead && overlap(o, e)) { if (e.t === 'miasma') continue; if (e.immune) { o.life = 0; burst(o.x + 5, o.y + 2, '#cfd6e6', 4); sfx('bump'); break; } hitEnemy(e, 2); o.life = 0; break; }
     if (o.life <= 0) continue;
-    for (const f of s.eshots) if ((f.t === 'fake' || f.t === 'flask' || f.t === 'portrait') && f.life > 0 && overlap(o, f)) { f.life = 0; o.life = 0; if (f.t === 'fake') popFake(f); else burst(f.x + 4, f.y + 4, f.t === 'flask' ? '#7fd36a' : '#d9b44a', 7); sfx('pop'); break; }
+    for (const f of s.eshots) if ((f.t === 'fake' || f.t === 'flask' || f.t === 'portrait' || ESHOT3.has(f.t)) && f.life > 0 && overlap(o, f)) { f.life = 0; o.life = 0; if (f.t === 'fake') popFake(f); else burst(f.x + 4, f.y + 4, f.t === 'flask' ? '#7fd36a' : f.v != null ? SORO_COR[f.v][0] : '#d9b44a', 7); sfx('pop'); break; }
     if (o.life > 0 && s.fase === 2 && b.active && b.st !== 'dying' && overlap(o, b)) { hitBaron(o); continue; }
+    if (o.life > 0 && s.fase === 3 && shot3(o)) continue;
     if (o.life > 0 && s.fase === 1 && b.active && b.st !== 'dying') {
       if (b.bubble) { if (Math.hypot(o.x + 5 - (b.x + b.w / 2), o.y + 2 - (b.y + b.h / 2)) < 32) { o.life = 0; burst(o.x + 5, o.y + 2, '#d6f6ff', 5); sfx('ploc'); hintOnce('bubble', 'A bolha de eco bloqueia as seringas. Guarde-as para quando a bateria dele acabar.', 320); } }
       else if (overlap(o, b)) { damageBoss(2); o.life = 0; burst(o.x + 5, o.y + 2, '#46e0d0', 4); }
@@ -1411,6 +1415,7 @@ function stepShots() {
     f.life--; f.x += f.vx;
     if (f.t === 'fake') { f.vy += .09; f.y += f.vy; const c = tileAt(Math.floor((f.x + 4) / T), Math.floor((f.y + 7) / T)); if (solid(c) || (c === '=' && f.vy > 0)) { f.life = 0; popFake(f); } }
     else if (f.t === 'flask' || f.t === 'portrait') eshot2(f, p);
+    else if (s.fase === 3) { eshot3(f, p); if (f.y > LH * T + 20) f.life = 0; }
     else if (f.x < 154 * T || f.x > 174 * T - 8) f.life = 0;
     if (f.life > 0 && !p.dead && overlap(p, f)) { hurt(f.x + 4); if (f.t === 'fake') { f.life = 0; popFake(f); } }
   }
@@ -1435,6 +1440,7 @@ function stepItems() {
       else if (it.src && !s.pu.has(it.src)) { it.got = true; sfx('gota'); txt(it.x + 7, it.y - 6, '+' + PTS.pu + ' pts', '#ffd23f'); }
     }
     else if (it.t === 'shield') { it.got = true; p.shield = true; sfx('power'); txt(it.x, it.y - 6, 'Escudo de imunidade', '#8ff3e6'); }
+    else if (it.t === 'grana') grana3(it);
     else if (it.t === 'boost') { it.got = true; p.boost = 600; sfx('power'); txt(it.x, it.y - 6, 'Dose de reforço!', '#ffe27a'); }
     if (it.got && it.src) s.pu.add(it.src);
   }
@@ -1591,6 +1597,7 @@ function platMove2(pl, t) {
     if (on) pl.cx = clamp(p.x + p.w / 2, pl.x + 6, pl.x + pl.w - 6);
     pl.v += ((on ? 9 : 0) - pl.dip) * .1; pl.v *= .86; pl.dip += pl.v; pl.y = pl.y0 + Math.max(0, pl.dip);
   }
+  else if (pl.kind === 'bar') pl.y += (pl.ty - pl.y) * .08;   // barra do gráfico do telão (fase 3)
   else if (pl.kind === 'pa') { const W = pl.W, a = pl.a0 + t * W.sp; pl.x = W.cx + Math.cos(a) * W.r - pl.w / 2; pl.y = W.cy + Math.sin(a) * W.r; }
   pl.dx = pl.x - ox; pl.dy = pl.y - oy;
 }
@@ -1638,7 +1645,8 @@ function stepBlock(k) {
   if (k.onG && !was && k.fell > 6) { sfx('bump'); dust(k.x + 8, k.y + k.h, 4, 12); shake(4, 1); }
   k.fell = k.onG ? 0 : (k.fell || 0) + 1;
   if (k.y > LH * T + 8) {
-    if (k.k === 'tr') { k.gone = true; txt(k.x + 8, G * T - 20, 'Tradição descartada.', '#ffd23f'); }
+    if (k.k === 'tr') { k.gone = true; txt(k.x + 8, G * T - 20, st.fase === 3 ? 'Preço descartado.' : 'Tradição descartada.', '#ffd23f'); }
+    else if (k.k === 'qo') { k.x = k.ox; k.y = k.oy; k.vy = 0; }
     else { k.x = k.ox; k.y = k.oy; k.vy = 0; txt(k.x + 8, k.y - 6, 'Evidência não se joga fora.', '#9fd4ff'); }
   }
 }
@@ -1651,9 +1659,10 @@ function solveBal(bl, quiet) {
   for (const x of [bl.door, bl.door + 1]) for (let y = 8; y <= 11; y++) { s.map[y][x] = '.'; if (!quiet) burst(x * T + 8, y * T + 8, '#6b3f22', 3); }
   if (quiet) return;
   sfx('ok'); shake(10, 2); s.balOk = (s.balOk || 0) + 1; txt(bl.door * T, 7 * T, 'A evidência pesou!', '#9fd4ff');
-  introStart('balok', { x: bl.x0 * T, y: 10 * T, w: (bl.door - bl.x0 + 2) * T, h: 2 * T }, { kind: 'Balança da evidência', name: 'O prato desceu', text: 'Duas evidências fizeram o que séculos de tradição não fizeram. Tempo de uso não pesa na balança.', tipLabel: '', tip: 'A porta abriu.', zoom: 1.4, cls: 'ok', quiet: true });
+  introStart('balok', { x: bl.x0 * T, y: 10 * T, w: (bl.door - bl.x0 + 2) * T, h: 2 * T }, { kind: 'Balança da evidência', name: 'O prato desceu', text: s.fase === 3 ? 'Duas evidências fizeram o que o pote importado não fez. Preço e selo de prêmio não pesam na balança.' : 'Duas evidências fizeram o que séculos de tradição não fizeram. Tempo de uso não pesa na balança.', tipLabel: '', tip: 'A porta abriu.', zoom: 1.4, cls: 'ok', quiet: true });
 }
 function resetBal(i) {
+  if (i === 'maq') return resetMaq();
   const s = st, bl = s.bals[i]; if (!bl || bl.solved) { sfx('bump'); return; }
   for (const k of s.blocks) if (k.bal === i) { k.gone = false; k.x = k.ox; k.y = k.oy; k.vy = 0; k.on = null; k.zero = false; burst(k.x + 8, k.y + 8, '#ffd23f', 5); }
   sfx('power'); txt(s.p.x + 5, s.p.y - 8, 'Blocos de volta ao lugar', '#ffd23f');
@@ -1731,6 +1740,7 @@ function stepItems2(it) {   // item boiando no balãozinho
 /* ───────── Inimigos novos ───────── */
 function stepEnemy2(e, p) {
   const s = st;
+  if (s.fase === 3 && stepEnemy3(e, p)) return;
   if (e.t === 'sangue') {
     if (e.hang) { if (Math.abs(p.x + p.w / 2 - e.x - e.w / 2) < 30 && p.y > e.y) { e.hang = false; e.vy = 0; sfx('bump'); } return; }
     e.vy = Math.min(e.vy + .28, 5); const pb = e.y + e.h; e.ph += .08; e.vx = e.dir * (Math.sin(e.ph) > 0 ? .5 : .1); e.x += e.vx; collideX(e); if (e.hitWall) e.dir = -e.dir;
@@ -1839,7 +1849,7 @@ function step2() {
   for (const k of s.blocks) if (!k.gone) stepBlock(k);
   s.bals.forEach((bl, i) => {
     if (bl.solved) { bl.sink = Math.min(6, bl.sink + .3); return; }
-    let w = 0; for (const k of s.blocks) if (!k.gone && k.bal === i && onPan(k)) { if (k.k === 'ev') w++; else if (!k.zero) { k.zero = true; txt(k.x + 8, k.y - 6, 'Peso: zero', '#ffd23f'); hintOnce('zero', '<span><b class="tag">Tradição não pesa.</b> Séculos de uso e o prato nem se mexe.</span>', 260); } }
+    let w = 0; for (const k of s.blocks) if (!k.gone && k.bal === i && onPan(k)) { if (k.k === 'ev') w++; else if (!k.zero) { k.zero = true; txt(k.x + 8, k.y - 6, 'Peso: zero', '#ffd23f'); hintOnce('zero', s.fase === 3 ? '<span><b class="tag">Preço não pesa.</b> R$ 890 em cima do prato e ele nem se mexe.</span>' : '<span><b class="tag">Tradição não pesa.</b> Séculos de uso e o prato nem se mexe.</span>', 260); } }
     bl.w = w; bl.sink = w * 2; if (w >= bl.need) solveBal(bl);
   });
   for (const key in s.crumb) {
@@ -2055,6 +2065,7 @@ const footDraw = (im, e, x, y, flip) => sprFlip(im, Math.round(x + e.w / 2 - im.
 function sprFlip(im, x, y, flip) { if (flip) { ctx.save(); ctx.translate(x + im.width, y); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0); ctx.restore(); } else ctx.drawImage(im, x, y); }
 function puff2(im, x, y, t, vy = 0) { st.fx.push({ img: im, cw: im.width, base: im.height / 2, x, y, t, vy, flip: false }); }   // efeito solto centrado em x, y
 function deathArt2(e, stomp) {   // quadro que fica um instante quando o inimigo da fase 2 é derrotado
+  if (st.fase === 3) return deathArt3(e, stomp);
   const Hm = SPR2.hum, Bt = SPR2.bot; let im = null, flip = false;
   if (Hm && e.t === 'sangue') { im = Hm.sout; flip = e.dir < 0; }
   else if (Hm && e.t === 'humor') { im = Hm['h' + e.v + 'a']; flip = e.face < 0; }
@@ -2167,11 +2178,910 @@ function hud2() {   // camadas de poeira que ainda cobrem o Barão (hoje zero) e
   const b = st.boss; for (let i = 0; i < DF().b2Layers; i++) { ctx.fillStyle = K; ctx.fillRect(VW / 2 + 56 + i * 7, 13, 6, 6); ctx.fillStyle = i < b.layers && b.st !== 'exposed' ? '#c9b994' : '#3a2a55'; ctx.fillRect(VW / 2 + 57 + i * 7, 14, 4, 4); }
 }
 
+/* ═════════ FASE 3: CLÍNICA VITTA PRIME (apelo à autoridade e ao preço) ═════════
+   Trechos: recepção de mármore (recepcionista, lustres) · lounge da soroterapia (suportes de soro, pacientes VIP das fases 1 e 2, Dr. Soro Platinum) ·
+   corredor no suporte de soro · farmácia premium (balança) · sala do diagnóstico quântico (máquina) · spa detox (buraco para o intestino de café, Guru Glow) ·
+   auditório (Prof. Magnus Aurum, com o Barão na plateia). A área bônus fica no fim do mapa, atrás de uma parede: só se chega caindo no buraco do spa.
+   Sprites, cenário e fundo são provisórios, desenhados em código (SPR3); o fluxo de troca pela arte do André é o mesmo das outras fases. */
+const SPR3 = {};
+const SORO_COR = [['#ff9a2e', '#b85e10', '#ffd29a'], ['#5ccf5a', '#2a8a34', '#c4f6b4'], ['#ff6fb5', '#b8307a', '#ffc4e2'], ['#3fa9ff', '#1d5fb8', '#bfe3ff'], ['#ffd23f', '#b08a14', '#fff3a0']];   // laranja, verde, rosa, azul, dourada
+const SORO_NOME = ['vitamina C', 'detox', 'beleza', 'energia', 'longevidade'];
+(function buildSprites3() {
+  const R2 = (fn, w = 16, h = 16) => mk(w, h, fn);
+  const drop = (R, x, y, w, h, c, d, l) => {   // gota: ponta em cima, barriga embaixo
+    for (let j = 0; j < h; j++) { const k = j < h * .45 ? j / (h * .45) : 1, half = Math.max(1, Math.round(w / 2 * (j < h * .45 ? k : Math.sqrt(1 - Math.pow((j - h * .45) / (h * .58), 2))))); R(x + w / 2 - half, y + j, half * 2, 1, c); }
+    R(x + w / 2 - 1, y + h - 2, Math.ceil(w / 2), 1, d); R(x + 2, y + Math.round(h * .45), 1, 3, l);
+  };
+  // gotinhas de grife: imitam o Zé, cada cor com uma promessa
+  SPR3.gotinha = SORO_COR.map(([c, d, l], v) => [0, 1].map(f => outl(mk(12, 15, R => {
+    drop(R, 0, f, 12, 15 - f, c, d, l);
+    R(3, 7 + f, 2, 3, '#fff'); R(7, 7 + f, 2, 3, '#fff'); R(4, 8 + f, 1, 2, K); R(7, 8 + f, 1, 2, K);
+    R(4, 12, 4, 1, d); if (v === 4) { R(3, 5 + f, 6, 1, '#fff6c9'); R(4, 4 + f, 1, 1, '#fff6c9'); R(7, 4 + f, 1, 1, '#fff6c9'); }   // a dourada usa coroa
+    if (f) { R(1, 14, 3, 1, d); R(8, 14, 3, 1, d); } }))));
+  SPR3.drip = SORO_COR.map(([c, d, l]) => outl(mk(6, 8, R => drop(R, 0, 0, 6, 8, c, d, l))));
+  SPR3.poca = SORO_COR.map(([c, d]) => mk(20, 4, R => { R(2, 0, 16, 1, c); R(0, 1, 20, 2, c); R(1, 3, 18, 1, d); R(5, 1, 4, 1, '#ffffff99'); }));
+  // bolsa de soro com etiqueta colorida
+  SPR3.bolsa = SORO_COR.map(([c, d]) => outl(mk(10, 15, R => { R(4, 0, 2, 2, '#cfd6e6'); R(1, 2, 8, 9, '#e8f4ff'); R(1, 2, 8, 1, '#ffffff'); R(2, 5, 6, 6, c); R(2, 10, 6, 1, d); R(3, 6, 4, 2, '#ffffffaa'); R(4, 11, 2, 2, '#cfd6e6'); R(4, 13, 2, 2, '#9aa3b8'); })));
+  // recepcionista de blazer e headset, com o cartão do pacote trimestral
+  SPR3.recep = [0, 1].map(f => outl(mk(18, 32, R => { const skin = '#e8b48a', bl = '#2b2f48';
+    R(5, 0, 8, 3, '#3a2a1c'); R(4, 2, 10, 2, '#3a2a1c'); R(5, 3, 8, 8, skin); R(4, 4, 1, 6, '#3a2a1c'); R(13, 4, 1, 6, '#3a2a1c'); R(6, 6, 2, 2, K); R(10, 6, 2, 2, K); R(7, 9, 4, 1, '#c0505a');
+    R(3, 3, 1, 5, '#59607e'); R(3, 7, 4, 1, '#59607e'); R(7, 7, 1, 1, '#59607e');   // fone com microfone
+    R(3, 11, 12, 13, bl); R(7, 11, 4, 9, '#efe7d4'); R(8, 12, 2, 7, '#c0505a'); R(3, 11, 1, 13, '#3a405c'); R(14, 11, 1, 13, '#3a405c'); R(5, 14, 2, 1, '#ffd23f');
+    R(4, 24, 4, 8, '#1a1f3d'); R(10, 24, 4, 8, '#1a1f3d'); R(3, 30, 5, 2, K); R(10, 30, 5, 2, K);
+    if (f) { R(14, 6, 3, 7, bl); R(15, 2, 3, 5, skin); R(13, 0, 5, 3, '#ffd23f'); } else { R(14, 12, 3, 8, bl); R(14, 19, 3, 3, skin); } R(1, 12, 3, 8, bl); R(1, 19, 3, 3, skin); })));
+  SPR3.card = outl(mk(10, 6, R => { R(0, 0, 10, 6, '#ffd23f'); R(0, 0, 10, 1, '#fff3a0'); R(1, 2, 8, 1, '#8a6420'); R(1, 4, 5, 1, '#8a6420'); R(7, 3, 2, 2, '#e23b4e'); }));
+  // drone de filmagem do influencer
+  SPR3.drone = [0, 1].map(f => outl(mk(16, 10, R => { R(4, 3, 8, 5, '#3a405c'); R(4, 3, 8, 1, '#9aa3b8'); R(6, 4, 4, 3, K); R(7, 5, 2, 1, '#5b9be0'); R(11, 4, 1, 1, '#ff3b4e');
+    R(1, 2, 3, 1, '#59607e'); R(12, 2, 3, 1, '#59607e'); R(2, 1, 1, 2, '#59607e'); R(13, 1, 1, 2, '#59607e');
+    if (f) { R(0, 0, 5, 1, '#cfd6e6'); R(11, 0, 5, 1, '#cfd6e6'); } else { R(1, 0, 3, 1, '#cfd6e6'); R(12, 0, 3, 1, '#cfd6e6'); } R(5, 8, 1, 2, '#59607e'); R(10, 8, 1, 2, '#59607e'); })));
+  // lustre de cristal (pêndulo)
+  SPR3.lustre = outl(mk(26, 12, R => { R(11, 0, 4, 3, '#d9a441'); R(2, 3, 22, 2, '#d9a441'); R(2, 3, 22, 1, '#ffe08a'); for (const x of [2, 7, 12, 17, 22]) { R(x, 5, 2, 3, '#e8f4ff'); R(x, 8, 2, 2, '#bfe3ff'); R(x, 10, 1, 2, '#ffffff'); } R(12, 5, 2, 5, '#ffd23f'); }));
+  // xícara de porcelana (veículo da área bônus) e a frente dela, desenhada por cima do Zé
+  const cup = R => { R(0, 1, 24, 12, '#f4f4f4'); R(1, 13, 22, 2, '#dcdcdc'); R(0, 1, 24, 1, '#ffffff'); R(0, 3, 24, 2, '#2f7bff'); R(0, 4, 24, 1, '#1d4fb8'); R(23, 4, 4, 2, '#f4f4f4'); R(26, 5, 1, 5, '#f4f4f4'); R(23, 9, 4, 2, '#f4f4f4'); R(3, 7, 2, 4, '#ffffff'); R(10, 8, 4, 3, '#2f7bff'); R(11, 9, 2, 1, '#bfe3ff'); };
+  SPR3.cup = outl(mk(28, 15, cup));
+  SPR3.cupFront = outl(mk(28, 11, (R, x) => { x.translate(0, -4); cup(R); }));
+  // suporte de soro com rodinhas: o Zé vai em pé na base e segura o poste
+  SPR3.poste = outl(mk(22, 34, R => { R(9, 2, 2, 26, '#cfd6e6'); R(9, 2, 1, 26, '#ffffff'); R(5, 1, 10, 2, '#9aa3b8'); R(4, 2, 2, 3, '#9aa3b8'); R(14, 2, 2, 3, '#9aa3b8');
+    R(13, 4, 6, 9, '#e8f4ff'); R(14, 7, 4, 5, '#ff6fb5'); R(13, 4, 6, 1, '#ffffff'); R(15, 13, 1, 6, '#bfe3ff');
+    R(1, 27, 20, 3, '#59607e'); R(1, 27, 20, 1, '#9aa3b8'); R(1, 30, 4, 4, '#2b2f48'); R(17, 30, 4, 4, '#2b2f48'); R(9, 30, 4, 4, '#2b2f48'); R(2, 31, 2, 2, '#9aa3b8'); R(18, 31, 2, 2, '#9aa3b8'); R(10, 31, 2, 2, '#9aa3b8'); }));
+  // objetos da máquina quântica
+  SPR3.qo = {
+    pedra: mk(16, 16, R => { R(0, 3, 16, 13, K); R(1, 4, 14, 11, '#8a7a6a'); R(3, 1, 10, 3, K); R(4, 2, 8, 3, '#8a7a6a'); R(2, 4, 6, 3, '#a8977a'); R(9, 10, 4, 3, '#6b5a4e'); R(4, 12, 3, 2, '#6b5a4e'); }),
+    banana: mk(16, 16, R => { R(0, 0, 16, 16, K); R(1, 1, 14, 14, '#2a8a6a'); R(1, 1, 14, 1, '#4fbf98');
+      for (let i = 0; i < 10; i++) { const y = 9 - Math.round(Math.sin(i / 9 * Math.PI) * 4); R(3 + i, y, 1, 4, '#ffd23f'); R(3 + i, y + 3, 1, 1, '#b08a14'); } R(2, 8, 2, 2, '#5a3a22'); R(12, 7, 2, 2, '#5a3a22'); }),
+    vaso: mk(16, 16, R => { R(0, 0, 16, 16, K); R(1, 1, 14, 14, '#7a3a8a'); R(1, 1, 14, 1, '#a868b8'); R(5, 3, 2, 4, '#49c05a'); R(8, 2, 2, 5, '#49c05a'); R(10, 4, 2, 3, '#49c05a'); R(4, 7, 8, 7, '#c8653a'); R(4, 7, 8, 1, '#e89463'); R(5, 13, 6, 1, '#8a3a1f'); }),
+  };
+  // pote premium (bloco de peso zero da balança da fase 3)
+  SPR3.pr = mk(16, 16, R => { R(0, 0, 16, 16, K); R(1, 1, 14, 14, '#1a1f3d'); R(1, 1, 14, 1, '#3a405c'); R(4, 3, 8, 2, '#d9a441'); R(3, 5, 10, 9, '#ffd23f'); R(3, 5, 10, 1, '#fff3a0'); R(4, 8, 8, 3, '#1a1f3d'); R(5, 9, 6, 1, '#ffd23f'); R(11, 6, 1, 7, '#b08a14'); });
+  // máquina quântica: console com tela, antenas e três lâmpadas
+  SPR3.grana = outl(mk(9, 5, R => { R(0, 0, 9, 5, '#49c05a'); R(0, 0, 9, 1, '#8be36a'); R(3, 1, 3, 3, '#2a8a34'); R(4, 2, 1, 1, '#c4f6b4'); }));
+  SPR.grana = SPR3.grana;
+  SPR3.coin = outl(mk(5, 5, R => { R(1, 0, 3, 5, '#ffd23f'); R(0, 1, 5, 3, '#ffd23f'); R(1, 1, 1, 2, '#fff3a0'); R(3, 2, 1, 2, '#b08a14'); }));
+  // projéteis dos chefes
+  SPR3.cristal = SORO_COR.map(([c, d, l]) => outl(mk(7, 10, R => { R(3, 0, 1, 2, l); R(2, 2, 3, 2, c); R(1, 4, 5, 3, c); R(2, 7, 3, 2, d); R(3, 9, 1, 1, d); R(2, 3, 1, 3, l); })));
+  SPR3.vela = outl(mk(6, 9, R => { R(1, 3, 4, 6, '#f6ecd8'); R(1, 3, 4, 1, '#ffffff'); R(1, 8, 4, 1, '#d4c49c'); R(2, 1, 1, 2, '#3a2a1c'); }));
+  SPR3.chama = [0, 1].map(f => mk(8, 12, R => { R(2, 4 - f, 4, 8 + f, '#ff8a3a'); R(3, 2 - f, 2, 3, '#ff8a3a'); R(3, 6, 2, 5, '#ffd23f'); R(1, 8, 6, 4, '#ff5d2e'); R(3, 9, 2, 2, '#fff6c9'); }));
+  SPR3.adesivo = outl(mk(9, 9, R => { R(3, 0, 3, 9, '#b46cff'); R(0, 3, 9, 3, '#b46cff'); R(1, 1, 7, 7, '#b46cff'); R(3, 3, 3, 3, '#f0d0ff'); R(4, 1, 1, 1, '#f0d0ff'); }));
+  SPR3.like = [0, 1].map(f => outl(mk(10, 9, R => { R(1, 0, 3, 1, '#ff3b6b'); R(6, 0, 3, 1, '#ff3b6b'); R(0, 1, 10, 3, '#ff3b6b'); R(1, 4, 8, 2, '#ff3b6b'); R(2, 6, 6, 1, '#ff3b6b'); R(3, 7, 4, 1, '#ff3b6b'); R(4, 8, 2, 1, '#ff3b6b'); R(2, 1, 2, 2, '#ffc4d4'); if (f) R(7, 2, 1, 1, '#fff'); })));
+  SPR3.livro = SORO_COR.map(([c, d]) => outl(mk(11, 8, R => { R(0, 0, 11, 8, c); R(0, 0, 11, 1, '#ffffff66'); R(0, 6, 11, 2, '#f4f4f4'); R(1, 7, 9, 1, '#cfd6e6'); R(0, 0, 2, 8, d); R(4, 2, 5, 1, '#ffffff'); R(4, 4, 3, 1, '#ffffffaa'); })));
+  SPR3.diploma = outl(mk(13, 10, R => { R(0, 0, 13, 10, '#d9a441'); R(0, 0, 13, 1, '#ffe08a'); R(1, 1, 11, 8, '#fff6dc'); R(3, 2, 7, 1, '#3a2a1c'); R(2, 4, 9, 1, '#b39a6a'); R(2, 6, 6, 1, '#b39a6a'); R(9, 6, 2, 2, '#e23b4e'); R(9, 8, 1, 2, '#e23b4e'); }));
+  // Guru Glow: chapéu de aba larga, linho bege, cabelo loiro e o smoothie verde
+  const guru = mode => outl(mk(28, 42, R => {
+    const skin = '#f6d3b8', hair = '#f3d77a', hd = '#d9b44a', lin = '#efe6d2', ld = '#d4c9ae', hat = '#d8c49a', hb = '#a8936a';
+    const by = mode === 'medita' ? 6 : 0;
+    R(9, 0 + by, 10, 4, hat); R(9, 0 + by, 10, 1, '#ece0bf'); R(9, 3 + by, 10, 1, '#7a5a3a'); R(1, 4 + by, 26, 2, hat); R(1, 5 + by, 26, 1, hb);
+    R(7, 6 + by, 14, 12, hair); R(6, 8 + by, 2, 12, hair); R(20, 8 + by, 2, 12, hair); R(7, 18 + by, 2, 3, hd); R(19, 18 + by, 2, 3, hd);
+    R(9, 6 + by, 10, 10, skin); R(9, 6 + by, 10, 1, hair);
+    if (mode === 'medita' || mode === 'hurt') { R(10, 10 + by, 3, 1, K); R(15, 10 + by, 3, 1, K); } else { R(10, 9 + by, 3, 2, '#fff'); R(15, 9 + by, 3, 2, '#fff'); R(11, 9 + by, 2, 2, '#3a7a6a'); R(15, 9 + by, 2, 2, '#3a7a6a'); }
+    R(12, 13 + by, 4, 1, mode === 'hurt' ? K : '#d06070'); R(10, 12 + by, 1, 1, '#f2a8a0'); R(17, 12 + by, 1, 1, '#f2a8a0');
+    R(8, 16 + by, 12, 2, skin); R(7, 18 + by, 14, 8, lin); R(13, 18 + by, 2, 6, ld); R(7, 25 + by, 14, 1, '#b8a678');
+    if (mode === 'medita') { R(3, 27 + by, 22, 6, lin); R(3, 32 + by, 22, 1, ld); R(5, 29 + by, 6, 2, ld); R(17, 29 + by, 6, 2, ld); R(2, 24 + by, 5, 3, skin); R(21, 24 + by, 5, 3, skin); }
+    else {
+      for (let j = 0; j < 14; j++) { const w = 14 + (j >> 1); R(14 - (w >> 1), 26 + j, w, 1, j > 11 ? ld : lin); } R(13, 28, 2, 10, ld);
+      if (mode === 'throw') { R(21, 8, 3, 11, lin); R(21, 5, 3, 3, skin); } else { R(21, 18, 3, 8, lin); R(21, 25, 3, 2, skin); R(22, 20, 4, 6, '#7fd36a'); R(22, 20, 4, 1, '#c4f6b4'); R(24, 16, 1, 4, '#ffffff'); }   // smoothie verde
+      R(4, 18, 3, 8, lin); R(4, 25, 3, 2, skin);
+    }
+  }));
+  SPR3.guru = { idle: guru('idle'), throw: guru('throw'), medita: guru('medita'), hurt: guru('hurt') };
+  // Dr. Soro Platinum: grisalho, bronzeado, terno azul apertado com os botões no limite e o relógio dourado
+  const bomb = mode => outl(mk(34, 46, R => {
+    const skin = '#d9965a', sk2 = '#b8743a', suit = '#1f2a5a', sd = '#141c40', sl = '#3a4a8a', hair = '#d4d4d4';
+    const lean = mode === 'charge' ? 3 : 0, tired = mode === 'tired';
+    const hx = 11 + lean, hy = tired ? 6 : 0;
+    R(hx, hy, 12, 3, hair); R(hx - 1, hy + 2, 14, 2, hair); R(hx, hy + 3, 12, 9, skin); R(hx - 1, hy + 4, 1, 4, hair); R(hx + 12, hy + 4, 1, 4, hair);
+    if (tired || mode === 'hurt') { R(hx + 2, hy + 6, 3, 1, K); R(hx + 7, hy + 6, 3, 1, K); R(hx + 4, hy + 9, 4, 2, '#7a2a2a'); R(hx + 12, hy + 5, 1, 2, '#bfe3ff'); }
+    else { R(hx + 2, hy + 5, 3, 2, '#fff'); R(hx + 7, hy + 5, 3, 2, '#fff'); R(hx + 3, hy + 5, 2, 2, K); R(hx + 7, hy + 5, 2, 2, K); R(hx + 2, hy + 4, 3, 1, '#9a9a9a'); R(hx + 7, hy + 4, 3, 1, '#9a9a9a'); R(hx + 3, hy + 9, 6, 2, '#ffffff'); R(hx + 3, hy + 9, 6, 1, sk2); }
+    R(hx + 1, hy + 11, 10, 2, sk2); R(13 + lean, hy + 13, 8, 2, skin);   // queixo largo e pescoço grosso
+    const ty = 15 + hy;
+    R(6 + lean, ty, 22, 16 - (tired ? 4 : 0), suit); R(6 + lean, ty, 22, 1, sl); R(14 + lean, ty, 6, 9, '#efe7d4'); R(16 + lean, ty + 1, 2, 9, '#c0303a');
+    for (const yy of [ty + 9, ty + 12]) { R(16 + lean, yy, 2, 2, '#ffd23f'); R(12 + lean, yy, 3, 1, sl); R(19 + lean, yy, 3, 1, sl); }   // botões no limite
+    if (mode === 'flex') { R(0, ty - 10, 7, 12, suit); R(27, ty - 10, 7, 12, suit); R(0, ty - 12, 6, 4, sl); R(28, ty - 12, 6, 4, sl); R(1, ty - 15, 5, 4, skin); R(28, ty - 15, 5, 4, skin); R(1, ty - 8, 4, 4, sl); R(29, ty - 8, 4, 4, sl); }
+    else if (mode === 'throw') { R(27, ty - 12, 7, 14, suit); R(27, ty - 14, 6, 4, skin); R(0, ty + 1, 7, 13, suit); R(0, ty + 13, 6, 3, skin); }
+    else { R(0 + lean, ty + 1, 7, 14, suit); R(1 + lean, ty + 2, 4, 6, sl); R(0 + lean, ty + 14, 6, 3, skin); R(27 + lean, ty + 1, 7, 14, suit); R(29 + lean, ty + 2, 4, 6, sl); R(28 + lean, ty + 14, 6, 3, skin); R(27 + lean, ty + 12, 7, 2, '#ffd23f'); }
+    const ly = ty + 16 - (tired ? 4 : 0);
+    R(9 + lean, ly, 7, 46 - ly - 2, sd); R(18 + lean, ly, 7, 46 - ly - 2, sd); R(7 + lean, 44, 9, 2, K); R(18 + lean, 44, 9, 2, K);
+    if (tired) { R(4, ty + 8, 4, 4, skin); R(26, ty + 8, 4, 4, skin); }
+  }));
+  SPR3.bomb = { idle: bomb('idle'), flex: bomb('flex'), throw: bomb('throw'), charge: bomb('charge'), tired: bomb('tired'), hurt: bomb('hurt') };
+  // Prof. Magnus Aurum: cabelo branco, óculos, terno impecável, voz mansa
+  const prof = mode => outl(mk(26, 46, R => {
+    const skin = '#f2c9a0', suit = '#3a3a48', sl = '#585868', hair = '#f4f4f4';
+    R(7, 0, 12, 3, hair); R(6, 2, 2, 8, hair); R(18, 2, 2, 8, hair); R(8, 2, 10, 11, skin); R(8, 2, 10, 1, hair);
+    R(8, 6, 4, 3, '#fff'); R(14, 6, 4, 3, '#fff'); R(8, 6, 4, 1, K); R(14, 6, 4, 1, K); R(12, 7, 2, 1, K);   // óculos
+    if (mode === 'tired' || mode === 'hurt') { R(9, 8, 2, 1, K); R(15, 8, 2, 1, K); R(11, 11, 4, 1, '#8a3a2a'); } else { R(10, 7, 1, 2, K); R(15, 7, 1, 2, K); R(11, 11, 4, 1, '#a05a4a'); }
+    R(10, 13, 6, 2, skin); R(5, 15, 16, 15, suit); R(5, 15, 16, 1, sl); R(11, 15, 4, 10, '#efe7d4'); R(12, 16, 2, 8, '#2f5d8a');
+    if (mode === 'throw') { R(20, 6, 4, 11, suit); R(20, 3, 4, 4, skin); } else if (mode === 'tired') { R(20, 16, 4, 6, suit); R(17, 13, 4, 5, '#bfe3ff'); R(17, 13, 4, 1, '#ffffff'); }
+    else { R(20, 16, 4, 12, suit); R(20, 27, 4, 3, skin); R(21, 28, 4, 2, '#2b2f48'); }   // controle dos slides
+    R(2, 16, 4, 12, suit); R(2, 27, 4, 3, skin);
+    R(7, 30, 5, 14, '#2b2b38'); R(14, 30, 5, 14, '#2b2b38'); R(6, 44, 6, 2, K); R(14, 44, 6, 2, K);
+  }));
+  SPR3.prof = { idle: prof('idle'), throw: prof('throw'), tired: prof('tired'), hurt: prof('hurt') };
+})();
+
+/* Fase 3: autoridade e preço. Os fatos destas explicações foram escritos sem checar a fonte na hora e aguardam a revisão do André. */
+const QS3 = [
+  { q: 'Soro de vitaminas na veia faz bem para quem está saudável.', a: 'M', e: 'Quem come de tudo já tem as vitaminas de que precisa. O que sobra das vitaminas solúveis em água sai na urina, e a agulha na veia ainda traz risco de infecção. É uma urina cara.' },
+  { q: 'O fígado e os rins já fazem a desintoxicação do corpo.', a: 'F', e: 'São eles que filtram, transformam e eliminam o que precisa sair. Suco, chá e enema “detox” não aceleram nada disso. Quando fígado ou rim param, o tratamento é no hospital.' },
+  { q: 'Enema de café limpa toxinas acumuladas no intestino.', a: 'M', e: 'Não existe a tal camada de toxinas grudada no intestino. O enema de café já causou queimadura, desidratação e perda de sódio e potássio, com mortes descritas em relatos de caso.' },
+  { q: 'Quanto mais caro o tratamento, maior a chance de funcionar.', a: 'M', e: 'Preço mede quanto alguém aceita pagar. Em 2008, voluntários sentiram mais alívio com um placebo que custava caro do que com o mesmo placebo vendido com desconto. Continuava sendo placebo.' },
+  { q: 'Quem tem doutorado pode estar errado, até na própria área.', a: 'F', e: 'Título conta a formação de alguém. Quem diz se uma afirmação está certa são os dados, e qualquer um pode errar na leitura deles, com ou sem diploma na parede.' },
+  { q: 'Linus Pauling, que ganhou dois prêmios Nobel, defendia megadoses de vitamina C contra o resfriado.', a: 'F', e: 'Defendia, num livro de 1970. Os ensaios clínicos que vieram depois mostraram que a vitamina C não evita resfriado na população em geral. Os dois Nobel não mudaram o resultado.' },
+  { q: 'Uma máquina que dá o mesmo resultado para qualquer coisa está medindo alguma coisa.', a: 'M', e: 'Teste que serve dá resultados diferentes para coisas diferentes. Se a banana e o paciente saem com o mesmo laudo, a máquina mede só a disposição de pagar.' },
+  { q: 'Muitos seguidores nas redes sociais mostram que o médico sabe o que diz.', a: 'M', e: 'Seguidor mede alcance. Dá para comprar seguidores, e o algoritmo premia o que dá medo ou esperança. Quem mede acerto é a evidência.' },
+  { q: 'Depoimento emocionado de paciente prova que o tratamento funciona.', a: 'M', e: 'Quem não melhorou não grava vídeo. Muita doença melhora sozinha, e o placebo e a regressão à média fazem o resto. Para separar uma coisa da outra existe o grupo controle.' },
+  { q: 'Tratamento sem eficácia é inofensivo, porque no pior caso não faz nada.', a: 'M', e: 'Tira dinheiro, tempo e às vezes o tratamento que funcionaria. Em 2018, um estudo no Journal of the National Cancer Institute mostrou que pacientes com câncer que escolheram só medicina alternativa morreram mais.' },
+  { q: 'Se o paciente melhorou depois do tratamento, foi o tratamento que curou.', a: 'M', e: 'Depois não quer dizer por causa. Gripe, dor nas costas e crise de enxaqueca passam sozinhas. Sem comparar com quem não recebeu o tratamento, não dá para saber o que curou.' },
+  { q: 'O placebo pode fazer a pessoa se sentir melhor sem mudar a doença.', a: 'F', e: 'Dor e enjoo respondem à expectativa. Tumor, glicemia e infecção não respondem. Sentir-se melhor e estar tratado são coisas diferentes.' },
+];
+const KILL_TXT3 = { gotinha: 'DILUÍDA!', recep: 'PACOTE CANCELADO!', drone: 'SEM SINAL!', like: 'DESCURTIDO!' };
+const KILL_COL3 = { recep: '#ffd23f', drone: '#59607e', like: '#ff3b6b' };
+Object.assign(KILL_TXT, KILL_TXT3); Object.assign(KILL_COL, KILL_COL3);
+Object.assign(BESTIARY, {
+  gotinha: { name: 'Gotinhas de grife', zoom: 3, text: 'Cópias do Zé com corante e preço de importado. Cada cor promete uma coisa: vitamina C, detox, beleza, energia e longevidade. Nenhuma entrega.',
+    list: ['Laranja anda reto. Verde deixa poça que escorrega.', 'Rosa pula. Azul corre em zigue-zague.', 'Dourada persegue o Zé e aguenta dois golpes.'], tip: 'Pisão ou seringa.' },
+  recep: { name: 'Recepcionista', zoom: 2.6, text: 'Antes de dizer bom-dia, oferece o pacote trimestral com desconto à vista. A consulta ainda nem começou.', tip: 'Arremessa cartões do pacote. Seringa ou dois pisões.' },
+  drone: { name: 'Drone de filmagem', zoom: 3, text: 'Grava tudo para os stories do doutor. A clínica acha que paciente filmado melhora mais rápido.', tip: 'Pule por cima ou passe por baixo. Pisão também resolve.' },
+  bolsa: { name: 'Bolsa de soro solta', zoom: 3, text: 'Pendurada no teto do corredor, esperando o próximo pacote. Cai quando alguém passa embaixo.', tip: 'Não dá para vencer. Passe rápido.' },
+  vapor: { name: 'Vapor do spa', zoom: 2.4, text: 'Sauna detox com essência de eucalipto importada. Quem desintoxica de verdade são o fígado e os rins, que não cobram a hora.', tip: 'Liga e desliga. Passe quando ele baixar.' },
+  i_grana: { kind: 'Novo item', name: 'Dinheiro do pacote', zoom: 3.2, text: 'Sai do bolso do Dr. Soro Platinum a cada golpe. É o dinheiro dos pacientes.', tipLabel: 'Atenção', tip: 'não vale pontos. Dinheiro não compra evidência.' },
+  poste: { kind: 'Veículo', name: 'Suporte de soro', zoom: 2.4, text: 'Tem rodinhas e o corredor é inclinado. O Zé sobe na base e segura o poste.',
+    list: [`Ele anda sozinho e não para. Você só pula (${isTouch ? 'A' : 'espaço'}).`, 'Buraco no piso derruba.', 'Carrinho de soro no caminho é golpe.', 'Onde o teto é baixo, o pulo também é.'] },
+  xicara: { kind: 'Área bônus', name: 'Intestino de café', zoom: 2.4, text: 'A clínica jura que o café entra limpando tudo. O Zé foi conferir de perto, dentro de uma xícara.',
+    list: [`A xícara desce sozinha. Você só pula (${isTouch ? 'A' : 'espaço'}).`, 'Cair do café derruba.', 'Grão de café no caminho é golpe.', 'Lá no fim, um cano devolve o Zé ao spa.'] },
+  bal3: { kind: 'Desafio', name: 'Balança da evidência', zoom: 1.5, text: 'A porta da farmácia premium só abre quando o prato desce. Empurre os blocos até ele.',
+    list: ['Bloco com lupa é evidência e tem peso.', 'Pote dourado é o produto importado de R$ 890, com selo e prêmio de revista.', 'Se os blocos travarem, bata a cabeça no bloco ↺ para recolocá-los.'] },
+  maq: { kind: 'Desafio', name: 'Máquina quântica', zoom: 1.5, text: 'Promete ler a energia de cada célula do paciente. Esta máquina detecta tudo. Será?',
+    list: ['Empurre um objeto até a plataforma de leitura e espere o laudo.', 'Cada objeto diferente com o mesmo laudo acende uma luz da porta.', 'Depois do laudo, empurre o objeto para o fosso e traga o próximo.', 'Se travar, bata a cabeça no bloco ↺.'] },
+  bomb: { name: 'Dr. Soro Platinum', kind: 'Subchefe', zoom: 2, text: 'Grisalho, bronzeado e com o terno dois números abaixo. Receita soro de vitaminas para quem está saudável e filma a aplicação para os seguidores.',
+    tip: 'Cada seringa conta. Depois da investida ele cansa: aí o pisão tira 2.', quote: 'Na veia o efeito é total!' },
+  guru: { name: 'Guru Glow', kind: 'Subchefe', zoom: 2, text: 'Não é médica. É a parceira de marca da clínica: vende vela, cristal, smoothie verde e adesivo energético, cada um com uma promessa de saúde.',
+    tip: 'Cada seringa conta. Quando ela para para meditar, o pisão tira 2. Fuja dos adesivos: eles deixam o Zé lento.', quote: 'Confie na sua energia!' },
+  prof: { name: 'Prof. Dr. PhD Magnus Aurum', kind: 'Chefão', zoom: 2, text: 'Palestrante de auditório lotado, voz mansa e uma pilha de livros próprios à venda na saída. Os diplomas fazem o trabalho que os dados não fazem.',
+    list: ['Os diplomas giram em volta dele: derrube um por um com seringas.', 'Sem diplomas, toda seringa conta e o pisão tira 2.', 'No telão, as barras do gráfico viram plataformas.'], quote: 'Confiem em mim, eu sou doutor.' },
+});
+const AR3 = { bomb: 101, guru: 283, prof: 316 };   // primeira coluna de cada arena (20 blocos, a largura da tela)
+const VEIC3 = { corr: [125, 211], bonus: [340, 427] };
+const HOLE3 = [270, 271], PIPE3 = 277;
+function buildLevel3() {
+  const m = []; for (let y = 0; y < LH; y++) m.push(new Array(LW).fill('.'));
+  const set = (x, y, c) => { if (x >= 0 && x < LW && y >= 0 && y < LH) m[y][x] = c; };
+  const hl = (x0, x1, y, c) => { for (let x = x0; x <= x1; x++) set(x, y, c); };
+  const vl = (x, y0, y1, c) => { for (let y = y0; y <= y1; y++) set(x, y, c); };
+  const items = [], enemies = [], qb = {}, plats = [], gates = [], blocks = [], bals = [], resetAt = {}, deco = [], drips = [];
+  const gota = (x, y) => items.push({ t: 'gota', x: x * T + 4, y: y * T + 3, w: 8, h: 10 });
+  const gotas = (x0, x1, y, step = 1) => { for (let x = x0; x <= x1; x += step) gota(x, y); };
+  const syr = (x, y) => items.push({ t: 'syr', x: x * T + 2, y: y * T + 6, w: 12, h: 6 });
+  const Q = (x, y, k) => { set(x, y, '?'); qb[x + ',' + y] = k; };
+  const mplat = (ax, x, y, a, b, v) => plats.push({ ax, x, y, w: 32, h: 6, a, b, v, dx: 0, dy: 0 });
+  const swing = (px, py, L, A, sp, ph) => { const pl = { kind: 'swing', px, py, L, A, sp, ph, w: 22, h: 6, x: 0, y: 0, dx: 0, dy: 0 }; platMove2(pl, 0); plats.push(pl); };
+  const pole = (tx, ty) => { plats.push({ kind: 'pole', x: tx * T, y: ty * T, w: 16, h: 6, dx: 0, dy: 0 }); deco.push({ k: 'polo', tx, ty }); };   // suporte de soro: o gancho em cima é degrau
+  const E = (t, tx, ty, o = {}) => {
+    const gy = (ty ?? G) * T, b = { t, hp: 1, fl: 0, vx: 0, vy: 0, ...o };
+    if (t === 'boato') enemies.push({ ...b, x: tx * T + 2, y: gy - 16, w: 14, h: 16, dir: -1, vip: true });
+    if (t === 'virus') enemies.push({ ...b, x: tx * T + 2, y: gy - 16, w: 16, h: 16, face: -1, hp: 2, tm: 50, vip: true });
+    if (t === 'fake') enemies.push({ ...b, x0: tx * T, y0: ty * T, x: tx * T, y: ty * T, w: 16, h: 16, ph: tx, r: 34, vip: true });
+    if (t === 'gotinha') enemies.push({ ...b, x: tx * T + 2, y: gy - 14, w: 12, h: 14, dir: -1, v: o.v ?? 0, hp: o.v === 4 ? 2 : 1, tm: 40 + (tx * 7) % 30, ph: tx, face: -1 });
+    if (t === 'recep') enemies.push({ ...b, x: tx * T, y: gy - 30, w: 16, h: 30, hp: 2, face: -1, tm: 60 });
+    if (t === 'drone') enemies.push({ ...b, x: tx * T, x0: tx * T, y0: ty * T, y: ty * T, w: 14, h: 10, awake: false });
+    if (t === 'bolsa') enemies.push({ ...b, x: tx * T + 3, y: gy, w: 10, h: 14, immune: true, noCount: true, hang: true, v: o.v ?? 0 });   // ty = linha logo abaixo do teto
+    if (t === 'vapor') enemies.push({ ...b, x: tx * T + 2, bx: tx * T + 2, by: gy, y: -500, w: 12, h: 40, immune: true, noCount: true, ph: o.ph ?? 0, on: false });
+  };
+  const drip = (tx, ty, v, every) => { drips.push({ x: tx * T + 5, y: ty * T, v, every, t: every >> 1 }); deco.push({ k: 'bag', tx, ty, v }); };
+  const gate = x => { vl(x, 0, 7, 'B'); vl(x + 1, 0, 7, 'B'); vl(x, 8, 11, 'G'); vl(x + 1, 8, 11, 'G'); set(x - 6, 8, 'M'); set(x - 3, 8, 'F'); gates.push({ x, mx: x - 6, fx: x - 3, z0: x - 10, z1: x + 1, open: false, lock: 0, first: true, q: null }); };
+  const blk = (k, tx, ty, bal, lab, obj) => blocks.push({ k, x: tx * T, y: ty * T, ox: tx * T, oy: ty * T, w: 16, h: 16, vx: 0, vy: 0, onG: true, on: null, bal, lab, obj, gone: false });
+  const bal = (x0, n, door, need, rx, ry) => { const i = bals.length; bals.push({ x0, n, door, need, solved: false, w: 0, sink: 0 }); hl(x0, x0 + n - 1, 12, 'P'); vl(door, 0, 7, 'B'); vl(door + 1, 0, 7, 'B'); vl(door, 8, 11, 'D'); vl(door + 1, 8, 11, 'D'); set(rx, ry, 'O'); resetAt[rx + ',' + ry] = i; };
+  const arena = (a, door) => { vl(a - 1, 0, 7, 'B'); vl(a + 20, 0, 7, 'B'); vl(a + 20, 8, 11, door ? 'D' : 'B'); };
+  hl(0, LW - 1, 12, '#'); hl(0, LW - 1, 13, '#');
+  const pit = (a, b) => { hl(a, b, 12, '.'); hl(a, b, 13, '.'); };
+
+  // trecho 1: recepção de mármore
+  gotas(4, 7, 10); E('recep', 11); deco.push({ k: 'balcao', tx: 10 }); Q(8, 8, 'gotas'); deco.push({ k: 'placa', tx: 6 });
+  pit(16, 24); swing(19.5 * T, T, 150, .5, .034, 0); swing(23.5 * T, T, 150, .5, .034, 1.6); gotas(17, 23, 7, 2);   // lustres sobre o espelho d'água (a geometria dos sinos da fase 2)
+  E('gotinha', 28, null, { v: 0 }); Q(30, 8, 'sus'); hl(33, 35, 9, '='); gotas(33, 35, 8);
+  hl(37, 38, 11, '^'); syr(40, 10); E('gotinha', 42, null, { v: 2 });
+  gate(48);
+  // trecho 2: lounge da soroterapia
+  gotas(52, 55, 10);
+  pit(58, 70); for (const x of [60, 64, 68]) { pole(x, 10); gota(x, 9); } drip(62, 4, 0, 110); drip(66, 4, 3, 130);   // os suportes de soro são o caminho; as bolsas pingam no vão
+  for (const x of [75, 82, 89]) deco.push({ k: 'poltrona', tx: x });
+  E('boato', 76); E('virus', 83); E('fake', 86, 8); drip(80, 3, 1, 150); drip(88, 3, 2, 150); Q(79, 8, 'gotas');
+  E('gotinha', 92, null, { v: 1 }); hl(91, 92, 10, '='); hl(93, 95, 8, '='); items.push({ t: 'shield', x: 95 * T + 3, y: 7 * T + 4, w: 10, h: 10, src: 'prat-95' }); gota(93, 7);
+  E('gotinha', 97, null, { v: 3 });
+  arena(AR3.bomb, true); hl(104, 106, 9, '='); hl(115, 117, 9, '=');
+  // trecho 3: corredor, no suporte de soro (a geometria da mina da fase 2, conferida por robô)
+  const [C0, C1] = VEIC3.corr;
+  for (let x = C0; x <= C1; x++) vl(x, 0, 5, 'B');
+  for (let x = 154; x <= 160; x++) vl(x, 6, 7, 'B'); for (let x = 175; x <= 180; x++) vl(x, 6, 7, 'B');   // teto baixo
+  for (const [a, b] of [[136, 138], [148, 150], [163, 166], [170, 172], [177, 178], [184, 186], [195, 198]]) pit(a, b);
+  for (const x of [143, 174, 190, 191]) set(x, 11, 'X');   // carrinho de soro; nada embaixo do teto baixo
+  E('bolsa', 146, 6, { v: 2 }); E('bolsa', 168, 6, { v: 3 }); E('bolsa', 193, 6, { v: 1 });
+  E('drone', 137, 8.5); E('drone', 157, 10); E('drone', 206, 10);
+  gotas(129, 133, 10); gota(137, 8); gota(149, 8); gotas(164, 165, 8); gota(171, 8); gotas(184, 186, 8); gotas(195, 198, 8); gotas(206, 208, 10);
+  const vehs = [{ k: 'poste', x: 127 * T, y: G * T - 14, w: 22, h: 14, x0: 127 * T, end: 209 * T, state: 'park' }];
+  // trecho 4: farmácia premium, balança (a geometria da balança 1 da fase 2)
+  gate(222); E('gotinha', 226, null, { v: 2 });
+  mplat('y', 229 * T, G * T - 12, 6 * T, G * T - 12, .55);
+  hl(231, 234, 7, '='); hl(236, 239, 7, '=');
+  blk('tr', 233, 11, 0, 'R$ 890'); blk('tr', 236, 11, 0, 'IMPORTADO');
+  blk('ev', 233, 6, 0, 'ENSAIO CLÍNICO'); blk('ev', 238, 6, 0, 'DADOS');
+  bal(240, 4, 244, 2, 227, 8);
+  // trecho 5: diagnóstico quântico
+  blk('qo', 247, 11, -1, 'PEDRA', 'pedra'); blk('qo', 249, 11, -1, 'BANANA', 'banana'); blk('qo', 251, 11, -1, 'VASO', 'vaso');
+  hl(253, 254, 12, 'Y'); hl(255, 257, 12, '.');   // plataforma de leitura e o fosso das amostras (raso: a linha 13 continua chão)
+  vl(259, 0, 7, 'B'); vl(260, 0, 7, 'B'); vl(259, 8, 11, 'D'); vl(260, 8, 11, 'D'); set(250, 8, 'O'); resetAt['250,8'] = 'maq';
+  const maq = { plate: [253, 254], door: 259, read: [], lights: 0, done: false, screen: null, zeT: 0, smoke: 0 };
+  // trecho 6: spa detox (buraco para o intestino de café) e Guru Glow
+  gotas(262, 264, 10); E('vapor', 266, null, { ph: 0 }); deco.push({ k: 'cafeteira', tx: 268 }); pit(HOLE3[0], HOLE3[1]);
+  E('vapor', 274, null, { ph: 2.4 }); drip(275, 4, 2, 140); deco.push({ k: 'cano', tx: PIPE3 }); E('gotinha', 280, null, { v: 1 }); syr(281, 10);
+  arena(AR3.guru, true); hl(287, 289, 9, '='); hl(296, 298, 9, '=');
+  // trecho 7: último portão e o auditório
+  gotas(305, 307, 10); E('gotinha', 308, null, { v: 4 });
+  gate(313);
+  arena(AR3.prof, false); hl(332, 335, 10, 'B'); hl(332, 335, 11, 'B');   // palco do palestrante
+  for (let i = 0; i < 4; i++) plats.push({ kind: 'bar', i, x: (AR3.prof + 3 + i * 3) * T, y: G * T - 6, base: G * T - 6, ty: G * T - 6, w: 24, h: 6, dx: 0, dy: 0 });   // barras do gráfico do telão
+  for (let x = 336; x <= 339; x++) vl(x, 0, 13, 'B');   // separa o auditório da área bônus
+  // área bônus: o intestino de café, só pelo buraco do spa
+  const [B0, B1] = VEIC3.bonus;
+  for (let x = B0; x < LW; x++) { vl(x, 0, 5, 'Z'); set(x, 12, 'J'); set(x, 13, 'J'); }
+  vl(B0, 6, 11, 'Z'); for (let x = B1 + 1; x < LW; x++) vl(x, 6, 11, 'Z');
+  for (let x = 369; x <= 375; x++) vl(x, 6, 7, 'Z'); for (let x = 390; x <= 395; x++) vl(x, 6, 7, 'Z');
+  for (const [a, b] of [[351, 353], [363, 365], [378, 381], [385, 387], [392, 393], [399, 401], [410, 413]]) pit(a, b);
+  for (const x of [358, 389, 405, 406]) set(x, 11, 'X');   // grãos de café boiando
+  gotas(345, 349, 10); gota(352, 8); gota(364, 8); gotas(379, 380, 8); gota(386, 8); gotas(399, 401, 8); gotas(410, 413, 8); gotas(417, 423, 10); gotas(370, 374, 10);
+  items.push({ t: 'shield', x: 383 * T + 3, y: 9 * T + 4, w: 10, h: 10, src: 'bonus-383' }); items.push({ t: 'boost', x: 396 * T + 3, y: 9 * T + 2, w: 10, h: 12, src: 'bonus-396' });
+  vehs.push({ k: 'xicara', x: (B0 + 2) * T, y: G * T - 14, w: 22, h: 14, x0: (B0 + 2) * T, end: (B1 - 3) * T, state: 'park' });
+  for (const tx of [2, 13, 26, 46, 56, 73, 99, 214, 224, 262, 304, 311]) deco.push({ k: tx > 260 ? 'planta' : tx > 210 ? 'vitrine' : tx > 50 ? 'planta' : 'coluna', tx });
+
+  const pool = QS3.slice();
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const s = {
+    map: m, qb, items, enemies, gates, plats, deco, shots: [], eshots: [], parts: [], texts: [], fx: [],
+    cps: [52, 122, 225, 262, 305].map(x => ({ x, on: false })),
+    jacs: [],
+    boss: { active: false, dead: false, st: 'wait', x: 0, y: 0, w: 24, h: 40, hp: 10, max: 10, t: 0, inv: 0, hurtT: 0, face: -1, throws: 0, throwT: 0 },
+    p: { x: 2 * T + 3, y: G * T - 24, w: 10, h: 24, vx: 0, vy: 0, face: 1, onG: true, big: false, growT: 0, ammo: 3, maxAmmo: 3, plat: null, inv: 0, cd: 0, coy: 0, buf: 0, stun: 0, canCut: false, ride: null, bite: 0, shield: false, boost: 0, dead: false, deadT: 0, shootT: 0, slip: 0, slowT: 0 },
+    cam: { x: 0, y: 44 }, time: 0, gotas: 0, healed: 0, cur: -1, shake: 0, winT: 0, pool, hints: {}, bumpA: null, seen: {}, intro: null, anim: 0,
+    stats: { acertos: 0, quedas: 0 }, kills: { boato: 0, fake: 0, virus: 0, gotinha: 0, recep: 0, drone: 0, bomb: 0, guru: 0 }, pu: new Set(), enemyTotal: enemies.filter(e => !e.noCount).length + 2, finalT: 0,   // os dois subchefes contam como inimigos
+    arena: null, waterHint: null, facade: [], blocks, bals, resetAt, wheels: [], crumb: {}, cart: null, balloon: null, mine: null, air: null, launch: null,
+    vehs, maq, drips, pocas: [], bossDone: {}, grana: 0, placas: 0,
+  };
+  s.total = items.filter(i => i.t === 'gota').length + 5 * Object.values(qb).filter(k => k === 'gotas').length;
+  s.puTotal = Object.values(qb).filter(k => k !== 'gotas').length + items.filter(i => i.src).length;
+  for (const g of gates) g.q = s.pool.pop();
+  return s;
+}
+
+/* ───────── Fase 3: veículos (suporte de soro e xícara) ───────── */
+function board3(v) {
+  const p = st.p; v.state = 'ride'; p.cart = true; p.veh = v; if (p.big) p.growT = 0;
+  p.w = 20; p.h = 26; p.x = v.x + 1; p.y = G * T - p.h; p.vy = 0; p.vx = DF().cartV; p.plat = null; sfx('mount');
+}
+function leave3(v) {
+  const s = st, p = s.p, w = p.big ? 14 : 10, h = p.big ? 32 : 24, bottom = p.y + p.h;
+  p.cart = false; p.veh = null; p.w = w; p.h = h;
+  if (v.k === 'xicara') {   // fim do intestino: o cano devolve o Zé ao spa
+    v.state = 'park'; v.x = v.x0; p.x = PIPE3 * T + 3; p.y = G * T - h - 18; p.vy = -5.2; p.vx = .6; p.canCut = false;
+    s.cam.x = clamp(p.x - VW / 2, 0, LW * T - VW); sfx('pop'); shake(8, 2); burst(p.x + 5, G * T - 10, '#7a4a2a', 12); txt(p.x + 5, p.y - 10, 'Pelo cano, de volta ao spa', '#fff');
+    hintOnce('cano', '<span><b class="tag">De volta ao spa.</b> O café entrou e saiu sem limpar nada. Nem tinha o que limpar.</span>', 320); return;
+  }
+  v.state = 'done'; v.x = v.end - v.w + 6; v.y = G * T - v.h;
+  p.x += (20 - w) / 2 + 6; p.y = bottom - h - 2; p.vy = -4.2; p.vx = 1.4; p.canCut = false; sfx('jump'); shake(8, 2); burst(v.x + 20, v.y + 6, '#ffd23f', 8); txt(v.x + 10, v.y - 12, 'Fim do corredor', '#fff');
+}
+function fall3(p) {   // o buraco do spa leva ao intestino de café; o resto dos buracos derruba, como nas outras fases
+  const s = st; if (p.y < LH * T + 8 || p.dead) return false;
+  if (p.x + p.w / 2 < HOLE3[0] * T - 4 || p.x + p.w / 2 > (HOLE3[1] + 1) * T + 4) return false;
+  const v = s.vehs.find(v => v.k === 'xicara'); p.x = v.x + v.w / 2 - p.w / 2; p.y = 6 * T + 4; p.vy = 1; p.vx = 0; p.stun = 40; p.plat = null;   // cai direto na xícara
+  s.cam.x = clamp(p.x - VW / 2, 0, LW * T - VW); s.cam.y = 44; sfx('ploc'); txt(p.x + 5, p.y - 6, 'Glub… café!', '#e8c9a0');
+  return true;
+}
+function after3(p) {
+  const s = st;
+  for (const v of s.vehs) {
+    if (v.state === 'park' && !p.cart && !p.dead && overlap(p, v)) board3(v);
+    if (p.veh === v && p.x + p.w >= v.end) leave3(v);
+  }
+  if (p.slip > 0) p.slip--; if (p.slowT > 0) p.slowT--;
+  for (const k of s.pocas) if (p.onG && !p.cart && p.y + p.h >= k.y - 2 && p.y + p.h <= k.y + 4 && p.x + p.w > k.x + 2 && p.x < k.x + k.w - 2) { p.slip = 8; hintOnce('poca', '<span><b class="tag">Poça de soro.</b> Escorrega: o Zé demora a frear.</span>', 220); }
+  if (p.x > 245 * T && p.x < 258 * T) hintOnce('maq', '<span><b class="tag">Diagnóstico quântico.</b> Empurre coisas diferentes até a plataforma e compare os laudos.</span>', 360);
+  if (p.x > 263 * T && p.x < 270 * T) hintOnce('cafe', '<span><b class="tag">Ala detox.</b> Tem um buraco atrás da cafeteira. Quem cai nele não volta pelo mesmo caminho.</span>', 300);
+}
+function respawn3() {
+  const s = st, p = s.p; p.veh = null; p.slip = 0; p.slowT = 0;
+  for (const v of s.vehs) { if (v.state === 'done') continue; if (v.k === 'poste' && s.cur >= 2) { v.state = 'done'; v.x = v.end - v.w + 6; } else { v.state = 'park'; v.x = v.x0; } v.y = G * T - v.h; }
+  const cpx = s.cps[s.cur] ? s.cps[s.cur].x : 0;
+  for (const k of ['bomb', 'guru']) if (!s.bossDone[k] && cpx > AR3[k] + 20) bossOpen3(k, true);   // jogo continuado depois da arena: o subchefe já caiu
+  s.pocas.length = 0; s.placas = 0; for (const pl of s.plats) if (pl.kind === 'bar') { pl.ty = pl.base; pl.y = pl.base; }
+}
+function bossOpen3(k, quiet) {
+  const s = st, a = AR3[k]; s.bossDone[k] = true;
+  for (let y = 8; y <= 11; y++) { s.map[y][a - 1] = '.'; if (s.map[y][a + 20] === 'D') { s.map[y][a + 20] = '.'; if (!quiet) burst((a + 20) * T + 8, y * T + 8, '#cfe9ff', 3); } }
+}
+/* ───────── Fase 3: passo (gotejamento, poças, máquina quântica) ───────── */
+function step3() {
+  const s = st, p = s.p;
+  for (const d of s.drips) {   // bolsas de soro de grife: pingam quando o Zé está por perto
+    if (Math.abs(d.x - p.x) > 210 || p.dead || s.vic) continue;
+    if (--d.t <= 0) { d.t = d.every; s.eshots.push({ t: 'gota3', v: d.v, x: d.x - 3, y: d.y + 14, w: 6, h: 8, vx: 0, vy: d.v === 4 ? .4 : .8, life: 400, bounce: 0, ph: Math.random() * 6 }); }
+  }
+  for (const k of s.pocas) k.t--; s.pocas = s.pocas.filter(k => k.t > 0);
+  const M = s.maq; if (!M) return;
+  if (M.screen && --M.screen.t <= 0) M.screen = null;
+  if (M.smoke > 0 && s.time % 6 === 0) s.parts.push({ x: (M.plate[0] + 1) * T + (Math.random() - .5) * 20, y: 6 * T, vx: (Math.random() - .5) * .4, vy: -.5, t: 30, c: '#9aa3b8', g: -.01 });
+  if (M.done) return;
+  for (const k of s.blocks) {
+    if (k.k !== 'qo' || k.gone) continue;
+    const on = k.onG && tileAt(Math.floor((k.x + 8) / T), Math.floor((k.y + k.h + 1) / T)) === 'Y';
+    k.scan = on ? (k.scan || 0) + 1 : 0; if (k.scan === 24) readMaq(k.obj, k);
+  }
+  const zon = p.onG && !p.dead && tileAt(Math.floor((p.x + p.w / 2) / T), Math.floor((p.y + p.h + 1) / T)) === 'Y';
+  M.zeT = zon ? M.zeT + 1 : 0; if (M.zeT === 30) readMaq('ze', p);
+}
+function readMaq(obj, o) {
+  const s = st, M = s.maq; sfx('tick'); M.screen = { t: 200, obj };
+  const nome = { pedra: 'Pedra', banana: 'Banana', vaso: 'Vaso de planta', ze: 'Zé Gotinha' }[obj];
+  txt(o.x + o.w / 2, o.y - 10, nome + ': desequilíbrio grave', '#ff8fd0');
+  if (obj === 'ze') { hintOnce('maqze', '<span><b class="tag">Até o Zé.</b> Mesmo laudo, mesmo protocolo de R$ 12.900. Agora teste uma coisa que nem está viva.</span>', 300); return; }
+  if (M.read.includes(obj)) { txt(o.x + o.w / 2, o.y - 20, 'Esse já foi lido', '#ffd23f'); return; }
+  M.read.push(obj); M.lights = M.read.length; sfx('power'); burst(M.door * T + 16, 7 * T, '#ff8fd0', 6);
+  if (M.lights === 1) hintOnce('maq1', '<span><b class="tag">Uma luz acesa.</b> Empurre a amostra para o fosso e traga outra coisa, bem diferente.</span>', 300);
+  if (M.lights >= 3) solveMaq();
+}
+function solveMaq(quiet) {
+  const s = st, M = s.maq; if (M.done) return; M.done = true; M.lights = 3; M.smoke = 1;
+  for (const x of [M.door, M.door + 1]) for (let y = 8; y <= 11; y++) { s.map[y][x] = '.'; if (!quiet) burst(x * T + 8, y * T + 8, '#cfe9ff', 3); }
+  if (quiet) return;
+  sfx('ok'); shake(12, 2); s.balOk = (s.balOk || 0) + 1; M.screen = { t: 1e9, obj: 'erro' };
+  introStart('maqok', { x: (M.plate[0] - 4) * T, y: 6 * T, w: 10 * T, h: 6 * T }, { kind: 'Máquina quântica', name: 'Controle negativo', text: 'Pedra, banana e vaso saíram com o mesmo laudo do paciente. Um teste que dá o mesmo resultado para tudo não mede nada.', tipLabel: '', tip: 'A máquina pifou e a porta abriu.', zoom: 1.4, cls: 'ok', quiet: true });
+}
+function resetMaq() {
+  const s = st; if (s.maq.done) { sfx('bump'); return; }
+  for (const k of s.blocks) if (k.k === 'qo') { k.gone = false; k.x = k.ox; k.y = k.oy; k.vy = 0; k.on = null; k.scan = 0; burst(k.x + 8, k.y + 8, '#ffd23f', 5); }
+  sfx('power'); txt(s.p.x + 5, s.p.y - 8, 'Amostras de volta ao lugar', '#ffd23f');
+}
+function intro3(near) {
+  const s = st, p = s.p;
+  for (const v of s.vehs) if (v.state === 'park' && !s.seen[v.k] && near(v) && introStart(v.k, v)) return true;
+  for (const bl of s.bals) if (!bl.solved && !s.seen.bal3 && near({ x: bl.x0 * T, y: 10 * T, w: bl.n * T, h: 2 * T }) && introStart('bal3', { x: (bl.x0 - 6) * T, y: 6 * T, w: (bl.n + 8) * T, h: 6 * T })) return true;
+  const M = s.maq; if (M && !M.done && !s.seen.maq && p.x > 245 * T && introStart('maq', { x: 246 * T, y: 6 * T, w: 14 * T, h: 6 * T })) return true;
+  return false;
+}
+/* ───────── Fase 3: inimigos ───────── */
+function stepEnemy3(e, p) {
+  const s = st;
+  if (e.t === 'gotinha') {
+    e.vy = Math.min(e.vy + .28, 5); const pb = e.y + e.h; e.ph += .1;
+    if (e.v === 2) {   // rosa: pula
+      e.x += e.vx; collideX(e); if (e.hitWall) e.vx = -e.vx; e.y += e.vy; collideY(e, pb);
+      if (e.onG) { e.vx = 0; if (--e.tm <= 0) { const dx = p.x - e.x; e.tm = 50 + Math.random() * 30; if (Math.abs(dx) < 160) { e.face = Math.sign(dx) || -1; e.vy = -3.6; e.vx = e.face * .8; e.onG = false; const ah = tileAt(Math.floor((e.x + e.w / 2 + e.face * 20) / T), Math.floor((e.y + e.h + 4) / T)); if (!solid(ah) && !ONEWAY.has(ah)) e.vx = e.face * .2; } } }
+      return true;
+    }
+    if (e.v === 4) { const dx = p.x + p.w / 2 - e.x - e.w / 2; if (Math.abs(dx) < 140 && !p.dead) e.dir = Math.sign(dx) || e.dir; }   // dourada: persegue
+    const sp = e.v === 3 ? 1.15 : e.v === 4 ? .55 : e.v === 1 ? .35 : .45;
+    if (e.v === 3 && s.time % 70 === (e.ph * 10 | 0) % 70) e.dir = -e.dir;   // azul: zigue-zague
+    e.vx = e.dir * sp; e.x += e.vx; collideX(e); if (e.hitWall) e.dir = -e.dir;
+    e.y += e.vy; collideY(e, pb);
+    if (e.onG) { const fx = e.dir > 0 ? e.x + e.w + 1 : e.x - 1, c = tileAt(Math.floor(fx / T), Math.floor((e.y + e.h + 2) / T)); if (!solid(c) && !ONEWAY.has(c)) e.dir = -e.dir; }
+    if (e.v === 1 && e.onG && s.time % 120 === (e.ph * 10 | 0) % 120 && s.pocas.length < 8) s.pocas.push({ x: e.x - 4, y: e.y + e.h, w: 20, v: 1, t: 360 });   // verde: deixa poça
+    return true;
+  }
+  if (e.t === 'recep') {
+    e.vy = Math.min(e.vy + .28, 5); const pb = e.y + e.h; e.y += e.vy; collideY(e, pb);
+    const dx = p.x + p.w / 2 - (e.x + e.w / 2); e.face = Math.sign(dx) || -1; if (e.throwT > 0) e.throwT--;
+    if (--e.tm <= 0) { e.tm = DF().botiEvery + 10; if (Math.abs(dx) < 190 && !p.dead) { e.throwT = 16; sfx('shot'); s.eshots.push({ t: 'card', x: e.x + e.w / 2 - 5, y: e.y + 8, w: 10, h: 6, vx: e.face * 1.5, vy: 0, y0: e.y + 8, ph: 0, life: 220 }); } }
+    return true;
+  }
+  if (e.t === 'drone') {
+    if (!e.awake) { if (e.x - p.x < 150 && e.x > p.x) e.awake = true; return true; }
+    e.x -= .8; e.y = e.y0 + Math.sin(e.x * .05) * 5; if (e.x < e.x0 - 240) { e.dead = true; burst(e.x + 7, e.y + 5, '#59607e', 5); }
+    return true;
+  }
+  if (e.t === 'bolsa') {
+    if (e.hang) { if (e.x - p.x < 96 && e.x + 20 > p.x) { e.hang = false; sfx('bump'); } return true; }
+    e.vy = Math.min(e.vy + .3, 6); const pb = e.y + e.h; e.y += e.vy; collideY(e, pb);
+    if (e.onG) { e.dead = true; burst(e.x + 5, e.y + 8, SORO_COR[e.v][0], 10); sfx('pop'); shake(4, 1); }
+    return true;
+  }
+  if (e.t === 'vapor') {
+    e.ph += .02; const on = Math.sin(e.ph) > .1; if (on !== e.on) { e.on = on; if (on) sfx('ploc'); }
+    e.y = on ? e.by - e.h : -500;
+    if (on && s.time % 3 === 0) s.parts.push({ x: e.bx + 2 + Math.random() * 8, y: e.by - 4, vx: (Math.random() - .5) * .5, vy: -1.6 - Math.random(), t: 26, c: Math.random() < .5 ? '#ffffff' : '#dfe9f2', g: -.005 });
+    return true;
+  }
+  if (e.t === 'like') {
+    e.ph = (e.ph || 0) + .06; const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
+    e.x += dx / d * .75; e.y += dy / d * .55 + Math.sin(e.ph) * .6; return true;
+  }
+  return false;
+}
+function eshot3(f, p) {   // move os projéteis da fase 3; devolve true se cuidou dele
+  const s = st;
+  if (f.t === 'gota3') {
+    if (f.v === 3) f.x += Math.sin((f.ph += .12)) * 1.4;
+    if (f.v === 4 && !p.dead) f.x += clamp(p.x + p.w / 2 - f.x - 3, -.5, .5);
+    f.vy = Math.min(f.vy + (f.v === 4 ? .02 : .12), f.v === 4 ? 1.1 : 4); f.y += f.vy;
+    const c = tileAt(Math.floor((f.x + 3) / T), Math.floor((f.y + 8) / T));
+    if (solid(c) || (ONEWAY.has(c) && f.vy > 0) || f.y > LH * T) {
+      if (f.v === 2 && f.bounce < 2 && f.y < LH * T) { f.bounce++; f.vy = -2.6 + f.bounce * .7; f.y -= 2; return true; }   // rosa: quica
+      f.life = 0; burst(f.x + 3, f.y + 6, SORO_COR[f.v][0], 6); if (f.v === 1 && f.y < LH * T) s.pocas.push({ x: f.x - 7, y: Math.floor((f.y + 8) / T) * T, w: 20, v: 1, t: 300 });   // verde: poça
+    }
+    return true;
+  }
+  if (f.t === 'card') { f.ph += .1; f.y = f.y0 + Math.sin(f.ph) * 4; if (solid(tileAt(Math.floor((f.x + 5) / T), Math.floor((f.y + 3) / T)))) { f.life = 0; burst(f.x + 5, f.y + 3, '#ffd23f', 4); } return true; }
+  if (f.t === 'bolsa3' || f.t === 'cristal' || f.t === 'livro') {   // em arco; o cristal quica uma vez; a bolsa estoura numa poça
+    f.vy += f.t === 'livro' ? .12 : .16; f.y += f.vy; if (f.t === 'livro') f.rot = (f.rot || 0) + .2;
+    const c = tileAt(Math.floor((f.x + 4) / T), Math.floor((f.y + 8) / T));
+    if (solid(c) || (ONEWAY.has(c) && f.vy > 0) || f.y > LH * T) {
+      if (f.t === 'cristal' && !f.bounce && f.y < LH * T) { f.bounce = 1; f.vy = -2.4; f.y = Math.floor((f.y + 8) / T) * T - 9; return true; }
+      f.life = 0; burst(f.x + 4, f.y + 6, f.t === 'livro' ? '#efe7d4' : SORO_COR[f.v || 0][0], 7); sfx('pop');
+      if (f.t === 'bolsa3' && f.y < LH * T) s.pocas.push({ x: f.x - 6, y: Math.floor((f.y + 8) / T) * T, w: 20, v: f.v, t: 420 });
+    }
+    return true;
+  }
+  if (f.t === 'adesivo') {   // persegue devagar; pega e deixa o Zé lento, sem dano
+    const dx = p.x + p.w / 2 - f.x - 4, dy = p.y + p.h / 2 - f.y - 4, d = Math.hypot(dx, dy) || 1, v = .95;
+    f.vx += (dx / d * v - f.vx) * .05; f.vy += (dy / d * v - f.vy) * .05; f.y += f.vy;
+    if (!p.dead && overlap(p, f)) { f.life = 0; p.slowT = 200; sfx('ploc'); burst(f.x + 4, f.y + 4, '#b46cff', 8); txt(p.x + 5, p.y - 8, 'Adesivo energético: lerdeza!', '#d9a8ff'); }
+    return true;
+  }
+  if (f.t === 'vela') {   // vela: acende depois de um tempo e queima até apagar
+    f.t2 = (f.t2 || 0) + 1; f.vx = 0; f.lit = f.t2 > 45; f.h = 14; f.y = f.lit ? f.gy - 14 : f.gy + 4; return true;   // apagada fica abaixo do chão: não machuca
+  }
+  return false;
+}
+const ESHOT3 = new Set(['gota3', 'card', 'bolsa3', 'cristal', 'livro', 'adesivo']);   // a seringa estoura
+/* ───────── Fase 3: os três chefes ───────── */
+const BOSS3 = {
+  bomb: { name: 'DR. SORO PLATINUM', tag: 'Dr. Soro Platinum', w: 26, h: 44, hp: [10, 7], quote: '“Na veia o efeito é total!”' },
+  guru: { name: 'GURU GLOW', tag: 'Guru Glow', w: 22, h: 38, hp: [8, 6], quote: '“Confie na sua energia!”' },
+  prof: { name: 'PROF. DR. PHD MAGNUS AURUM', tag: 'Prof. Magnus Aurum', w: 22, h: 44, hp: [12, 8], quote: '“Confiem em mim, eu sou doutor.”' },
+};
+const DIPLOMAS = ['CURSO DE FIM DE SEMANA', 'TÍTULO HONORÁRIO', 'CERTIFICADO DE PARTICIPAÇÃO', 'PÓS EM 48 HORAS', 'PRÊMIO DE REVISTA', 'MEMBRO DE ACADEMIA'];
+function boss3Start(k) {
+  const s = st, b = s.boss, a = AR3[k], B = BOSS3[k], easy = s.diff === 'facil', hp = B.hp[easy ? 1 : 0];
+  for (let y = 8; y <= 11; y++) s.map[y][a - 1] = 'B';
+  s.arena = { lock: a * T, door: a - 1, a };
+  Object.assign(b, { active: true, dead: false, who: k, name: B.name, st: 'intro', t: 0, w: B.w, h: B.h, x: (a + 16) * T, y: G * T - B.h, vx: 0, vy: 0, max: hp, hp, inv: 0, hurtT: 0, throwT: 0, face: -1, n: 0, gaveSus: false, gaveMin: false,
+    dip: k === 'prof' ? (easy ? 3 : 5) : 0, dipA: 0 });
+  if (k === 'guru') b.y = G * T - B.h - 40;
+  if (k === 'prof') { b.x = (a + 13) * T; for (const pl of s.plats) if (pl.kind === 'bar') { pl.ty = pl.base; } }
+  arenaAmmo3(a); music('boss'); sfx('boss'); say(`<span><b class="tag">${B.tag}:</b> ${B.quote}</span>`, 260, 'boss');
+}
+function arenaAmmo3(a) {
+  const s = st; for (const tx of [a + 3, a + 16]) if (!s.items.some(i => i.arena && !i.got && i.tx === tx && i.t === 'syr')) s.items.push({ t: 'syr', x: tx * T + 2, y: 10 * T + 6, w: 12, h: 6, arena: true, tx });
+}
+function stepBoss3() {
+  const s = st, b = s.boss, p = s.p;
+  if (!b.active && !b.dead && !p.dead) for (const k of ['bomb', 'guru', 'prof']) { const a = AR3[k]; if (!s.bossDone[k] && p.x > (a + 1.5) * T && p.x < (a + 20) * T) { boss3Start(k); break; } }
+  if (!b.active) return;
+  b.t++; if (b.inv > 0) b.inv--; if (b.hurtT > 0) b.hurtT--; if (b.throwT > 0) b.throwT--;
+  const a = AR3[b.who], L = (a + 1) * T, R = (a + 19) * T, D = DF(), easy = s.diff === 'facil', cx = b.x + b.w / 2, pcx = p.x + p.w / 2, ph2 = b.hp <= b.max / 2;
+  if (b.st === 'dying') {
+    if (b.t % 8 === 0) { burst(b.x + Math.random() * b.w, b.y + Math.random() * b.h, ['#ffd23f', '#ff8fd0', '#fff'][b.t / 8 % 3 | 0], 8); sfx('pop'); }
+    if (b.who === 'bomb' && b.t % 5 === 0) cash3(b, 1);
+    if (b.t > 100) {
+      if (b.who === 'prof') { b.dead = true; b.active = false; s.finalT = s.time; s.placas = 1; if (window.__mgNoIntro) { s.winT = 110; sfx('win'); } else s.vic = { t: 0, g: -1 }; setMsg('<span><b class="tag">Auditório vazio.</b> A plateia levantou a mão e perguntou pela evidência.</span>', 'ok'); msgTTL = 400; }
+      else {
+        const k = b.who; b.active = false; b.st = 'wait'; s.kills[k] = (s.kills[k] || 0) + 1; bossOpen3(k); s.arena = null; music('stage'); sfx('ok');
+        if (k === 'bomb') { txt(cx, b.y - 10, 'Reembolso aos pacientes: R$ ' + num(12900 + s.grana * 450), '#8be36a'); say('<span><b class="tag">Dr. Soro Platinum caiu.</b> O soro de vitaminas foi parar na urina, como sempre.</span>', 300, 'ok'); }
+        else say('<span><b class="tag">Guru Glow saiu de cena.</b> Foi lançar uma vela com cheiro de evidência. Não vende.</span>', 300, 'ok');
+        s.enemies = s.enemies.filter(e => !e.arena); s.items = s.items.filter(i => !i.arena || i.t === 'grana'); s.eshots.length = 0; writeSave();
+      }
+    }
+    return;
+  }
+  if (b.who === 'bomb') stepBomb3(b, p, L, R, D, easy, ph2);
+  else if (b.who === 'guru') stepGuru3(b, p, L, R, D, easy, ph2);
+  else stepProf3(b, p, L, R, D, easy, ph2);
+  if (s.time % (easy ? 180 : 240) === 0) arenaAmmo3(a);
+  if (p.dead || s.vic || b.st === 'intro' || b.st === 'dying') return;
+  const body = { x: b.x + 3, y: b.y + 2, w: b.w - 6, h: b.h - 2 };
+  if (overlap(p, body)) {
+    const stomp = p.vy > .3 && !p.onG && p.y + p.h - b.y < 12;
+    if (stomp && (b.st === 'tired' || (b.who === 'prof' && b.dip === 0))) { dmg3(2, 'stomp'); p.vy = keys.jump ? -4.9 : -3.6; p.canCut = false; }
+    else if (stomp && b.who === 'prof') { p.vy = -3.4; txt(cx, b.y - 6, 'Tem diploma demais', '#ffd23f'); sfx('bump'); }
+    else hurt(cx);
+  }
+}
+function dmg3(d, kind) {
+  const s = st, b = s.boss; if (b.inv > 0 || !b.active || b.st === 'intro' || b.st === 'dying') return;
+  b.hp -= d; b.inv = 10; b.hurtT = 20; b.hurtKind = kind; hitstop(b.hp <= 0 ? 12 : 5); shake(b.hp <= 0 ? 26 : 8, b.hp <= 0 ? 4 : 2); sfx('boss'); burst(b.x + b.w / 2, b.y + 14, '#ffd23f', 10); txt(b.x + b.w / 2, b.y - 2, 'AI!', '#ff8fa3');
+  if (b.who === 'bomb') cash3(b, 3);
+  if (b.hp <= 0) { b.hp = 0; b.st = 'dying'; b.t = 0; s.eshots.length = 0; for (const e of s.enemies) if (e.arena && !e.dead) { e.dead = true; burst(e.x + 6, e.y + 6, '#ff3b6b', 6); }
+    if (b.who === 'prof') { s.slow = SLOW_STEPS; music(null); } }
+}
+function hitBoss3(o) {
+  const s = st, b = s.boss; o.life = 0;
+  if (b.st === 'intro') { burst(o.x + 5, o.y + 2, '#cfd6e6', 4); sfx('ploc'); return; }
+  dmg3(1);
+}
+function cash3(b, n) {   // o dinheiro dos pacientes sai do bolso do doutor
+  const s = st;
+  for (let i = 0; i < n; i++) {
+    s.parts.push({ x: b.x + b.w / 2, y: b.y + 18, vx: (Math.random() - .5) * 3, vy: -2 - Math.random() * 2, t: 40, c: Math.random() < .5 ? '#49c05a' : '#ffd23f', g: .12 });
+    if (s.items.filter(it => it.t === 'grana' && !it.got).length < 10) s.items.push({ t: 'grana', x: b.x + b.w / 2 - 4, y: b.y + 14, w: 9, h: 5, vx: (Math.random() - .5) * 2.4, vy: -2.6 - Math.random() * 1.2, phys: true, stopY: 0, arena: true });
+  }
+}
+function stepBomb3(b, p, L, R, D, easy, ph2) {
+  const s = st, cx = b.x + b.w / 2, pcx = p.x + p.w / 2;
+  if (b.st !== 'charge') b.face = pcx < cx ? -1 : 1;
+  switch (b.st) {
+    case 'intro': if (b.t === 40) { b.flex = 30; sfx('slam'); } if (b.flex > 0) b.flex--; if (b.t > 90) { b.st = 'walk'; b.t = 0; introStart('bomb', b); } break;
+    case 'walk': {   // anda atrás do Zé e alterna arremesso, supino e investida
+      const tx = clamp(pcx + (cx < pcx ? -60 : 60), L, R - b.w); b.x += clamp(tx - b.x, -.5, .5);
+      if (b.t > (easy ? 80 : 55)) { b.t = 0; b.n++; b.st = 'flex'; b.next = b.n % 4 === 0 ? 'charge' : ph2 && b.n % 4 === 2 ? 'press' : 'throw'; }
+    } break;
+    case 'flex': if (b.t === 1) txt(cx, b.y - 8, b.next === 'charge' ? 'Olha o shape!' : 'Hmpf!', '#fff'); if (b.t > (b.next === 'charge' ? D.warn + 14 : 22)) { b.st = b.next; b.t = 0; } break;
+    case 'throw':
+      if (b.t === 1) { b.throwT = 16; sfx('shot'); const v = (b.n * 3) % 5, dx = pcx - cx; s.eshots.push({ t: 'bolsa3', v, x: cx - 4, y: b.y + 4, w: 8, h: 10, vx: clamp(dx / 56, -2.4, 2.4), vy: -3.8, life: 260 }); }
+      if (b.t > 30) { b.st = 'walk'; b.t = 0; } break;
+    case 'press':   // supino com o suporte de soro: chove soro de grife na arena
+      if (b.t % 14 === 0 && b.t < 100) { const v = (b.t / 14 | 0) % 5; s.eshots.push({ t: 'gota3', v, x: L + Math.random() * (R - L), y: 2 * T, w: 6, h: 8, vx: 0, vy: .5, life: 400, bounce: 0, ph: Math.random() * 6 }); }
+      if (b.t > 120) { b.st = 'walk'; b.t = 0; } break;
+    case 'charge': {
+      if (b.t === 1) { b.face = pcx < cx ? -1 : 1; sfx('slam'); }
+      b.x += b.face * (easy ? 2.6 : 3.2); if (b.t % 4 === 0) dust(b.face > 0 ? b.x : b.x + b.w, G * T, 2, 6);
+      if (b.x < L || b.x + b.w > R) { b.x = clamp(b.x, L, R - b.w); b.st = 'tired'; b.t = 0; shake(14, 3); sfx('slam'); txt(cx, b.y - 8, 'Ufa… cadê a câmera?', '#fff'); hintOnce('bombt', '<span><b class="tag">Cansou da investida.</b> Agora o pisão tira 2.</span>', 220); }
+    } break;
+    case 'tired':
+      if (b.t % 30 === 0) s.parts.push({ x: cx + b.face * 8, y: b.y + 8, vx: b.face * .4, vy: -.6, t: 20, c: '#bfe3ff', g: .05 });
+      if (b.t > (easy ? 230 : 170)) {
+        b.st = 'walk'; b.t = 0;
+        if (ph2 && !b.gaveSus) { b.gaveSus = true; s.items.push({ t: 'sus', x: (AR3.bomb + 10) * T - 7, y: -12, w: 15, h: 9, vx: 0, vy: 0, phys: true, stopY: 0, arena: true, src: 'arena-soro' }); }
+        if (ph2 && D.minions && !b.gaveMin) { b.gaveMin = true; for (const yy of [60, 110]) s.enemies.push({ t: 'like', x: R + 10, y: yy, w: 10, h: 9, hp: 1, fl: 0, vx: 0, vy: 0, arena: true }); txt(cx, b.y - 16, 'Curtam meu vídeo!', '#ff8fd0'); }
+      } break;
+  }
+  b.y = G * T - b.h;
+}
+function stepGuru3(b, p, L, R, D, easy, ph2) {
+  const s = st, cx = b.x + b.w / 2, pcx = p.x + p.w / 2, hover = G * T - b.h - 40 + Math.sin(s.time * .05) * 4;
+  b.face = pcx < cx ? -1 : 1;
+  switch (b.st) {
+    case 'intro': b.y += (hover - b.y) * .05; if (b.t > 90) { b.st = 'float'; b.t = 0; b.tx = L + 40; introStart('guru', b); } break;
+    case 'float': {   // flutua de um lado ao outro e alterna cristal, vela e adesivo
+      b.y += (hover - b.y) * .08; if (Math.abs(b.tx - b.x) < 2) b.tx = L + 20 + Math.random() * (R - L - 60); b.x += clamp(b.tx - b.x, -.7, .7);
+      if (b.t > (easy ? 90 : 65)) { b.t = 0; b.n++; b.st = ['cristal', 'vela', 'adesivo', 'cristal', 'medita'][(b.n - 1) % 5]; if (b.st === 'adesivo' && easy && !ph2) b.st = 'cristal'; }
+    } break;
+    case 'cristal':
+      if (b.t % 16 === 1 && b.t < 40) { b.throwT = 14; sfx('shot'); const k = b.t / 16 | 0, dx = pcx - cx + (k - 1) * 30; s.eshots.push({ t: 'cristal', v: (b.n + k) % 5, x: cx - 3, y: b.y + 10, w: 7, h: 9, vx: clamp(dx / 60, -2.2, 2.2), vy: -2.6, life: 300 }); }
+      if (b.t > 60) { b.st = 'float'; b.t = 0; } break;
+    case 'vela':   // acende velas no chão perto do Zé; queimam um tempo e apagam
+      if (b.t === 1) { b.throwT = 20; txt(cx, b.y - 6, 'Vela de lavanda, R$ 380', '#fff'); const n = easy ? 2 : 3; for (let i = 0; i < n; i++) { const x = clamp(pcx + (i - (n - 1) / 2) * 34, L + 6, R - 10); s.eshots.push({ t: 'vela', x: x - 3, y: G * T - 1, gy: G * T, w: 6, h: 1, vx: 0, vy: 0, life: easy ? 200 : 260 }); } }
+      if (b.t > 50) { b.st = 'float'; b.t = 0; } break;
+    case 'adesivo':
+      if (b.t === 1) { b.throwT = 16; sfx('shot'); for (const d of ph2 ? [-1, 1] : [1]) s.eshots.push({ t: 'adesivo', x: cx - 4, y: b.y + 12, w: 9, h: 9, vx: d * 1, vy: -1, life: 360 }); txt(cx, b.y - 6, 'Adesivo energético!', '#d9a8ff'); }
+      if (b.t > 50) { b.st = 'float'; b.t = 0; } break;
+    case 'medita':   // desce para meditar: é a hora do pisão
+      b.y += (G * T - b.h - b.y) * .1; if (b.t > 30) { b.st = 'tired'; b.t = 0; txt(cx, b.y - 8, 'Namastê…', '#fff'); hintOnce('gurut', '<span><b class="tag">Meditando.</b> De olhos fechados ela não vê o pisão: tira 2.</span>', 220); } break;
+    case 'tired':
+      b.y += (G * T - b.h - b.y) * .1;
+      if (b.t > (easy ? 230 : 170)) { b.st = 'float'; b.t = 0;
+        if (ph2 && !b.gaveSus) { b.gaveSus = true; s.items.push({ t: 'sus', x: (AR3.guru + 10) * T - 7, y: -12, w: 15, h: 9, vx: 0, vy: 0, phys: true, stopY: 0, arena: true, src: 'arena-guru' }); } }
+      break;
+  }
+}
+function stepProf3(b, p, L, R, D, easy, ph2) {
+  const s = st, cx = b.x + b.w / 2, pcx = p.x + p.w / 2, a = AR3.prof, podX = (a + 16) * T + 8, ph3 = b.hp <= b.max / 3;
+  b.dipA += .035;
+  if (b.st !== 'graph') b.face = pcx < cx ? -1 : 1;
+  const bars = s.plats.filter(pl => pl.kind === 'bar');
+  switch (b.st) {
+    case 'intro': if (b.t > 90) { b.st = 'walk'; b.t = 0; introStart('prof', b); } break;
+    case 'walk': {   // anda pelo palco e joga os próprios livros
+      const tx = clamp(pcx + (cx < pcx ? -70 : 70), L, (a + 15) * T); b.x += clamp(tx - b.x, -.45, .45);
+      const every = easy ? 80 : ph3 ? 46 : 60;
+      if (b.t % every === every - 1) { b.throwT = 16; sfx('shot'); const dx = pcx - cx, sp = easy ? 66 : 56; for (const k of ph3 && !easy ? [-1, 1] : [0]) s.eshots.push({ t: 'livro', v: (b.t / every | 0) % 5, x: cx - 5, y: b.y + 6, w: 11, h: 8, vx: clamp(dx / sp + k * .4, -2.6, 2.6), vy: -3.4, life: 300 }); }
+      if (b.t > (easy ? 420 : 360) && b.dip === 0) { b.st = 'toPod'; b.t = 0; }
+    } break;
+    case 'toPod': b.x += clamp(podX - b.x, -1.2, 1.2); if (Math.abs(podX - b.x) < 2) { b.st = 'graph'; b.t = 0; b.face = -1; txt(cx, b.y - 8, 'Vejam este gráfico!', '#fff'); hintOnce('graf', '<span><b class="tag">Gráfico sem eixo.</b> As barras sobem e descem. Use-as para chegar até ele.</span>', 260); } break;
+    case 'graph': {   // no palco, com o gráfico no telão: as barras viram plataformas
+      bars.forEach((pl, i) => { pl.ty = pl.base - (24 + 44 * (.5 + .5 * Math.sin(b.t * .03 + i * 1.3))); });
+      const every = easy ? 90 : 70;
+      if (b.t % every === every - 1) { b.throwT = 16; sfx('shot'); s.eshots.push({ t: 'livro', v: 2, x: cx - 5, y: b.y + 6, w: 11, h: 8, vx: clamp((pcx - cx) / 50, -2.4, 2.4), vy: -2.8, life: 300 }); }
+      if (b.t > (easy ? 420 : 360)) { b.st = 'tired'; b.t = 0; for (const pl of bars) pl.ty = pl.base; txt(cx, b.y - 8, 'Um minuto, um gole de água…', '#fff'); }
+    } break;
+    case 'tired': if (b.t > (easy ? 200 : 150)) { b.st = 'walk'; b.t = 0; if (ph2 && !b.gaveSus) { b.gaveSus = true; s.items.push({ t: 'sus', x: (a + 6) * T - 7, y: -12, w: 15, h: 9, vx: 0, vy: 0, phys: true, stopY: 0, arena: true, src: 'arena-prof' }); } } break;
+  }
+  if (b.st !== 'graph' && b.st !== 'toPod') b.x = Math.min(b.x, (a + 15) * T);
+  b.y = (b.x + b.w / 2 > (a + 16) * T ? 10 * T : G * T) - b.h;   // em cima do palco quando está nele
+}
+function dipPos(b, i) { const a = b.dipA + i * Math.PI * 2 / b.dip; return { x: b.x + b.w / 2 + Math.cos(a) * 26 - 6, y: b.y + b.h / 2 + Math.sin(a) * 22 - 5, w: 13, h: 10 }; }
+function shot3(o) {   // seringa contra os chefes da fase 3; devolve true se acertou alguma coisa
+  const s = st, b = s.boss; if (!b.active || b.st === 'dying' || !b.who) return false;
+  if (b.who === 'prof' && b.dip > 0) {
+    for (let i = 0; i < b.dip; i++) { const d = dipPos(b, i); if (overlap(o, d)) {
+      o.life = 0; b.dip--; sfx('pop'); burst(d.x + 6, d.y + 5, '#ffd23f', 8); const lab = DIPLOMAS[(DIPLOMAS.length - 1 - b.dip) % DIPLOMAS.length];
+      s.texts.push({ x: d.x + 6, y: d.y - 4, s: lab, c: '#ffd23f', t: 80 }); s.fx.push({ img: SPR3.diploma, cw: 13, base: 5, x: d.x + 6, y: d.y + 5, t: 40, vy: 1.6, flip: false });
+      if (b.dip === 0) { hintOnce('dip0', '<span><b class="tag">Sem diplomas.</b> Agora ele é só mais uma pessoa falando. Toda seringa conta.</span>', 260); shake(10, 2); }
+      return true; } }
+    if (overlap(o, b)) { o.life = 0; burst(o.x + 5, o.y + 2, '#ffd23f', 4); sfx('ploc'); hintOnce('dipx', 'Os diplomas protegem o professor. Acerte os diplomas primeiro.', 260); return true; }
+    return false;
+  }
+  if (overlap(o, b)) { hitBoss3(o); return true; }
+  return false;
+}
+function grana3(it) {
+  const s = st; it.got = true; s.grana++; sfx('gota'); txt(it.x + 4, it.y - 6, 'R$ 450 de volta', '#8be36a');
+  hintOnce('grana', '<span><b class="tag">Dinheiro dos pacientes.</b> Pode pegar, mas não vale ponto. Dinheiro não compra evidência.</span>', 260);
+}
+
+/* ───────── Desenho da fase 3 ───────── */
+const ZONA3 = [[0, 'recep'], [50, 'lounge'], [122, 'corr'], [212, 'farm'], [246, 'quant'], [261, 'spa'], [304, 'aud'], [336, 'bonus']];
+const zona3 = tx => { let z = 'recep'; for (const [a, k] of ZONA3) if (tx >= a) z = k; return z; };
+const TIL3 = {};   // blocos por ambiente, desenhados na primeira vez
+function til3(key, fn) { return TIL3[key] || (TIL3[key] = mk(16, 16, fn)); }
+function floor3(z, top) {
+  const P = { recep: ['#f2ece0', '#d9cfbb', '#bdb29a'], lounge: ['#e6f2ee', '#c8ddd6', '#9fbdb3'], corr: ['#f4f7fb', '#d6dee9', '#a9b6c8'], farm: ['#eef7f1', '#cfe3d6', '#a5c4b0'],
+    quant: ['#3a2a5c', '#2a1e46', '#1a1230'], spa: ['#b07a4e', '#8a5a36', '#6b4428'], aud: ['#6b3a2a', '#4f2a1e', '#3a1e14'], bonus: ['#c8506a', '#a83a56', '#7a2440'] }[z];
+  return til3(z + (top ? 'F' : 'f'), R => {
+    R(0, 0, 16, 16, top ? P[1] : P[2]);
+    if (!top) { R(0, 0, 16, 1, P[1]); R(3, 6, 5, 1, P[1]); R(10, 11, 4, 1, P[1]); return; }
+    R(0, 0, 16, 7, P[0]); R(0, 0, 16, 1, '#ffffff');
+    if (z === 'spa' || z === 'aud') { R(0, 3, 16, 1, P[1]); R(7, 0, 1, 3, P[1]); R(3, 4, 1, 3, P[1]); R(12, 4, 1, 3, P[1]); }
+    else if (z === 'quant') { R(0, 6, 16, 1, '#ff4fd8'); R(7, 0, 1, 6, '#5a3a8a'); }
+    else { R(2, 2, 4, 1, P[1]); R(5, 3, 3, 1, P[1]); R(10, 4, 5, 1, P[1]); R(15, 1, 1, 5, P[1]); }   // veios do mármore
+    R(0, 7, 16, 1, z === 'quant' ? '#ff4fd8' : '#d9a441'); R(0, 8, 16, 1, P[2]);
+  });
+}
+function wall3(z, edge) {
+  return til3(z + 'B' + edge, R => {
+    if (z === 'corr') { R(0, 0, 16, 16, '#e9eef5'); R(0, 15, 16, 1, '#a9b6c8'); R(0, 0, 1, 16, '#ffffff'); if (edge) { R(0, 12, 16, 3, '#ffffff'); R(2, 13, 12, 1, '#bfe3ff'); } return; }   // forro do corredor com luminária
+    if (z === 'quant') { R(0, 0, 16, 16, '#2a1e46'); R(0, 0, 16, 1, '#5a3a8a'); R(0, 15, 16, 1, '#1a1230'); R(7, 3, 2, 2, '#ff4fd8'); return; }
+    if (z === 'aud') { R(0, 0, 16, 16, '#4f2a1e'); R(0, 0, 16, 1, '#8a5a36'); R(0, 7, 16, 1, '#3a1e14'); R(5, 0, 1, 7, '#3a1e14'); R(11, 8, 1, 7, '#3a1e14'); return; }
+    if (z === 'spa') { R(0, 0, 16, 16, '#8a5a36'); for (let x = 0; x < 16; x += 4) R(x, 0, 1, 16, '#6b4428'); R(0, 0, 16, 1, '#b07a4e'); return; }
+    R(0, 0, 16, 16, '#e8e0cf'); R(0, 0, 16, 1, '#ffffff'); R(0, 15, 16, 1, '#bdb29a'); R(15, 0, 1, 16, '#cfc5ae'); R(3, 4, 6, 1, '#d6ccb6'); R(8, 5, 4, 1, '#d6ccb6'); R(2, 10, 3, 1, '#d6ccb6');
+    R(0, 0, 1, 16, '#d9a441');
+  });
+}
+function tile3(c, tx, ty, up, x, y) {
+  const s = st, z = zona3(tx);
+  switch (c) {
+    case '#': return floor3(z, !SOLID.has(up));
+    case 'B': return wall3(z, z === 'corr' && ty < LH - 1 && s.map[ty + 1][tx] === '.' ? 1 : 0);
+    case '=': return til3('glass', R => { R(0, 0, 16, 4, '#bfe3ffcc'); R(0, 0, 16, 1, '#ffffff'); R(0, 3, 16, 1, '#8fb8d8'); R(2, 4, 2, 4, '#d9a441'); R(12, 4, 2, 4, '#d9a441'); });
+    case '^': return til3('cris', R => { const C = [['#b46cff', '#f0d0ff'], ['#ff6fb5', '#ffc4e2'], ['#3fd6c8', '#c4fff6'], ['#b46cff', '#f0d0ff']]; for (let i = 0; i < 4; i++) { const [a, l] = C[i], h = 6 + (i * 5) % 7; R(i * 4 + 1, 16 - h, 3, h, a); R(i * 4 + 2, 15 - h, 1, 1, a); R(i * 4 + 1, 16 - h, 1, h - 1, l); } R(0, 15, 16, 1, '#5a3a8a'); });
+    case 'X': return z === 'bonus' ? til3('grao', R => { R(2, 3, 12, 12, '#3a1e10'); R(1, 5, 14, 8, '#3a1e10'); R(3, 4, 10, 10, '#6b3a1e'); R(2, 6, 12, 6, '#6b3a1e'); R(7, 4, 2, 10, '#2a140a'); R(4, 5, 2, 2, '#8a5a36'); R(4, 1, 8, 2, '#e8c9a0'); })
+      : til3('carr', R => { R(1, 4, 14, 9, '#9aa3b8'); R(1, 4, 14, 1, '#dfe5f0'); R(2, 6, 12, 6, '#59607e'); for (const [xx, cc] of [[3, '#ff9a2e'], [6, '#5ccf5a'], [9, '#ff6fb5'], [12, '#3fa9ff']]) { R(xx, 1, 2, 5, '#e8f4ff'); R(xx, 3, 2, 3, cc); } R(2, 13, 3, 3, '#2b2f48'); R(11, 13, 3, 3, '#2b2f48'); });
+    case 'Y': { const k = (s.anim >> 3) & 1, M = s.maq, on = M && !M.done; ctx.drawImage(til3('plate' + k, R => { R(0, 0, 16, 16, '#3a405c'); R(0, 0, 16, 3, '#9aa3b8'); R(0, 0, 16, 1, '#dfe5f0'); R(1, 3, 14, 1, k ? '#ff4fd8' : '#4fd8ff'); R(3, 5, 10, 1, '#59607e'); }), x, y); if (on) { ctx.fillStyle = (s.anim >> 3) & 1 ? 'rgba(255,79,216,.25)' : 'rgba(79,216,255,.25)'; ctx.fillRect(x, y - 30, T, 30); } return 1; }
+    case 'J': { if (ty === 13) return til3('cafe2', R => { R(0, 0, 16, 16, '#3a1e10'); R(4, 6, 3, 1, '#4f2a16'); R(10, 11, 4, 1, '#4f2a16'); });
+      const o = (s.anim >> 2) & 15; ctx.drawImage(til3('cafe1', R => { R(0, 0, 16, 16, '#4f2a16'); R(0, 0, 16, 3, '#8a5a36'); R(0, 0, 16, 1, '#e8c9a0'); R(2, 1, 4, 1, '#f4e2c4'); R(10, 2, 3, 1, '#f4e2c4'); R(5, 7, 4, 1, '#6b3a1e'); }), o, 0, 16 - o, 16, x, y, 16 - o, 16);
+      if (o) ctx.drawImage(TIL3.cafe1, 0, 0, o, 16, x + 16 - o, y, o, 16); return 1; }
+    case 'Z': { ctx.drawImage(til3('intest', R => { R(0, 0, 16, 16, '#a83a56'); R(0, 0, 16, 1, '#c8506a'); R(3, 4, 4, 2, '#c8506a'); R(9, 10, 5, 2, '#c8506a'); R(1, 12, 3, 1, '#7a2440'); R(11, 3, 3, 1, '#7a2440'); }), x, y);
+      const dn = ty < LH - 1 && s.map[ty + 1][tx] === '.', pul = Math.round(Math.sin(s.time * .06 + tx) * 1.5);
+      if (dn) { ctx.fillStyle = '#c8506a'; for (const vx of [2, 9]) { ctx.fillRect(x + vx, y + 16, 4, 4 + pul); ctx.fillRect(x + vx + 1, y + 19 + pul, 2, 2); } ctx.fillStyle = '#ff8fa8'; ctx.fillRect(x + 3, y + 16, 1, 3); ctx.fillRect(x + 10, y + 16, 1, 3); }   // vilosidades
+      return 1; }
+    case 'D': { if (s.map[ty][tx - 1] === 'D' || s.map[ty - 1][tx] === 'D') return 1;   // porta de vidro inteira a partir do bloco de cima à esquerda
+      const im = SPR3.door || (SPR3.door = outl(mk(32, 64, R => { R(0, 0, 32, 64, '#d9a441'); R(2, 2, 13, 60, '#bfe3ffcc'); R(17, 2, 13, 60, '#bfe3ffcc'); R(3, 3, 2, 30, '#ffffff99'); R(18, 3, 2, 30, '#ffffff99'); R(13, 28, 2, 8, '#8a6420'); R(17, 28, 2, 8, '#8a6420'); R(8, 6, 16, 6, '#1a1f3d'); R(10, 8, 12, 2, '#ffd23f'); })));
+      ctx.drawImage(im, x - 1, y - 1); return 1; }
+    case 'P': { const bl = s.bals.find(b => tx >= b.x0 && tx < b.x0 + b.n), sk = bl ? Math.round(bl.sink) : 0; ctx.fillStyle = '#1a1f3d'; ctx.fillRect(x, y, T, sk); ctx.drawImage(floor3('farm', false), x, y + sk); ctx.fillStyle = '#d9a441'; ctx.fillRect(x, y + sk, T, 3); ctx.fillStyle = '#ffe08a'; ctx.fillRect(x, y + sk, T, 1); return 1; }
+    case 'O': return tile2(c, tx, ty, up, x, y);
+  }
+  return null;
+}
+/* Fundo: parede de cada ambiente, em paralaxe, com o recorte de cada um alinhado à fase. */
+function bg3() {
+  const s = st; ctx.fillStyle = '#1a1f3d'; ctx.fillRect(0, 0, VW, VH);
+  const gy = G * T - camY;
+  for (let i = 0; i < ZONA3.length; i++) {
+    const a = ZONA3[i][0] * T - camX, b = (i + 1 < ZONA3.length ? ZONA3[i + 1][0] : LW) * T - camX, z = ZONA3[i][1];
+    if (b < 0 || a > VW) continue;
+    ctx.save(); ctx.beginPath(); ctx.rect(Math.max(0, a), 0, Math.min(VW, b) - Math.max(0, a), VH); ctx.clip();
+    wallBg3(z, gy, s);
+    ctx.restore();
+  }
+  const top = gy - 214;   // acima do prédio, o céu da noite (aparece na abertura e no fim)
+  if (top > 0) {
+    const gr = ctx.createLinearGradient(0, Math.min(0, top - 400), 0, top); gr.addColorStop(0, '#0b1030'); gr.addColorStop(1, '#2a2a6c'); ctx.fillStyle = gr; ctx.fillRect(0, 0, VW, top);
+    for (let i = 0; i < 40; i++) { const sx = (i * 97 + 13) % VW, sy = top - 20 - ((i * 53) % 400); if (sy > 0) { ctx.fillStyle = i % 3 ? '#cfd6ff' : '#ffd23f'; ctx.fillRect(sx, sy, 1, 1); } }
+    ctx.fillStyle = '#d9a441'; ctx.fillRect(0, top, VW, 3); ctx.fillStyle = '#efe6d6'; ctx.fillRect(0, top + 3, VW, 4);
+  }
+}
+function wallBg3(z, gy, s) {
+  const px = camX * .6, rep = (w, fn) => { const o = -(((Math.floor(px) % w) + w) % w); for (let x = o; x < VW + w; x += w) fn(x); }, F = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+  if (z === 'recep' || z === 'lounge') {
+    const base = z === 'recep' ? '#e9e0cc' : '#d3e9e3', pan = z === 'recep' ? '#f4eddc' : '#e6f4f0';
+    F(0, 0, VW, VH, base);
+    rep(96, x => { F(x + 6, gy - 150, 84, 140, pan); F(x + 6, gy - 150, 84, 1, '#ffffff'); F(x + 30, gy - 132, 36, 60, '#1a2a5c'); for (const [wx, wy] of [[33, 30], [41, 18], [50, 26], [58, 12]]) F(x + wx, gy - 132 + 60 - wy, 6, wy, '#2b3f7a');
+      for (const [wx, wy] of [[35, 40], [44, 30], [52, 46], [60, 22]]) F(x + wx, gy - 132 + 60 - wy + 6, 1, 1, '#ffd23f'); F(x + 28, gy - 134, 40, 2, '#d9a441'); F(x + 28, gy - 72, 40, 3, '#d9a441'); F(x + 47, gy - 132, 2, 60, '#d9a441');
+      F(x, gy - 160, 3, 160, '#d9a441'); F(x + 1, gy - 160, 1, 160, '#ffe08a'); F(x + 6, gy - 36, 84, 2, '#cfc5ae'); });
+    if (z === 'lounge') rep(64, x => { F(x + 20, gy - 160, 1, 40, '#9aa3b8'); F(x + 14, gy - 120, 14, 3, '#cfd6e6'); });   // trilhos de soro no teto
+  } else if (z === 'corr') {
+    F(0, 0, VW, VH, '#e3e9f2'); rep(80, x => { F(x + 10, gy - 70, 26, 70, '#cfd8e6'); F(x + 12, gy - 68, 22, 66, '#f4f7fb'); F(x + 30, gy - 40, 2, 4, '#9aa3b8'); F(x + 14, gy - 64, 18, 10, '#bfe3ff'); F(x + 50, gy - 78, 20, 8, '#2f7bff'); F(x + 52, gy - 76, 16, 4, '#bfe3ff'); });
+    F(0, gy - 30, VW, 3, '#9aa3b8'); F(0, gy - 30, VW, 1, '#ffffff');   // corrimão
+  } else if (z === 'farm') {
+    F(0, 0, VW, VH, '#dcefe4'); rep(72, x => { for (let r = 0; r < 4; r++) { const yy = gy - 120 + r * 26; F(x + 4, yy + 18, 64, 3, '#ffffff'); F(x + 4, yy + 21, 64, 1, '#a5c4b0'); for (let k = 0; k < 6; k++) { const c = SORO_COR[(k + r) % 5][0]; F(x + 8 + k * 10, yy + 8, 6, 10, c); F(x + 8 + k * 10, yy + 6, 6, 2, '#ffd23f'); F(x + 9 + k * 10, yy + 10, 1, 6, '#ffffff88'); } } });
+  } else if (z === 'quant') {
+    F(0, 0, VW, VH, '#1e1236'); ctx.globalAlpha = .45; rep(32, x => { F(x, 0, 1, VH, '#ff4fd8'); }); for (let y = gy; y > -40; y -= 24) F(0, y, VW, 1, '#4fd8ff'); ctx.globalAlpha = 1;
+    rep(120, x => { for (const [sx, sy] of [[10, 20], [60, 50], [95, 15], [40, 80]]) F(x + sx, gy - 160 + sy, 1, 1, (s.anim >> 4) & 1 ? '#ffffff' : '#b46cff'); });
+  } else if (z === 'spa') {
+    F(0, 0, VW, VH, '#7a4a2a'); rep(12, x => { F(x, 0, 1, VH, '#6b3f22'); F(x + 6, 0, 1, VH, '#8a5a36'); });
+    rep(110, x => { F(x + 20, gy - 110, 70, 44, '#5a3a22'); F(x + 22, gy - 108, 66, 40, '#cfe8e2'); for (let k = 0; k < 5; k++) F(x + 30 + k * 12, gy - 100 + (k % 2) * 6, 2, 30, '#49c05a'); F(x + 20, gy - 66, 70, 3, '#d9a441'); });   // jardim de bambu na vitrine
+  } else if (z === 'aud') {
+    F(0, 0, VW, VH, '#4a0e1a'); rep(18, x => { F(x, 0, 9, VH, '#5a1020'); F(x + 2, 0, 2, VH, '#7a1a30'); F(x + 12, 0, 1, VH, '#3a0812'); });
+    F(0, gy - 172, VW, 8, '#d9a441');
+    const a = AR3.prof, b = st.boss;   // plateia: cadeiras e cabeças; o Barão na primeira fila
+    for (let i = 0; i < 26; i++) { const wx = (a - 2) * T + i * 15 - camX, row = i % 2, hy = gy - 26 - row * 10, clap = b.active && b.who === 'prof' && ((s.anim >> 3) + i) & 1 ? -1 : 0;
+      if (wx < -20 || wx > VW + 20) continue;
+      F(wx, hy + 10, 13, 14, '#2a0610'); F(wx + 3, hy + clap, 7, 8, ['#e8b48a', '#c08a60', '#8a5a3e', '#f2c9a0'][i % 4]); F(wx + 3, hy + clap, 7, 2, ['#3a2a1c', '#d4d4d4', '#1a1a1a', '#b8743a'][(i * 3) % 4]);
+      if (s.placas) { F(wx - 2, hy - 16, 17, 10, '#ffffff'); F(wx + 6, hy - 6, 1, 6, '#8a5a36'); F(wx, hy - 13, 13, 1, '#1a1f3d'); F(wx, hy - 10, 9, 1, '#1a1f3d'); } }
+    if (s.placas) label('QUAL A EVIDÊNCIA?', (a + 10) * T - camX, gy - 58, '#ffd23f', 9);
+    const BA = SPR2.baronArt, bx = (a + 7) * T - camX, by = gy - 46 + (b.active && b.who === 'prof' && (s.anim >> 3) & 1 ? -1 : 0);   // o Barão na plateia, aplaudindo
+    if (!s.placas) { if (BA) ctx.drawImage(BA.fly, 0, 0, BARAO_ART.cw, 34, bx - BARAO_ART.cw / 2, by, BARAO_ART.cw, 34); else ctx.drawImage(SPR2.baron.fly, 0, 0, 40, 30, bx - 20, by + 4, 40, 30); }
+    else label('O Barão saiu de fininho', bx, gy - 40, '#fff', 7);
+  } else if (z === 'bonus') {
+    F(0, 0, VW, VH, '#7a2440'); const pul = Math.sin(s.time * .04) * 3;
+    rep(40, x => { F(x + 4, gy - 120 + pul, 30, 110, '#8a2c4a'); F(x + 6, gy - 120 + pul, 2, 110, '#a83a56'); F(x + 18, gy - 90, 6, 6, '#c8506a'); });
+  }
+}
+function deco3(tx0) {
+  const s = st, F = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+  for (const d of s.deco) {
+    if (d.tx < tx0 - 3 || d.tx > tx0 + 23) continue; const x = d.tx * T - camX, gy = G * T - camY;
+    switch (d.k) {
+      case 'coluna': F(x + 2, gy - 150, 12, 150, '#f4eddc'); F(x + 2, gy - 150, 2, 150, '#ffffff'); F(x + 11, gy - 150, 3, 150, '#d9cfbb'); F(x, gy - 150, 16, 4, '#d9a441'); F(x, gy - 6, 16, 6, '#d9a441'); break;
+      case 'planta': F(x + 4, gy - 10, 9, 10, '#f4f4f4'); F(x + 4, gy - 10, 9, 1, '#d9a441'); for (const [lx, ly, c] of [[2, -22, '#2a8a34'], [8, -28, '#49c05a'], [11, -20, '#2a8a34'], [5, -16, '#49c05a']]) { F(x + lx, gy + ly, 5, 8, c); F(x + lx + 2, gy + ly + 2, 1, 5, '#8be36a'); } F(x + 8, gy - 18, 1, 8, '#2a8a34'); break;
+      case 'vitrine': F(x - 4, gy - 44, 28, 44, '#d9a441'); F(x - 2, gy - 42, 24, 40, '#bfe3ffaa'); for (let r = 0; r < 3; r++) for (let k = 0; k < 4; k++) F(x + k * 6, gy - 38 + r * 13, 4, 9, SORO_COR[(k + r) % 5][0]); break;
+      case 'balcao': F(x - 12, gy - 20, 44, 20, '#e8e0cf'); F(x - 12, gy - 20, 44, 3, '#d9a441'); F(x - 12, gy - 17, 44, 1, '#ffe08a'); F(x - 4, gy - 13, 28, 8, '#1a1f3d'); label('VIP', x + 10, gy - 6, '#ffd23f', 7); break;
+      case 'placa': { const py = 6 * T - camY; F(x - 30, py, 92, 26, '#1a1f3d'); F(x - 30, py, 92, 2, '#d9a441'); F(x - 30, py + 24, 92, 2, '#d9a441');
+        label('CLÍNICA VITTA PRIME', x + 16, py + 12, '#ffd23f', 8); label('Dr. Charles Latão · Dra. Pikha Aretha', x + 16, py + 21, '#fff', 6); } break;   // os sócios do Manual Prático do Picareta
+      case 'poltrona': F(x - 2, gy - 16, 22, 16, '#f4ecd8'); F(x - 4, gy - 22, 6, 18, '#e8dcc2'); F(x + 16, gy - 22, 6, 18, '#e8dcc2'); F(x + 1, gy - 24, 16, 10, '#efe6d2'); F(x - 2, gy - 3, 2, 3, '#d9a441'); F(x + 18, gy - 3, 2, 3, '#d9a441');
+        F(x + 26, gy - 54, 2, 54, '#cfd6e6'); F(x + 22, gy - 54, 10, 2, '#9aa3b8'); spr(SPR3.bolsa[(d.tx >> 1) % 5], x + 22, gy - 52); F(x + 26, gy - 37, 1, 16, '#bfe3ff'); break;   // o soro dos pacientes VIP
+      case 'bag': F(x + 7, 0 - camY, 1, d.ty * T, '#9aa3b8'); spr(SPR3.bolsa[d.v], x + 3, d.ty * T - camY); break;
+      case 'cafeteira': { const yy = gy - 70; F(x - 8, yy, 44, 70, '#59607e'); F(x - 8, yy, 44, 3, '#dfe5f0'); F(x - 4, yy + 8, 36, 22, '#3a405c'); F(x, yy + 12, 28, 14, '#1a1f3d'); label('DETOX', x + 14, yy + 22, '#8be36a', 7);
+        F(x + 8, yy + 34, 12, 8, '#2b2f48'); F(x + 12, yy + 42, 4, 10, '#4f2a16'); if ((s.anim >> 4) & 1) F(x + 13, yy + 52, 2, 4, '#4f2a16'); F(x - 8, yy + 64, 44, 6, '#2b2f48'); label('GRÃOS SELECIONADOS', x + 14, yy - 4, '#e8c9a0', 6); } break;
+      case 'cano': F(x, gy - 22, 16, 22, '#2a8a34'); F(x - 2, gy - 26, 20, 6, '#49c05a'); F(x - 2, gy - 26, 20, 1, '#8be36a'); F(x + 2, gy - 20, 2, 18, '#5ccf5a'); F(x + 1, gy - 22, 14, 2, '#1a5a24'); break;
+    }
+  }
+}
+function plat3(pl) {
+  const x = Math.round(pl.x) - camX, y = Math.round(pl.y) - camY, F = (a, b, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(a, b, w, h); };
+  if (pl.kind === 'swing') {
+    ctx.strokeStyle = '#d9a441'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(pl.px) - camX + .5, pl.py - camY); ctx.lineTo(x + pl.w / 2 + .5, y); ctx.stroke();
+    F(Math.round(pl.px) - camX - 4, pl.py - camY - 3, 8, 4, '#d9a441'); spr(SPR3.lustre, Math.round(x + pl.w / 2 - 14), y - 1);
+  } else if (pl.kind === 'pole') {
+    F(x + 7, y + 4, 2, LH * T - pl.y, '#cfd6e6'); F(x + 7, y + 4, 1, LH * T - pl.y, '#ffffff'); F(x, y, 16, 4, '#0b1030'); F(x + 1, y + 1, 14, 2, '#dfe5f0'); F(x + 1, y, 2, 4, '#9aa3b8'); F(x + 13, y, 2, 4, '#9aa3b8');
+  } else if (pl.kind === 'bar') {
+    const c = SORO_COR[pl.i % 5], h = G * T - pl.y;
+    if (h > 7) { F(x, y, pl.w, h, '#0b1030'); F(x + 1, y + 1, pl.w - 2, h - 1, c[0]); F(x + 1, y + 1, pl.w - 2, 2, c[2]); F(x + pl.w - 4, y + 3, 2, h - 3, c[1]); }
+    else { F(x, y + 2, pl.w, 4, '#0b1030'); F(x + 1, y + 3, pl.w - 2, 2, c[1]); }
+  } else if (!pl.kind) {   // elevador de vidro da farmácia
+    F(x, y, pl.w, 6, '#0b1030'); F(x + 1, y + 1, pl.w - 2, 4, '#bfe3ffcc'); F(x + 1, y + 1, pl.w - 2, 1, '#ffffff'); F(x + 2, y - 10, 1, 10, '#d9a441'); F(x + pl.w - 3, y - 10, 1, 10, '#d9a441'); F(x + 2, y - 10, pl.w - 4, 1, '#d9a441');
+  }
+}
+function world3() {
+  const s = st, p = s.p, M = s.maq, F = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+  // máquina quântica: console, tela com o laudo, luzes da porta e a placa
+  if (M) {
+    const mx = (M.plate[0] + 1) * T - camX, gy = G * T - camY;
+    if (mx > -140 && mx < VW + 140) {
+      F(mx - 18, gy - 64, 36, 62, '#0b1030'); F(mx - 17, gy - 63, 34, 60, '#3a2a5c'); F(mx - 17, gy - 63, 34, 2, '#b46cff'); F(mx - 12, gy - 54, 24, 3, (s.anim >> 2) & 1 ? '#ff4fd8' : '#4fd8ff'); for (let i = 0; i < 4; i++) F(mx - 12 + i * 7, gy - 46, 4, 4, ((s.anim >> 3) + i) & 1 ? '#8be36a' : '#3a405c');
+      F(mx - 2, gy - 96, 1, 32, '#9aa3b8'); F(mx + 9, gy - 90, 1, 26, '#9aa3b8'); F(mx - 4, gy - 98, 5, 3, '#ff4fd8'); F(mx + 7, gy - 92, 5, 3, '#4fd8ff');
+      const sx = mx - 56, sy = gy - 150; F(sx, sy, 112, 46, '#0b1030'); F(sx + 2, sy + 2, 108, 42, M.done ? '#3a0a14' : '#0e2a3a');
+      if (M.done) { label('ERRO: CONTROLE', mx, sy + 18, '#ff5d73', 8); label('NEGATIVO DETECTADO', mx, sy + 30, '#ff5d73', 8); }
+      else if (M.screen) { const nome = { pedra: 'PEDRA', banana: 'BANANA', vaso: 'VASO', ze: 'ZÉ GOTINHA' }[M.screen.obj] || '';
+        label('AMOSTRA: ' + nome, mx, sy + 11, '#ffffff', 7); label('DESEQUILÍBRIO ENERGÉTICO', mx, sy + 22, '#ff8fd0', 7); label('GRAVE', mx, sy + 30, '#ff8fd0', 7); label('PROTOCOLO R$ 12.900', mx, sy + 40, '#ffd23f', 7); }
+      else { label('QUANTUM SCAN 9000', mx, sy + 13, '#4fd8ff', 7); label('ESTA MÁQUINA', mx, sy + 27, '#ffd23f', 7); label('DETECTA TUDO', mx, sy + 37, '#ffd23f', 7); }
+      const dx = M.door * T + 16 - camX; for (let i = 0; i < 3; i++) { F(dx - 14 + i * 10, 7 * T - camY - 8, 8, 8, '#0b1030'); F(dx - 13 + i * 10, 7 * T - camY - 7, 6, 6, i < M.lights ? '#ff4fd8' : '#3a2a5c'); if (i < M.lights) F(dx - 12 + i * 10, 7 * T - camY - 6, 2, 2, '#ffffff'); }
+    }
+  }
+  // telão do auditório
+  { const a = AR3.prof, tx = (a + 5) * T - camX, ty = 2 * T - camY, b = s.boss;
+    if (tx > -200 && tx < VW + 40) {
+      F(tx, ty, 150, 80, '#0b1030'); F(tx + 3, ty + 3, 144, 74, '#f4f4f4');
+      if (b.active && b.who === 'prof' && b.st === 'graph') { for (let i = 0; i < 6; i++) { const h = 20 + Math.abs(Math.sin(s.time * .03 + i)) * 40; F(tx + 14 + i * 21, ty + 72 - h, 14, h, SORO_COR[i % 5][0]); } label('RESULTADOS!!!', tx + 75, ty + 14, '#e23b4e', 8); label('(sem eixo, sem unidade)', tx + 75, ty + 24, '#9aa3b8', 6); }
+      else if (b.dead) { label('PERGUNTAS?', tx + 75, ty + 42, '#1a1f3d', 12); }
+      else { label('A VERDADE QUE', tx + 75, ty + 26, '#1a1f3d', 9); label('A CIÊNCIA ESCONDE', tx + 75, ty + 40, '#e23b4e', 9); label('Prof. Dr. PhD Magnus Aurum', tx + 75, ty + 58, '#59607e', 7); }
+    } }
+  // ring light da academia do Dr. Soro
+  { const x = (AR3.bomb + 3) * T - camX, gy = G * T - camY; if (x > -60 && x < VW + 300) { F(x + 12, gy - 70, 2, 70, '#59607e'); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x + 13, gy - 84, 12, 0, 7); ctx.stroke(); F((AR3.bomb + 8) * T - camX, gy - 90, 60, 70, '#bfe3ff55'); F((AR3.bomb + 8) * T - camX, gy - 90, 60, 2, '#d9a441'); label('ACADEMIA VIP', (AR3.bomb + 8) * T - camX + 30, gy - 94, '#ffd23f', 7); } }
+  // balança: placa do peso
+  for (const bl of s.bals) {
+    const x = bl.x0 * T - camX, w = bl.n * T; if (x > VW + 40 || x + w < -40) continue;
+    const cx = Math.round(x + w / 2), sy = 7 * T - camY + 4;
+    F(cx - 1, sy + 12, 2, G * T - camY - sy - 12, '#d9a441'); F(cx - 22, sy - 1, 44, 14, K); F(cx - 21, sy, 42, 12, bl.solved ? '#2e6b4a' : '#1a1f3d');
+    label('PESO', cx - 9, sy + 9, '#fff', 7);
+    for (let i = 0; i < bl.need; i++) { F(cx + 4 + i * 7, sy + 3, 6, 6, K); F(cx + 5 + i * 7, sy + 4, 4, 4, i < bl.w ? '#9fd4ff' : '#3a2a1c'); }
+  }
+  // blocos: evidência, pote premium e as amostras da máquina
+  let near = null, nd = 46;
+  for (const k of s.blocks) {
+    if (k.gone) continue; const x = Math.round(k.x) - camX, y = Math.round(k.y) - camY; if (x < -16 || x > VW) continue;
+    const bim = k.k === 'ev' ? SPR2.ev : k.k === 'tr' ? SPR3.pr : SPR3.qo[k.obj]; ctx.drawImage(bim, x + 8 - (bim.width >> 1), y + 16 - bim.height + 1);
+    if (k.scan > 0 && k.scan < 24) { F(x, y - 3, Math.round(16 * k.scan / 24), 2, '#ff4fd8'); }
+    const d = Math.abs(k.x + 8 - p.x - p.w / 2) + Math.abs(k.y + 8 - p.y - p.h / 2) * .5; if (d < nd) { nd = d; near = k; }
+  }
+  if (near && !s.intro) label(near.lab, Math.round(near.x + 8) - camX, Math.round(near.y) - 4 - camY, near.k === 'ev' ? '#9fd4ff' : near.k === 'tr' ? '#ffd23f' : '#ff8fd0', 7);
+  // poças de soro
+  for (const k of s.pocas) { const x = Math.round(k.x) - camX; if (x < -20 || x > VW) continue; ctx.globalAlpha = Math.min(1, k.t / 60) * .9; ctx.drawImage(SPR3.poca[k.v], x, Math.round(k.y) - 3 - camY); ctx.globalAlpha = 1; }
+  // veículos estacionados
+  for (const v of s.vehs) {
+    if (p.veh === v) continue; const x = Math.round(v.x) - camX, y = Math.round(v.y) - camY; if (x < -40 || x > VW + 20) continue;
+    if (v.k === 'poste') spr(SPR3.poste, x + v.w / 2 - 11, y + v.h - 34);
+    else spr(SPR3.cup, x + v.w / 2 - 14, y + v.h - 14 + Math.round(Math.sin(st.time * .08) * 1.2));
+  }
+}
+function drawEnemy3(e, x, y, f) {
+  const mid = im => spr(im, Math.round(x + e.w / 2 - im.width / 2), Math.round(y + e.h / 2 - im.height / 2));
+  switch (e.t) {
+    case 'gotinha': footDraw(SPR3.gotinha[e.v][e.v === 2 ? (e.onG ? 0 : 1) : f], e, x, y, (e.v === 2 ? e.face : e.dir) < 0); return true;
+    case 'recep': footDraw(SPR3.recep[e.throwT > 0 ? 1 : 0], e, x, y, e.face < 0); return true;
+    case 'drone': mid(SPR3.drone[(st.anim >> 1) & 1]); return true;
+    case 'bolsa': ctx.drawImage(SPR3.bolsa[e.v], Math.round(x), Math.round(y)); return true;
+    case 'like': mid(SPR3.like[f]); return true;
+    case 'vapor': {
+      const gx = Math.round(e.bx - camX), gy = Math.round(e.by - camY); ctx.fillStyle = '#59607e'; ctx.fillRect(gx - 2, gy - 3, 16, 3); ctx.fillStyle = '#9aa3b8'; for (let i = 0; i < 4; i++) ctx.fillRect(gx + i * 4 - 1, gy - 3, 2, 1);
+      if (e.on) { for (let i = 0; i < 7; i++) { const yy = gy - 6 - i * 6 - ((st.time >> 1) % 6), r = 3 + i * .9 + Math.sin(st.time * .3 + i) * .8; ctx.globalAlpha = .7 - i * .07; ctx.fillStyle = i & 1 ? '#ffffff' : '#dfe9f2'; ctx.beginPath(); ctx.arc(gx + 6 + Math.sin(st.time * .2 + i * 1.7) * 2, yy, r, 0, 7); ctx.fill(); } ctx.globalAlpha = 1; }
+      return true; }
+  }
+  return false;
+}
+function deathArt3(e, stomp) {
+  if (e.t === 'gotinha') return { img: SPR3.poca[e.v], cw: 20, base: 3, x: e.x + e.w / 2, y: e.y + e.h, t: 30, vy: 0, flip: false };
+  if (e.t === 'drone') { const im = SPR3.drone[0]; return { img: im, cw: im.width, base: im.height / 2, x: e.x + e.w / 2, y: e.y + e.h / 2, t: 30, vy: 1.6, flip: false }; }
+  if (e.t === 'recep') { const im = SPR3.recep[0]; return { img: im, cw: im.width, base: im.height - 1, x: e.x + e.w / 2, y: e.y + e.h, t: 30, vy: stomp ? 0 : -.35, flip: e.face < 0 }; }
+  return null;
+}
+function drawEshot3(f) {
+  const x = Math.round(f.x) - camX, y = Math.round(f.y) - camY;
+  switch (f.t) {
+    case 'gota3': spr(SPR3.drip[f.v], x, y); return true;
+    case 'card': spr(SPR3.card, x, y, f.vx < 0); return true;
+    case 'bolsa3': spr(SPR3.bolsa[f.v], x - 1, y - 2); return true;
+    case 'cristal': spr(SPR3.cristal[f.v], x, y); return true;
+    case 'livro': { const im = SPR3.livro[f.v || 0]; ctx.save(); ctx.translate(x + 5, y + 4); ctx.rotate(Math.round((f.rot || 0) / (Math.PI / 4)) * Math.PI / 4); ctx.drawImage(im, -im.width / 2, -im.height / 2); ctx.restore(); return true; }
+    case 'adesivo': { ctx.save(); ctx.translate(x + 4, y + 4); ctx.rotate(((st.time >> 3) & 3) * Math.PI / 2); ctx.drawImage(SPR3.adesivo, -SPR3.adesivo.width / 2, -SPR3.adesivo.height / 2); ctx.restore(); return true; }
+    case 'vela': { const gy = Math.round(f.gy) - camY; spr(SPR3.vela, x, gy - 9); if (f.lit) spr(SPR3.chama[(st.anim >> 2) & 1], x - 1, gy - 20); else if ((st.anim >> 3) & 1) { ctx.fillStyle = '#ffd23f'; ctx.fillRect(x + 3, gy - 12, 1, 2); } return true; }
+  }
+  return false;
+}
+function drawBoss3() {
+  const s = st, b = s.boss; if (!b.active || !b.who || (b.st === 'dying' && (s.time & 2))) return;
+  const jit = b.hurtT > 12 ? ((b.hurtT >> 1) & 1 ? 2 : -2) : (b.st === 'flex' && b.next === 'charge') ? ((b.t >> 1) & 1 ? 1 : -1) : 0;
+  const x = Math.round(b.x) - camX + jit, y = Math.round(b.y) - camY, cx = x + b.w / 2, foot = y + b.h;
+  if (b.who === 'bomb' && b.st === 'flex' && b.next === 'charge') { ctx.fillStyle = 'rgba(224,69,123,.55)'; ctx.fillRect(0, G * T - camY - 2, VW, 2); }
+  const blink = b.inv > 0 && (s.time & 1);
+  if (b.who === 'bomb') {
+    const A = SPR3.bomb, im = b.st === 'dying' || b.hurtT > 0 ? A.hurt : b.st === 'tired' ? A.tired : b.st === 'charge' ? A.charge : (b.st === 'flex' || b.flex > 0) ? A.flex : b.throwT > 0 || b.st === 'press' ? A.throw : A.idle;
+    if (!blink) spr(im, cx - im.width / 2, foot - im.height + 1, b.st === 'charge' ? b.face < 0 : b.face < 0);
+  } else if (b.who === 'guru') {
+    const A = SPR3.guru, im = b.st === 'dying' || b.hurtT > 0 ? A.hurt : b.st === 'tired' ? A.medita : b.throwT > 0 ? A.throw : A.idle;
+    if (b.st !== 'tired' && s.time % 10 === 0) s.parts.push({ x: b.x + Math.random() * b.w, y: b.y + b.h, vx: 0, vy: .3, t: 20, c: '#fff6c9', g: 0 });
+    if (!blink) spr(im, cx - im.width / 2, foot - im.height + 1, b.face < 0);
+  } else {
+    const A = SPR3.prof, im = b.st === 'dying' || b.hurtT > 0 ? A.hurt : b.st === 'tired' ? A.tired : b.throwT > 0 ? A.throw : A.idle;
+    if (!blink) spr(im, cx - im.width / 2, foot - im.height + 1, b.face < 0);
+    for (let i = 0; i < b.dip; i++) { const d = dipPos(b, i); spr(SPR3.diploma, Math.round(d.x) - camX, Math.round(d.y) - camY); }
+  }
+}
+/* Zé no veículo: em pé na base do suporte de soro, ou dentro da xícara (do peito para cima). */
+function drawZeVehicle3(x, y, big, fl) {
+  const p = st.p, v = p.veh, A = big ? ZE_BIG : ZE_ART, art = SPR[A.key], bottom = y + p.h, cx = x + p.w / 2;
+  if (!v) return;
+  const z = art ? (p.shootT > 0 ? art.throw : art.idle) : big ? SPR.zeBig.idle : SPR.ze.idle;
+  if (v.k === 'poste') {
+    spr(SPR3.poste, Math.round(cx - 11), bottom - 34);
+    const zw = art ? A.cw : z.width, zx = Math.round(cx - zw / 2 - 3), zy = bottom - 7 - (art ? A.base : z.height);
+    if (art) spr(z, zx, zy, fl); else spr(z, zx, zy, fl);
+    ctx.fillStyle = '#cfd6e6'; ctx.fillRect(Math.round(cx) - 2, bottom - 30, 2, 22);   // o poste na frente do braço
+    return;
+  }
+  const bob = Math.round(Math.sin(st.time * .12) * 1.2);
+  spr(SPR3.cup, Math.round(cx - 14), bottom - 15 + bob);
+  const zw = art ? A.cw : z.width, zh = art ? A.base - A.legs : z.height - 6, zx = Math.round(cx - zw / 2), zy = bottom - 8 - zh + bob, zd = Math.min(zh, 12 + 6);
+  if (fl) { ctx.save(); ctx.translate(zx + zw, zy); ctx.scale(-1, 1); ctx.drawImage(z, 0, 0, zw, zd, 0, 0, zw, zd); ctx.restore(); } else ctx.drawImage(z, 0, 0, zw, zd, zx, zy, zw, zd);
+  spr(SPR3.cupFront, Math.round(cx - 14), bottom - 11 + bob);
+}
+function hud3() {
+  const b = st.boss; if (!b.active || b.who !== 'prof' || b.dip <= 0) return;
+  for (let i = 0; i < b.dip; i++) spr(SPR3.diploma, VW / 2 + 54 + i * 9, 11);
+}
+
+
 /* ───────── Abertura da fase ─────────
    A câmera começa no céu, mostra o nome da fase e desce até o chão. O tempo não conta; pulo ou seringa encerram antes. */
 const PHASES = {
   1: { n: 1, lw: 176, name: 'VILA DO ZAP', boss: 'TIO DO ZAP', bossLong: 'Tio do Zap', tema: 'Desinformação', qs: QS, board: 'mg-placar' },
-  2: { n: 2, lw: 300, name: 'ARRAIAL DO ANTIGAMENTE', boss: 'BARÃO DO SEMPRE FOI ASSIM', bossLong: 'Barão do Sempre Foi Assim', tema: 'Apelo à tradição', qs: QS2, board: 'mg-placar-2' } };
+  2: { n: 2, lw: 300, name: 'ARRAIAL DO ANTIGAMENTE', boss: 'BARÃO DO SEMPRE FOI ASSIM', bossLong: 'Barão do Sempre Foi Assim', tema: 'Apelo à tradição', qs: QS2, board: 'mg-placar-2' },
+  3: { n: 3, lw: 430, name: 'CLÍNICA VITTA PRIME', boss: 'PROF. DR. PHD MAGNUS AURUM', bossLong: 'Prof. Magnus Aurum', tema: 'Apelo à autoridade', qs: QS3, board: 'mg-placar-3' } };
 let PHASE = PHASES[1];
 const OPEN_Y = -640, OPEN_HOLD = 50, OPEN_LEN = 225;
 function stepOpening(jp, sp) {
@@ -2219,6 +3129,7 @@ function step() {
     if (!s.seen.jac) for (const j of s.jacs) { const o = { x: j.x + 4, y: j.y - 4, w: 13, h: 16 }; if (j.state === 'egg' && near(o) && introStart('jac', o)) return; }
     if (!s.seen.gate) { const ptx = Math.floor((p.x + p.w / 2) / T), g = s.gates.find(g => !g.open && ptx >= g.z0 && ptx <= g.z1); if (g && introStart('gate', { x: g.mx * T, y: 8 * T, w: (g.fx - g.mx + 1) * T, h: T })) return; }
     if (s.fase === 2 && intro2(near)) return;
+    if (s.fase === 3 && intro3(near)) return;
   }
   if (s.winT > 0) { if (--s.winT === 0) { win(); return; } }
   stepPlats();
@@ -2227,7 +3138,8 @@ function step() {
   else if (s.launch) stepLaunch();
   else if (s.air) stepAir(jp, sp);
   else stepPlayer(jp, sp);
-  if (s.fase === 2) step2();
+  if (s.fase >= 2) step2();
+  if (s.fase === 3) step3();
   stepEnemies(); stepJacs(); stepBoss(); stepShots(); stepItems(); stepFx();
   for (const g of s.gates) {
     if (g.lock > 0 && --g.lock === 0 && !g.open) g.q = nextQ();
@@ -2261,14 +3173,14 @@ function step() {
 /* ───────── Pontuação ─────────
    Conhecimento pesa mais que pressa: os três portões valem até 1.800, o tempo até 2.000 (cheio até 1:30,
    zero a partir de 10:00). Cada fonte de pontos conta uma vez só, então repetir ou errar de propósito não rende. */
-const PTS = { gota: 10, boato: 50, fake: 80, virus: 100, sangue: 50, humor: 60, boti: 120, morcego: 60, boss: 1000, pu: 100, bal: 400, gate: [600, 200, 50], timeMax: 2000, timeFull: 90, timeZero: 600, time2: [150, 900] };   // fase 2: tempo cheio até 2:30, zero a partir de 15:00
+const PTS = { gota: 10, boato: 50, fake: 80, virus: 100, sangue: 50, humor: 60, boti: 120, morcego: 60, boss: 1000, pu: 100, bal: 400, gate: [600, 200, 50], timeMax: 2000, timeFull: 90, timeZero: 600, time2: [150, 900], time3: [210, 1200], gotinha: 60, recep: 100, drone: 60, bomb: 500, guru: 500 };   // fase 3: tempo cheio até 3:30, zero a partir de 20:00   // fase 2: tempo cheio até 2:30, zero a partir de 15:00
 function score(final) {
   const s = st, k = s.kills;
   const gates = s.gates.reduce((a, g) => a + (g.open ? PTS.gate[Math.min(g.err || 0, 2)] : 0), 0);
-  const kills = Object.keys(k).reduce((a, t) => a + (k[t] || 0) * (PTS[t] || 0), 0), bals = s.bals.filter(b => b.solved).length * PTS.bal;
+  const kills = Object.keys(k).reduce((a, t) => a + (k[t] || 0) * (PTS[t] || 0), 0), bals = (s.bals.filter(b => b.solved).length + (s.maq && s.maq.done ? 1 : 0)) * PTS.bal;
   const pu = s.pu.size * PTS.pu, gotas = Math.min(s.gotas, s.total) * PTS.gota, boss = s.boss.dead ? PTS.boss : 0;
   const sec = (s.finalT || s.time) / 60;
-  const [tf, tz] = s.fase === 2 ? PTS.time2 : [PTS.timeFull, PTS.timeZero];
+  const [tf, tz] = s.fase === 3 ? PTS.time3 : s.fase === 2 ? PTS.time2 : [PTS.timeFull, PTS.timeZero];
   const time = final ? Math.round(clamp(1 - (sec - tf) / (tz - tf), 0, 1) * PTS.timeMax / 10) * 10 : 0;
   return { gates, kills, pu, gotas, boss, time, bals, total: gates + kills + pu + gotas + boss + time + bals };
 }
@@ -2298,7 +3210,7 @@ function render() {
     ctx.translate(ex + (VW * .26 - ex) * k, ey + (VH * .52 - ey) * k); ctx.scale(z, z); ctx.translate(-ex, -ey);
   }
   if (s.air) { renderAir(); renderHud(I); return; }
-  if (s.fase === 2) bg2(); else {
+  if (s.fase === 3) bg3(); else if (s.fase === 2) bg2(); else {
   if (SKYC.art) ctx.drawImage(SKYC, 0, 0); else {
     for (const [y, h, c] of SKY) { ctx.fillStyle = c; ctx.fillRect(0, y, VW, h); }
     for (let i = 1; i < SKY.length; i++) { ctx.fillStyle = SKY[i][2]; ctx.fillRect(0, SKY[i][0] - 3, VW, 1); }
@@ -2321,7 +3233,8 @@ function render() {
     let x = tx * T - camX, y = ty * T - camY;
     if (s.bumpA && s.bumpA.x === tx && s.bumpA.y === ty) y -= s.bumpA.t > 4 ? 8 - s.bumpA.t : s.bumpA.t;
     let img = null; const up = ty > 0 ? s.map[ty - 1][tx] : '.';
-    if (s.fase === 2) img = tile2(c, tx, ty, up, x, y);
+    if (s.fase === 3) img = tile3(c, tx, ty, up, x, y);
+    else if (s.fase === 2) img = tile2(c, tx, ty, up, x, y);
     else if (A) {
       if (c === '#') { img = up === '#' ? A.dirt : A.grass; if (up === '.') ctx.drawImage(A['bl' + WIND3[((s.anim >> 4) + (tx >> 1)) & 3]], x, y - 4); }
       else if (c === 'B') img = A.brick; else if (c === '^') img = A.spike; else if (c === 'G') img = A.gate;
@@ -2331,12 +3244,12 @@ function render() {
     if (img && img !== 1) ctx.drawImage(img, x, y);
     if (c === 'M' || c === 'F') label(c === 'M' ? 'MITO' : 'FATO', x + 8, y - 3, '#fff', 7);
   }
-  if (s.fase === 2) deco2(tx0); else if (A) for (const d of s.deco) {   // capim e flores: o vento passa em onda pela fase
+  if (s.fase === 3) deco3(tx0); else if (s.fase === 2) deco2(tx0); else if (A) for (const d of s.deco) {   // capim e flores: o vento passa em onda pela fase
     if (d.tx < tx0 - 1 || d.tx > tx0 + 22) continue; const im = A[d.k + WIND5[((s.anim / 9 | 0) + d.tx * 3) & 7]];
     ctx.drawImage(im, d.tx * T + 8 - (im.width >> 1) - camX, d.ty * T + 1 - im.height - camY);
   }
-  for (const pl of s.plats) { if (s.fase === 2) { plat2(pl); continue; } ctx.drawImage(A ? A[(s.anim >> 2) & 1 ? 'mp2' : 'mp1'] : SPR.mplat, Math.round(pl.x) - camX, Math.round(pl.y) - camY); }
-  if (s.fase === 2) world2();
+  for (const pl of s.plats) { if (s.fase === 3) { plat3(pl); continue; } if (s.fase === 2) { plat2(pl); continue; } ctx.drawImage(A ? A[(s.anim >> 2) & 1 ? 'mp2' : 'mp1'] : SPR.mplat, Math.round(pl.x) - camX, Math.round(pl.y) - camY); }
+  if (s.fase === 2) world2(); else if (s.fase === 3) world3();
   // postos e ninhos
   for (const c of s.cps) { const im = SPR.flag[c.on ? 1 : 0]; if (im.o) spr(im, c.x * T - camX, G * T - 32 - camY); else spr(im, c.x * T - 3 - camX, G * T - im.height - camY); }
   for (const j of s.jacs) {
@@ -2371,13 +3284,15 @@ function render() {
     else if (art && e.t === 'fake') spr(art[f ? 'fly1' : 'fly2'], x + e.w / 2 - A.cw / 2, y + e.h - A.base + 1, Math.cos(e.ph) < 0);
     else if (art && e.t === 'virus') spr(art[e.sq > 0 ? 'stomp' : e.onG ? 'crouch' : 'jump'], x + e.w / 2 - A.cw / 2, y + e.h - A.base, e.face < 0);
     else if (drawEnemy2(e, x, y, f)) { /* fase 2 */ }
+    else if (s.fase === 3 && drawEnemy3(e, x, y, f)) { /* fase 3 */ }
     else if (e.t === 'boato') spr(SPR.boato[f], x - 1, y - 1, e.dir > 0);
     else if (e.t === 'fake') spr(SPR.fake[f], x - 1, y - 1);
     else spr(SPR.virus[e.onG ? 0 : 1], x - 1, y - 2);
   }
   // chefão
   const b = s.boss;
-  if (b.active) {
+  if (s.fase === 3) drawBoss3();
+  else if (b.active) {
     const bx = b.x - camX + (b.st === 'warn' ? ((b.t >> 1) & 1 ? 2 : -2) : b.hurtT > 12 ? ((b.hurtT >> 1) & 1 ? 2 : -2) : 0), by = b.y - camY;
     if (!(b.inv > 0 && (s.time & 1) && !SPR.bossArt) && !(b.st === 'dying' && (s.time & 2))) {
       const BA = SPR.bossArt;
@@ -2419,6 +3334,7 @@ function render() {
     if (VA) {   // comemoração: preparo, salto e pose
       const g = s.vic.g, X = EXTRA_ART[big ? 'vb' : 'vn'], hop = g >= V_PREP && g < V_POSE ? Math.round(Math.sin(Math.PI * (g - V_PREP) / (V_POSE - V_PREP)) * 18) : 0;
       spr(g < V_PREP ? VA.vprep : g < V_POSE ? VA.vjump : VA.vpose, x + p.w / 2 - X.cw / 2, y + p.h - X.base - hop, fl);
+    } else if (p.cart && s.fase === 3) { drawZeVehicle3(x, y, big, fl);
     } else if (p.cart || s.launch) { drawZeVehicle(x, y, big, fl);
     } else if (p.ride) {
       const ja = SPR.jacArt;
@@ -2478,6 +3394,7 @@ function render() {
   for (const f of s.eshots) {
     const C = SPR.sc;
     if (f.t === 'flask' || f.t === 'portrait') { drawEshot2(f); continue; }
+    if (s.fase === 3 && drawEshot3(f)) continue;
     if (!C) spr(f.t === 'fake' ? SPR.efake : SPR.wave, f.x - camX, f.y - camY, f.vx < 0);
     else if (f.t === 'fake') { const im = (s.anim >> 2) & 1 ? C.fx_b2 : C.fx_b1; spr(im, f.x + 4 - im.width / 2 - camX, f.y + 4 - im.height / 2 - camY, f.vx > 0); }
     else { const im = f.life < 10 ? C.fx_w4 : f.life > 74 ? C.fx_w1 : (s.anim / 5 | 0) & 1 ? C.fx_w3 : C.fx_w2, R = f.vx > 0; spr(im, (R ? f.x + 11 - im.width : f.x - 3) - camX, f.y + 13 - im.height - camY, !R); }
@@ -2526,10 +3443,10 @@ function renderHud(I) {
     if (!hot || (s.time >> 3) & 1 || reduceMotion) label(String(sec), VW / 2 + 54, 20, col, 12);
   }
   if (b.active) {
-    label(PHASE.boss, VW / 2, 10, '#fff', 7);
+    label(b.name || PHASE.boss, VW / 2, 10, '#fff', 7);
     ctx.fillStyle = K; ctx.fillRect(VW / 2 - 51, 13, 102, 6); ctx.fillStyle = '#3a2a55'; ctx.fillRect(VW / 2 - 50, 14, 100, 4);
     ctx.fillStyle = '#e0457b'; ctx.fillRect(VW / 2 - 50, 14, Math.round(100 * b.hp / b.max), 4);
-    if (s.fase === 2) hud2();
+    if (s.fase === 2) hud2(); else if (s.fase === 3) hud3();
   }
 }
 
@@ -2592,7 +3509,7 @@ function useBoard(f) {
 useBoard(1);
 /* Fases liberadas neste aparelho (mg-fases). Vencer uma fase libera a seguinte. Na pré-visualização (esboço), a fase 2 já vem liberada. */
 const ESBOCO = !__PWA__;
-function fasesOk() { let n = 1; try { n = +localStorage.getItem('mg-fases') || 1; } catch (e) {} return Math.min(Object.keys(PHASES).length, Math.max(n, ESBOCO ? 2 : 1)); }
+function fasesOk() { let n = 1; try { n = +localStorage.getItem('mg-fases') || 1; } catch (e) {} return Math.min(Object.keys(PHASES).length, Math.max(n, ESBOCO ? 3 : 1)); }
 function unlockFase(n) { try { if (n > (+localStorage.getItem('mg-fases') || 1)) localStorage.setItem('mg-fases', String(n)); } catch (e) {} }
 const sortBoard = () => board.sort((a, b) => b.s - a.s || a.t - b.t || a.d - b.d);
 function saveBoard() { try { localStorage.setItem(PHASES[boardFase].board, JSON.stringify(board.slice(0, 50))); return true; } catch (e) { return false; } }
@@ -2612,7 +3529,8 @@ function win() {
   }
   const first = s.gates.filter(g => g.open && !g.err).length, errs = s.gates.reduce((a, g) => a + (g.err || 0), 0), kills = Object.values(s.kills).reduce((a, b) => a + b, 0);
   const rows = [['Portões de mito ou fato', `${first} de ${s.gates.length} de primeira` + (errs ? ` · ${errs} ${errs === 1 ? 'erro' : 'erros'}` : ''), sc.gates]];
-  if (s.bals.length) rows.push(['Balanças da evidência', `${s.bals.filter(b => b.solved).length} de ${s.bals.length}`, sc.bals]);
+  if (s.maq) rows.push(['Balança e máquina quântica', `${s.bals.filter(b => b.solved).length + (s.maq.done ? 1 : 0)} de ${s.bals.length + 1}`, sc.bals]);
+  else if (s.bals.length) rows.push(['Balanças da evidência', `${s.bals.filter(b => b.solved).length} de ${s.bals.length}`, sc.bals]);
   rows.push(['Tempo', fmt(lastRun.t), sc.time], ['Inimigos', `${kills} de ${s.enemyTotal}`, sc.kills], [PHASE.bossLong, 'derrotado', sc.boss],
     ['Power-ups', `${s.pu.size} de ${s.puTotal}`, sc.pu], ['Gotas', `${Math.min(s.gotas, s.total)} de ${s.total}`, sc.gotas]);
   const dl = $('#sBreak'); dl.textContent = '';
@@ -2630,6 +3548,7 @@ function win() {
 }
 const WIN_NOTE = {
   1: 'Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.',
+  3: 'Em 2008, voluntários tomaram o mesmo comprimido de placebo. Quem ouviu que ele custava caro sentiu mais alívio da dor do que quem ouviu que ele saiu com desconto. O preço também funciona como remédio, para quem vende.',
   2: 'Em 1747, James Lind deu laranja e limão a dois marinheiros com escorbuto, e eles melhoraram em poucos dias. A Marinha britânica só adotou o suco de limão em 1795. Quase meio século de “sempre foi assim”.',
 };
 $('#fReg').addEventListener('submit', e => {
