@@ -5,7 +5,7 @@ Publicação: GitHub Pages, branch `main`, raiz. Endereço: https://andrebacchi.
 Pré-visualização como artefato (privada, do André): https://claude.ai/artifact/F7Wzi36G24LKyR5uPZKEQG
 
 Jogo de plataforma em estilo 16 bits (Mega Drive). O Zé Gotinha enfrenta a desinformação sobre vacinas.
-Está em construção: fase 1 (Vila do Zap, chefão Tio do Zap, tema desinformação) e fase 2 em esboço no ramo `fase-2` (Arraial do Antigamente, chefão Barão do Sempre Foi Assim, tema apelo à tradição).
+Está em construção: fase 1 (Vila do Zap, chefão Tio do Zap, tema desinformação) e fase 2 (Arraial do Antigamente, chefão Barão do Sempre Foi Assim, tema apelo à tradição), publicada em 13/10/2026 com aprovação do André; no site ela só abre depois de vencer a fase 1.
 Cada fase tem um chefão que representa um obstáculo à vacinação.
 
 ## Estrutura
@@ -13,7 +13,7 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
 - `src/jogo.html` é a fonte: um arquivo só, com estilos, marcação, código e todas as artes em data URI. Não tem dependência além das fontes do Google.
   `sh build.sh` gera `index.html` e `sw.js` na raiz (arquivos gerados: não edite à mão). `sh build.sh artifact` gera `dist/artifact.html`, a versão de artefato
   (sem instalação nem service worker; o link do BACCHI LAB abre em nova aba). O build troca os marcadores `__PWA__`, `__VERSAO__`, `__QR__`, `__HUB__` e `__HUB_ALVO__`.
-- `audio/`: músicas em MP3 (96 kbps). `titulo.mp3` toca na tela de título, `fase1.mp3` na fase, `chefe.mp3` em toda luta de chefe e `vitoria.mp3` (uma vez, sem laço) na comemoração do fim de fase. No artefato, publique os quatro como arquivos de apoio (`audio/...`).
+- `audio/`: músicas em MP3 (96 kbps). `titulo.mp3` toca na tela de título, `fase1.mp3` e `fase2.mp3` nas fases, `chefe.mp3` em toda luta de chefe e `vitoria.mp3` (uma vez, sem laço) na comemoração do fim de fase. No artefato, publique os cinco como arquivos de apoio (`audio/...`).
 - `src/qr.svg`: QR code do endereço do jogo (fixo; gerado com o `qrcode.js` do repositório `bacchilab`, nível M, margem de 2 módulos).
 - `icons/`: ícones do app. `tools/icone.py` gera todos a partir do rosto do Zé (quadro parado do sprite, `tools/ze_2x.png` e `tools/head_1.png`) sobre o céu do jogo.
 - `tools/arte/`: scripts usados para recortar e reduzir as artes (chroma key, redução por maioria, contorno refeito, empacotamento em data URI).
@@ -109,7 +109,7 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
   `t73.js` (força bruta nos sinos), `t74.js` (força bruta na roda d'água a pé, com os miasmas: embarque e chegada à tábua), `t75.js` (decolagem, chefão e vitória), `t76.js` (telas de fase no computador e no celular), `t77.js` (botão FASES no título com jogo salvo).
   `t56.js` e `t57.js` são de antes da tela de modo e já falhavam na versão publicada.
 
-## Fase 2: Arraial do Antigamente (esboço)
+## Fase 2: Arraial do Antigamente
 
 Arraial colonial com cara de Minas. Tema: técnicas que se mantiveram só pela tradição. Sprites, cenário e fundo são provisórios, desenhados em código (`SPR2`, `SKY2`, `LAYERS2`);
 o fluxo de troca é o mesmo da fase 1. Artes já trocadas: Barão (`BARAO_ART`, 6 quadros: flutuar, arremessar, investida, exposto, dor, derrota; `tools/arte/barao.py`, fundo verde, escala 0,145);
@@ -154,7 +154,8 @@ Ordem combinada das folhas: Barão · humores e sanguessuga · boticário e fras
 
 ## Pendências e ideias em aberto
 
-- Fase 2: revisão das perguntas e dos cartões, sentir a dificuldade jogando, aprovação para levar o ramo `fase-2` ao `main`.
+- Fase 2 (no ar): revisão das perguntas e dos cartões pelo André, sentir a dificuldade jogando; sons próprios para sino, telha, porta da balança, vagonete e passarola, se ele quiser.
+- Depois da fase 2 ainda aparece "Em construção, novas fases em breve": trocar por uma prévia quando houver fase 3.
 
 - Placar online: hoje é só no aparelho. Fora do artefato dá para usar um banco externo (sugestão feita: Firebase); o André ainda não decidiu.
 - Cartões de apresentação só na primeira partida do aparelho (oferecido, sem resposta).
