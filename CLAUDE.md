@@ -174,13 +174,14 @@ Tudo provisório, desenhado em código (`SPR3`, `tile3`, `bg3`, `wallBg3`, `deco
 - **Máquina quântica** (`s.maq`): blocos `qo` (pedra, banana, vaso) empurrados até a plataforma `Y` (253 e 254); depois de 24 quadros parado ali sai o laudo, sempre o mesmo. Cada objeto diferente acende uma luz;
   três abrem a porta (259 e 260). O fosso raso (255 a 257) recebe as amostras. O Zé na plataforma também ganha laudo e não acende luz. O bloco ↺ em 250, 8 recoloca as amostras (`resetAt` = 'maq').
 - **Chefes** (`BOSS3`, `boss3Start()`, `stepBoss3()`): um de cada vez no mesmo `s.boss`, com `b.who`. Entrar na arena fecha a parede de trás; vencer um subchefe abre a porta da frente (`bossOpen3()`) e o jogo continua.
-  Dr. Soro Platinum: arremessa bolsas que viram poça, faz supino que chove soro e dá investida; depois dela cansa e o pisão tira 2; cada golpe solta dinheiro (`grana`, não vale ponto; no fim, "reembolso aos pacientes").
+  Dr. Soro Platinum: arremessa bolsas que viram poça, faz supino que chove soro e dá investida de ombro, abaixado (área de golpe só nos 22 px de baixo, desenho achatado), para dar para pular por cima ou esperar na plataforma; depois dela cansa e o pisão tira 2; cada golpe solta dinheiro (`grana`, não vale ponto; no fim, "reembolso aos pacientes").
   Guru Glow: flutua, joga cristais, acende velas no chão e solta adesivos; a cada ciclo desce para meditar e o pisão tira 2. Prof. Magnus Aurum: diplomas giram em volta dele e seguram as seringas até caírem um por um;
   sem diplomas toda seringa conta e o pisão tira 2; ele joga os próprios livros e, no palco, as barras do gráfico do telão viram plataformas. Na vitória a plateia levanta placas de "Qual a evidência?" e o Barão, que estava na plateia aplaudindo, sai de fininho.
   Seringas na arena a cada 4 s (3 s no fácil). Vida: 10, 8 e 12 no normal; 7, 6 e 8 no fácil; o fácil tem 3 diplomas em vez de 5.
 - **Perguntas:** `QS3`, sobre autoridade, preço, soro e detox. Os fatos aguardam a revisão do André.
 - **Testes:** `t80.js` (capturas de cada trecho), `t81.js` (força bruta nos lustres e suportes, robô no suporte de soro e na xícara, balança, máquina e os três chefes; aceita `pe`, `veic`, `puz` ou `boss`),
-  `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura).
+  `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura), `t84.js` (sem invulnerabilidade: escapar da investida pulando e na plataforma).
+- **Alcance nas arenas:** o pulo do Zé sobe uns 43 px. Plataforma de arena fica na linha 10 (32 px); na linha 9 (48 px) não se alcança, e o André não conseguiu vencer o Dr. Soro por isso (14/10/2026).
 
 ## Pendências e ideias em aberto
 

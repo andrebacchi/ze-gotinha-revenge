@@ -2336,7 +2336,7 @@ Object.assign(BESTIARY, {
   maq: { kind: 'Desafio', name: 'Máquina quântica', zoom: 1.5, text: 'Promete ler a energia de cada célula do paciente. Esta máquina detecta tudo. Será?',
     list: ['Empurre um objeto até a plataforma de leitura e espere o laudo.', 'Cada objeto diferente com o mesmo laudo acende uma luz da porta.', 'Depois do laudo, empurre o objeto para o fosso e traga o próximo.', 'Se travar, bata a cabeça no bloco ↺.'] },
   bomb: { name: 'Dr. Soro Platinum', kind: 'Subchefe', zoom: 2, text: 'Grisalho, bronzeado e com o terno dois números abaixo. Receita soro de vitaminas para quem está saudável e filma a aplicação para os seguidores.',
-    tip: 'Cada seringa conta. Depois da investida ele cansa: aí o pisão tira 2.', quote: 'Na veia o efeito é total!' },
+    tip: 'Na investida ele vem de ombro, abaixado: pule por cima ou suba numa plataforma. Depois ele cansa e o pisão tira 2. Cada seringa conta.', quote: 'Na veia o efeito é total!' },
   guru: { name: 'Guru Glow', kind: 'Subchefe', zoom: 2, text: 'Não é médica. É a parceira de marca da clínica: vende vela, cristal, smoothie verde e adesivo energético, cada um com uma promessa de saúde.',
     tip: 'Cada seringa conta. Quando ela para para meditar, o pisão tira 2. Fuja dos adesivos: eles deixam o Zé lento.', quote: 'Confie na sua energia!' },
   prof: { name: 'Prof. Dr. PhD Magnus Aurum', kind: 'Chefão', zoom: 2, text: 'Palestrante de auditório lotado, voz mansa e uma pilha de livros próprios à venda na saída. Os diplomas fazem o trabalho que os dados não fazem.',
@@ -2391,7 +2391,7 @@ function buildLevel3() {
   E('boato', 76); E('virus', 83); E('fake', 86, 8); drip(80, 3, 1, 150); drip(88, 3, 2, 150); Q(79, 8, 'gotas');
   E('gotinha', 92, null, { v: 1 }); hl(91, 92, 10, '='); hl(93, 95, 8, '='); items.push({ t: 'shield', x: 95 * T + 3, y: 7 * T + 4, w: 10, h: 10, src: 'prat-95' }); gota(93, 7);
   E('gotinha', 97, null, { v: 3 });
-  arena(AR3.bomb, true); hl(104, 106, 9, '='); hl(115, 117, 9, '=');
+  arena(AR3.bomb, true); hl(104, 106, 10, '='); hl(115, 117, 10, '=');   // linha 10: o pulo alcança uns 43 px; na linha 9 (48 px) não dava
   // trecho 3: corredor, no suporte de soro (a geometria da mina da fase 2, conferida por robô)
   const [C0, C1] = VEIC3.corr;
   for (let x = C0; x <= C1; x++) vl(x, 0, 5, 'B');
@@ -2417,7 +2417,7 @@ function buildLevel3() {
   // trecho 6: spa detox (buraco para o intestino de café) e Guru Glow
   gotas(262, 264, 10); E('vapor', 266, null, { ph: 0 }); deco.push({ k: 'cafeteira', tx: 268 }); pit(HOLE3[0], HOLE3[1]);
   E('vapor', 274, null, { ph: 2.4 }); drip(275, 4, 2, 140); deco.push({ k: 'cano', tx: PIPE3 }); E('gotinha', 280, null, { v: 1 }); syr(281, 10);
-  arena(AR3.guru, true); hl(287, 289, 9, '='); hl(296, 298, 9, '=');
+  arena(AR3.guru, true); hl(287, 289, 10, '='); hl(296, 298, 10, '=');
   // trecho 7: último portão e o auditório
   gotas(305, 307, 10); E('gotinha', 308, null, { v: 4 });
   gate(313);
@@ -2677,7 +2677,7 @@ function stepBoss3() {
   else stepProf3(b, p, L, R, D, easy, ph2);
   if (s.time % (easy ? 180 : 240) === 0) arenaAmmo3(a);
   if (p.dead || s.vic || b.st === 'intro' || b.st === 'dying') return;
-  const body = { x: b.x + 3, y: b.y + 2, w: b.w - 6, h: b.h - 2 };
+  const low = b.who === 'bomb' && b.st === 'charge', body = low ? { x: b.x + 1, y: b.y + b.h - 22, w: b.w - 2, h: 22 } : { x: b.x + 3, y: b.y + 2, w: b.w - 6, h: b.h - 2 };   // investida de ombro, abaixado: dá para pular por cima ou esperar na plataforma
   if (overlap(p, body)) {
     const stomp = p.vy > .3 && !p.onG && p.y + p.h - b.y < 12;
     if (stomp && (b.st === 'tired' || (b.who === 'prof' && b.dip === 0))) { dmg3(2, 'stomp'); p.vy = keys.jump ? -4.9 : -3.6; p.canCut = false; }
@@ -3044,7 +3044,7 @@ function drawBoss3() {
   const blink = b.inv > 0 && (s.time & 1);
   if (b.who === 'bomb') {
     const A = SPR3.bomb, im = b.st === 'dying' || b.hurtT > 0 ? A.hurt : b.st === 'tired' ? A.tired : b.st === 'charge' ? A.charge : (b.st === 'flex' || b.flex > 0) ? A.flex : b.throwT > 0 || b.st === 'press' ? A.throw : A.idle;
-    if (!blink) spr(im, cx - im.width / 2, foot - im.height + 1, b.st === 'charge' ? b.face < 0 : b.face < 0);
+    if (!blink) { if (b.st === 'charge') { ctx.save(); ctx.translate(Math.round(cx), foot + 1); ctx.scale(b.face < 0 ? -1.15 : 1.15, .55); ctx.drawImage(im, -im.width / 2, -im.height); ctx.restore(); } else spr(im, cx - im.width / 2, foot - im.height + 1, b.face < 0); }
   } else if (b.who === 'guru') {
     const A = SPR3.guru, im = b.st === 'dying' || b.hurtT > 0 ? A.hurt : b.st === 'tired' ? A.medita : b.throwT > 0 ? A.throw : A.idle;
     if (b.st !== 'tired' && s.time % 10 === 0) s.parts.push({ x: b.x + Math.random() * b.w, y: b.y + b.h, vx: 0, vy: .3, t: 20, c: '#fff6c9', g: 0 });
