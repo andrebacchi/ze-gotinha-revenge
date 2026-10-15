@@ -174,6 +174,9 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
   Com o posto novo os índices mudaram: o suporte de soro já conta como usado quando o posto do jogo salvo fica depois do corredor (`VEIC3.corr[1]`), sem depender do índice.
 - **Área bônus:** o intestino de café fica em 340 a 427, atrás de uma parede. Cair no buraco do spa (`fall3()`) solta o Zé direto na xícara; a xícara anda como o vagonete (geometria da mina de novo) e no fim o cano (277) devolve o Zé ao spa.
   Na área bônus nenhum posto conta. Morrer lá volta ao último posto.
+- **Rampa do corredor** (pedido do André, 15/10/2026): o corredor do suporte de soro desce em rampa só no desenho; a física segue plana. `rampOff(x)` dá o deslocamento (`RAMPA` 0,14 px por px, contado do meio da tela, limitado às pontas do corredor).
+  Fundo, blocos e enfeites são desenhados planos e `ramp3Screen()` fatia a tela em colunas descidas (o vão repete a faixa de 16 px da ponta); objetos, Zé, inimigos, tiros e efeitos passam por `R3(x)`, que acerta `camY` a partir de `camY0`.
+  Montado no suporte, o Zé inclina junto. Capturas em `t85.js` e `t86.js`.
 - **Veículos:** `s.vehs` (suporte de soro e xícara), `board3()`, `leave3()`, desenho em `drawZeVehicle3()`. Usam o `p.cart` do vagonete, então pulo, caixote (`X`) e câmera funcionam igual.
 - **Soros coloridos** (`SORO_COR`): laranja (vitamina C), verde (detox), rosa (beleza), azul (energia), dourada (longevidade). As bolsas (`s.drips`) pingam gotas `gota3`: laranja cai reto, verde deixa poça, rosa quica, azul faz zigue-zague, dourada persegue.
   As gotinhas de grife (inimigo `gotinha`) têm o mesmo código de cores: laranja anda, verde deixa poça, rosa pula, azul corre em zigue-zague, dourada persegue e aguenta dois golpes.
