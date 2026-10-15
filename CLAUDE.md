@@ -185,7 +185,7 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
   Os corações de curtida que perseguiam o Zé na segunda metade da luta saíram (o André achou apelativo, 15/10/2026); o inimigo `like` continua no código, guardado para outro chefe.
   Guru Glow: flutua, joga cristais, acende velas no chão e solta adesivos; a cada ciclo desce para meditar e o pisão tira 2. Prof. Magnus Aurum: diplomas giram em volta dele e seguram as seringas até caírem um por um;
   sem diplomas toda seringa conta e o pisão tira 2; ele joga os próprios livros e, no palco, as barras do gráfico do telão viram plataformas. Na vitória a plateia levanta placas de "Qual a evidência?" e o Barão, que estava na plateia aplaudindo, sai de fininho.
-  Seringas na arena a cada 4 s (3 s no fácil). Vida: 10, 8 e 12 no normal; 7, 6 e 8 no fácil; o fácil tem 3 diplomas em vez de 5.
+  Seringas na arena a cada 4 s (3 s no fácil). Vida: 6, 8 e 12 no normal; 4, 6 e 8 no fácil (o Dr. Soro tinha 10 e 7; o André achou forte demais para um chefe do meio da fase, 15/10/2026); o fácil tem 3 diplomas em vez de 5.
 - **Perguntas:** `QS3`, sobre autoridade, preço, soro e detox. Os fatos aguardam a revisão do André.
 - **Testes:** `t80.js` (capturas de cada trecho), `t81.js` (força bruta nos lustres e suportes, robô no suporte de soro e na xícara, balança, máquina e os três chefes; aceita `pe`, `veic`, `puz` ou `boss`),
   `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura), `t84.js` (sem invulnerabilidade: escapar da investida pulando e na plataforma).
