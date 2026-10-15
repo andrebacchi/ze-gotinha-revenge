@@ -2826,30 +2826,6 @@ function grana3(it) {
 }
 
 /* ───────── Desenho da fase 3 ───────── */
-/* Rampa do corredor (pedido do André): a física continua plana; o desenho desce. Cada coisa é deslocada para baixo conforme a distância,
-   ao longo do corredor, até o meio da tela, então o trecho em volta da câmera desce em diagonal e o que vem depois fica no pé da rampa. */
-const RAMPA = .14;
-let camY0 = 0;
-function rampOff(x) { if (!st || st.fase !== 3) return 0; const a = VEIC3.corr[0] * T, b = (VEIC3.corr[1] + 1) * T; return Math.round(RAMPA * (clamp(x, a, b) - clamp(camX + VW / 2, a, b))); }
-function R3(x) { camY = camY0 - rampOff(x); }   // põe a câmera no degrau da rampa de x; camY0 é a câmera de verdade
-/* Fundo, blocos e enfeites são desenhados planos e depois a tela é fatiada em colunas, cada uma descida conforme a rampa.
-   O vão que abre embaixo (ou em cima) repete a última faixa de 16 px da própria coluna. */
-const RC = document.createElement('canvas'), rcx = RC.getContext('2d');
-function ramp3Screen() {
-  if (st.fase !== 3) return; const d0 = rampOff(camX), d1 = rampOff(camX + VW - 1); if (!d0 && !d1) return;
-  const W = cv.width, H = cv.height, k = W / VW; if (RC.width !== W || RC.height !== H) { RC.width = W; RC.height = H; }
-  rcx.clearRect(0, 0, W, H); rcx.drawImage(cv, 0, 0); ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, W, H);
-  const band = 16 * k | 0;
-  for (let sx = 0; sx < VW;) {
-    const d = rampOff(camX + sx); let e = sx + 1; while (e < VW && rampOff(camX + e) === d) e++;
-    const X = Math.round(sx * k), Wd = Math.round(e * k) - X, D = Math.round(d * k);
-    ctx.drawImage(RC, X, 0, Wd, H, X, D, Wd, H);
-    if (D < 0) for (let y = H + D; y < H; y += band) ctx.drawImage(RC, X, H - band, Wd, band, X, y, Wd, band);
-    else for (let y = D - band; y > -band; y -= band) ctx.drawImage(RC, X, 0, Wd, band, X, y, Wd, band);
-    sx = e;
-  }
-  ctx.restore();
-}
 const ZONA3 = [[0, 'recep'], [50, 'lounge'], [122, 'corr'], [212, 'farm'], [246, 'quant'], [261, 'spa'], [304, 'aud'], [336, 'bonus']];
 const zona3 = tx => { let z = 'recep'; for (const [a, k] of ZONA3) if (tx >= a) z = k; return z; };
 const TIL3 = {};   // blocos por ambiente, desenhados na primeira vez
@@ -3056,10 +3032,10 @@ function world3() {
   }
   if (near && !s.intro) label(near.lab, Math.round(near.x + 8) - camX, Math.round(near.y) - 4 - camY, near.k === 'ev' ? '#9fd4ff' : near.k === 'tr' ? '#ffd23f' : '#ff8fd0', 7);
   // poças de soro
-  for (const k of s.pocas) { R3(k.x + 10); const x = Math.round(k.x) - camX; if (x < -20 || x > VW) continue; ctx.globalAlpha = Math.min(1, k.t / 60) * .9; { const im = SPR3.poca[k.v]; ctx.drawImage(im, x + 10 - (im.width >> 1), Math.round(k.y) - im.height + 3 - camY); } ctx.globalAlpha = 1; }
+  for (const k of s.pocas) { const x = Math.round(k.x) - camX; if (x < -20 || x > VW) continue; ctx.globalAlpha = Math.min(1, k.t / 60) * .9; { const im = SPR3.poca[k.v]; ctx.drawImage(im, x + 10 - (im.width >> 1), Math.round(k.y) - im.height + 3 - camY); } ctx.globalAlpha = 1; }
   // veículos estacionados
   for (const v of s.vehs) {
-    if (p.veh === v) continue; R3(v.x + v.w / 2); const x = Math.round(v.x) - camX, y = Math.round(v.y) - camY; if (x < -40 || x > VW + 20) continue;
+    if (p.veh === v) continue; const x = Math.round(v.x) - camX, y = Math.round(v.y) - camY; if (x < -40 || x > VW + 20) continue;
     if (v.k === 'poste') spr(SPR3.poste, x + v.w / 2 - (SPR3.poste.width >> 1), y + v.h - SPR3.poste.height);
     else spr(SPR3.cup, x + v.w / 2 - 14, y + v.h - 14 + Math.round(Math.sin(st.time * .08) * 1.2));
   }
@@ -3271,7 +3247,7 @@ function render() {
   ctx.setTransform(S, 0, 0, S, 0, 0); ctx.imageSmoothingEnabled = false;
   const sa = s.shake > 0 && !reduceMotion ? Math.min(s.shakeA || 2, 1 + s.shake / 3) : 0;
   const sh = sa ? Math.round((Math.random() - .5) * 2 * sa) : 0, sv = sa ? -Math.round(Math.random() * .8 * sa) : 0;
-  camX = Math.round(s.cam.x) + sh; camY = Math.round(s.cam.y) + sv; camY0 = camY;
+  camX = Math.round(s.cam.x) + sh; camY = Math.round(s.cam.y) + sv;
   const I = s.intro;
   if (I && I.k > 0) { // zoom: leva o inimigo para o lado esquerdo do palco e amplia em volta dele
     ctx.fillStyle = K; ctx.fillRect(0, 0, VW, VH);
@@ -3313,14 +3289,14 @@ function render() {
     if (img && img !== 1) ctx.drawImage(img, x, y);
     if (c === 'M' || c === 'F') label(c === 'M' ? 'MITO' : 'FATO', x + 8, y - 3, '#fff', 7);
   }
-  if (s.fase === 3) { deco3(tx0); ramp3Screen(); } else if (s.fase === 2) deco2(tx0); else if (A) for (const d of s.deco) {   // capim e flores: o vento passa em onda pela fase
+  if (s.fase === 3) deco3(tx0); else if (s.fase === 2) deco2(tx0); else if (A) for (const d of s.deco) {   // capim e flores: o vento passa em onda pela fase
     if (d.tx < tx0 - 1 || d.tx > tx0 + 22) continue; const im = A[d.k + WIND5[((s.anim / 9 | 0) + d.tx * 3) & 7]];
     ctx.drawImage(im, d.tx * T + 8 - (im.width >> 1) - camX, d.ty * T + 1 - im.height - camY);
   }
-  for (const pl of s.plats) { if (s.fase === 3) { R3(pl.x + pl.w / 2); plat3(pl); camY = camY0; continue; } if (s.fase === 2) { plat2(pl); continue; } ctx.drawImage(A ? A[(s.anim >> 2) & 1 ? 'mp2' : 'mp1'] : SPR.mplat, Math.round(pl.x) - camX, Math.round(pl.y) - camY); }
-  if (s.fase === 2) world2(); else if (s.fase === 3) { world3(); camY = camY0; }
+  for (const pl of s.plats) { if (s.fase === 3) { plat3(pl); continue; } if (s.fase === 2) { plat2(pl); continue; } ctx.drawImage(A ? A[(s.anim >> 2) & 1 ? 'mp2' : 'mp1'] : SPR.mplat, Math.round(pl.x) - camX, Math.round(pl.y) - camY); }
+  if (s.fase === 2) world2(); else if (s.fase === 3) world3();
   // postos e ninhos
-  for (const c of s.cps) { R3(c.x * T); const im = SPR.flag[c.on ? 1 : 0]; if (im.o) spr(im, c.x * T - camX, G * T - 32 - camY); else spr(im, c.x * T - 3 - camX, G * T - im.height - camY); }
+  for (const c of s.cps) { const im = SPR.flag[c.on ? 1 : 0]; if (im.o) spr(im, c.x * T - camX, G * T - 32 - camY); else spr(im, c.x * T - 3 - camX, G * T - im.height - camY); }
   for (const j of s.jacs) {
     const x = j.x - camX, y = j.y - camY;
     const ja = SPR.jacArt, ea = SPR.eggArt, sa = SPR.shellArt, gy = G * T - camY;
@@ -3338,7 +3314,7 @@ function render() {
   }
   // itens
   for (const it of s.items) {
-    if (it.got) continue; R3(it.x + it.w / 2);
+    if (it.got) continue;
     const bob = it.phys ? 0 : Math.round(Math.sin((s.time + it.x) * .08) * 1.5);
     const im = it.t === 'gota' ? SPR.gota : SPR[it.t];
     if (im.o) spr(im, it.x - camX, it.y - camY + bob); else spr(im, it.x + it.w / 2 - im.width / 2 - camX, it.y + it.h - im.height - camY + bob + (it.phys ? 1 : 0));
@@ -3346,7 +3322,7 @@ function render() {
   }
   // inimigos
   for (const e of s.enemies) {
-    if (e.dead || (e.fl > 0 && (s.time & 1))) continue; R3(e.x + e.w / 2);
+    if (e.dead || (e.fl > 0 && (s.time & 1))) continue;
     const f = (s.anim >> 3) & 1, x = e.x - camX + (e.fl > 0 ? ((e.fl >> 1) & 1 ? 1 : -1) : 0), y = e.y - camY;
     const A = ENEMY_ART[e.t], art = SPR.en[e.t];
     if (art && e.t === 'boato') spr(art[f ? 'walk1' : 'walk2'], x + e.w / 2 - A.cw / 2, y + e.h - A.base, e.dir < 0);
@@ -3360,7 +3336,7 @@ function render() {
   }
   // chefão
   const b = s.boss;
-  if (s.fase === 3) { R3(b.x + b.w / 2); drawBoss3(); }
+  if (s.fase === 3) drawBoss3();
   else if (b.active) {
     const bx = b.x - camX + (b.st === 'warn' ? ((b.t >> 1) & 1 ? 2 : -2) : b.hurtT > 12 ? ((b.hurtT >> 1) & 1 ? 2 : -2) : 0), by = b.y - camY;
     if (!(b.inv > 0 && (s.time & 1) && !SPR.bossArt) && !(b.st === 'dying' && (s.time & 2))) {
@@ -3389,7 +3365,6 @@ function render() {
     if (b.st === 'aim' || b.st === 'warn') { ctx.fillStyle = 'rgba(224,69,123,.55)'; ctx.fillRect(Math.round(bx), G * T - camY - 2, b.w, 2); }
   }
   // jogador
-  R3(p.x + p.w / 2);
   if (!(p.inv > 0 && !p.dead && (s.time >> 2) & 1)) {
     const x = Math.round(p.x) - camX, jsw = p.ride && p.inW && SPR.xj, y = Math.round(p.y) - camY + (p.ride && p.inW ? (jsw ? 10 : 5) + Math.round(Math.sin(s.time * .12)) : 0), fl = p.face < 0;
     const big = p.growT > 0 && (s.time >> 2) & 1 ? !p.big : p.big; // pisca entre os tamanhos ao mudar
@@ -3404,8 +3379,7 @@ function render() {
     if (VA) {   // comemoração: preparo, salto e pose
       const g = s.vic.g, X = EXTRA_ART[big ? 'vb' : 'vn'], hop = g >= V_PREP && g < V_POSE ? Math.round(Math.sin(Math.PI * (g - V_PREP) / (V_POSE - V_PREP)) * 18) : 0;
       spr(g < V_PREP ? VA.vprep : g < V_POSE ? VA.vjump : VA.vpose, x + p.w / 2 - X.cw / 2, y + p.h - X.base - hop, fl);
-    } else if (p.cart && s.fase === 3) { const inc = p.veh && p.veh.k === 'poste' && p.x > VEIC3.corr[0] * T && p.x < VEIC3.corr[1] * T ? Math.atan(RAMPA) : 0;   // na rampa, o suporte inclina junto
-      if (inc) { ctx.save(); ctx.translate(x + p.w / 2, y + p.h); ctx.rotate(inc); ctx.translate(-x - p.w / 2, -y - p.h); } drawZeVehicle3(x, y, big, fl); if (inc) ctx.restore();
+    } else if (p.cart && s.fase === 3) { drawZeVehicle3(x, y, big, fl);
     } else if (p.cart || s.launch) { drawZeVehicle(x, y, big, fl);
     } else if (p.ride) {
       const ja = SPR.jacArt;
@@ -3461,8 +3435,8 @@ function render() {
     ctx.fillStyle = 'rgba(255,255,255,.3)'; ctx.fillRect(x + (w * 5) % 12, y + 9, 4, 1);
     if (c === 'L') ctx.drawImage(SPR.pad, x, y - 1);
   }
-  for (const o of s.shots) { R3(o.x); const im = SPR.syr; if (im.o) spr(im, o.x - 1 - camX, o.y - camY, o.vx < 0); else spr(im, o.x + 5 - im.width / 2 - camX, o.y + 2.5 - im.height / 2 - camY, o.vx < 0); }
-  for (const f of s.eshots) { R3(f.x);
+  for (const o of s.shots) { const im = SPR.syr; if (im.o) spr(im, o.x - 1 - camX, o.y - camY, o.vx < 0); else spr(im, o.x + 5 - im.width / 2 - camX, o.y + 2.5 - im.height / 2 - camY, o.vx < 0); }
+  for (const f of s.eshots) {
     const C = SPR.sc;
     if (f.t === 'flask' || f.t === 'portrait') { drawEshot2(f); continue; }
     if (s.fase === 3 && drawEshot3(f)) continue;
@@ -3470,10 +3444,9 @@ function render() {
     else if (f.t === 'fake') { const im = (s.anim >> 2) & 1 ? C.fx_b2 : C.fx_b1; spr(im, f.x + 4 - im.width / 2 - camX, f.y + 4 - im.height / 2 - camY, f.vx > 0); }
     else { const im = f.life < 10 ? C.fx_w4 : f.life > 74 ? C.fx_w1 : (s.anim / 5 | 0) & 1 ? C.fx_w3 : C.fx_w2, R = f.vx > 0; spr(im, (R ? f.x + 11 - im.width : f.x - 3) - camX, f.y + 13 - im.height - camY, !R); }
   }
-  for (const a of s.fx) { R3(a.x); if (a.seq) { spr(a.seq[Math.min(a.seq.length - 1, (a.t0 - a.t) / a.per | 0)], a.x - a.cw / 2 - camX, a.y - a.base - camY); continue; } if (a.t < 8 && (a.t & 1)) continue; spr(a.img, a.x - a.cw / 2 - camX, a.y - a.base - camY, a.flip); }   // inimigo derrotado: fica um instante e some piscando
-  for (const a of s.parts) { R3(a.x); ctx.fillStyle = a.c; ctx.fillRect(Math.round(a.x - camX), Math.round(a.y - camY), 2, 2); }
-  for (const a of s.texts) { R3(a.x); label(a.s, Math.round(a.x - camX), Math.round(a.y - camY), a.c, 7); }
-  camY = camY0;
+  for (const a of s.fx) { if (a.seq) { spr(a.seq[Math.min(a.seq.length - 1, (a.t0 - a.t) / a.per | 0)], a.x - a.cw / 2 - camX, a.y - a.base - camY); continue; } if (a.t < 8 && (a.t & 1)) continue; spr(a.img, a.x - a.cw / 2 - camX, a.y - a.base - camY, a.flip); }   // inimigo derrotado: fica um instante e some piscando
+  for (const a of s.parts) { ctx.fillStyle = a.c; ctx.fillRect(Math.round(a.x - camX), Math.round(a.y - camY), 2, 2); }
+  for (const a of s.texts) label(a.s, Math.round(a.x - camX), Math.round(a.y - camY), a.c, 7);
 
   renderHud(I);
 }
