@@ -2749,7 +2749,6 @@ function stepBomb3(b, p, L, R, D, easy, ph2) {
       if (b.t > (easy ? 230 : 170)) {
         b.st = 'walk'; b.t = 0;
         if (ph2 && !b.gaveSus) { b.gaveSus = true; s.items.push({ t: 'sus', x: (AR3.bomb + 10) * T - 7, y: -12, w: 15, h: 9, vx: 0, vy: 0, phys: true, stopY: 0, arena: true, src: 'arena-soro' }); }
-        if (ph2 && D.minions && !b.gaveMin) { b.gaveMin = true; for (const yy of [60, 110]) s.enemies.push({ t: 'like', x: R + 10, y: yy, w: 10, h: 9, hp: 1, fl: 0, vx: 0, vy: 0, arena: true }); txt(cx, b.y - 16, 'Curtam meu vídeo!', '#ff8fd0'); }
       } break;
   }
   b.y = G * T - b.h;
