@@ -2453,13 +2453,13 @@ function buildLevel3() {
   gotas(345, 349, 10); gota(352, 8); gota(364, 8); gotas(379, 380, 8); gota(386, 8); gotas(399, 401, 8); gotas(410, 413, 8); gotas(417, 423, 10); gotas(370, 374, 10);
   items.push({ t: 'shield', x: 383 * T + 3, y: 9 * T + 4, w: 10, h: 10, src: 'bonus-383' }); items.push({ t: 'boost', x: 396 * T + 3, y: 9 * T + 2, w: 10, h: 12, src: 'bonus-396' });
   vehs.push({ k: 'xicara', x: (B0 + 2) * T, y: G * T - 14, w: 22, h: 14, x0: (B0 + 2) * T, end: (B1 - 3) * T, state: 'park' });
-  for (const tx of [2, 13, 26, 46, 56, 73, 99, 214, 224, 262, 304, 311]) deco.push({ k: tx > 260 ? 'planta' : tx > 210 ? 'vitrine' : tx > 50 ? 'planta' : 'coluna', tx });
+  for (const tx of [2, 13, 26, 46, 56, 73, 96, 214, 224, 262, 304, 311]) deco.push({ k: tx > 260 ? 'planta' : tx > 210 ? 'vitrine' : tx > 50 ? 'planta' : 'coluna', tx });
 
   const pool = QS3.slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   const s = {
     map: m, qb, items, enemies, gates, plats, deco, shots: [], eshots: [], parts: [], texts: [], fx: [],
-    cps: [52, 122, 225, 262, 305].map(x => ({ x, on: false })),
+    cps: [52, 98, 122, 225, 262, 305].map(x => ({ x, on: false })),
     jacs: [],
     boss: { active: false, dead: false, st: 'wait', x: 0, y: 0, w: 24, h: 40, hp: 10, max: 10, t: 0, inv: 0, hurtT: 0, face: -1, throws: 0, throwT: 0 },
     p: { x: 2 * T + 3, y: G * T - 24, w: 10, h: 24, vx: 0, vy: 0, face: 1, onG: true, big: false, growT: 0, ammo: 3, maxAmmo: 3, plat: null, inv: 0, cd: 0, coy: 0, buf: 0, stun: 0, canCut: false, ride: null, bite: 0, shield: false, boost: 0, dead: false, deadT: 0, shootT: 0, slip: 0, slowT: 0 },
@@ -2510,7 +2510,7 @@ function after3(p) {
 }
 function respawn3() {
   const s = st, p = s.p; p.veh = null; p.slip = 0; p.slowT = 0;
-  for (const v of s.vehs) { if (v.state === 'done') continue; if (v.k === 'poste' && s.cur >= 2) { v.state = 'done'; v.x = v.end - v.w + 6; } else { v.state = 'park'; v.x = v.x0; } v.y = G * T - v.h; }
+  for (const v of s.vehs) { if (v.state === 'done') continue; if (v.k === 'poste' && s.cps[s.cur] && s.cps[s.cur].x > VEIC3.corr[1]) { v.state = 'done'; v.x = v.end - v.w + 6; } else { v.state = 'park'; v.x = v.x0; } v.y = G * T - v.h; }
   const cpx = s.cps[s.cur] ? s.cps[s.cur].x : 0;
   for (const k of ['bomb', 'guru']) if (!s.bossDone[k] && cpx > AR3[k] + 20) bossOpen3(k, true);   // jogo continuado depois da arena: o subchefe já caiu
   s.pocas.length = 0; s.placas = 0; for (const pl of s.plats) if (pl.kind === 'bar') { pl.ty = pl.base; pl.y = pl.base; }

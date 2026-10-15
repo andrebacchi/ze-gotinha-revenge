@@ -170,7 +170,8 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
 - **Trechos** (`buildLevel3`, 430 blocos): recepção de mármore (recepcionista, lustres em pêndulo sobre o espelho d'água, com a geometria dos sinos da fase 2) · lounge da soroterapia (suportes de soro como degraus sobre o vão,
   bolsas pingando, pacientes VIP: boato, vírus e fake news da fase 1 nas poltronas) · arena do Dr. Soro Platinum (101 a 120) · corredor no suporte de soro (a geometria da mina da fase 2, 125 a 211) ·
   farmácia premium com a balança (a geometria da balança 1 da fase 2, deslocada 148 blocos) · sala do diagnóstico quântico · spa detox com o buraco atrás da cafeteira (270 e 271) ·
-  arena da Guru Glow (283 a 302) · auditório do Prof. Magnus Aurum (316 a 335, palco em 332 a 335). Postos em 52, 122, 225, 262, 305. Portões em 48, 222 e 313.
+  arena da Guru Glow (283 a 302) · auditório do Prof. Magnus Aurum (316 a 335, palco em 332 a 335). Postos em 52, 98 (logo antes da arena do Dr. Soro, pedido do André em 15/10/2026), 122, 225, 262, 305. Portões em 48, 222 e 313.
+  Com o posto novo os índices mudaram: o suporte de soro já conta como usado quando o posto do jogo salvo fica depois do corredor (`VEIC3.corr[1]`), sem depender do índice.
 - **Área bônus:** o intestino de café fica em 340 a 427, atrás de uma parede. Cair no buraco do spa (`fall3()`) solta o Zé direto na xícara; a xícara anda como o vagonete (geometria da mina de novo) e no fim o cano (277) devolve o Zé ao spa.
   Na área bônus nenhum posto conta. Morrer lá volta ao último posto.
 - **Veículos:** `s.vehs` (suporte de soro e xícara), `board3()`, `leave3()`, desenho em `drawZeVehicle3()`. Usam o `p.cart` do vagonete, então pulo, caixote (`X`) e câmera funcionam igual.
