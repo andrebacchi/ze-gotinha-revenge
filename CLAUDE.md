@@ -163,7 +163,8 @@ Os nomes são inventados e os desenhos ficam no nível do tipo, sem copiar rosto
 Provisório, desenhado em código (`SPR3`, `tile3`, `bg3`, `wallBg3`, `deco3`, `world3`); a música é a da fase 1 (`stage3`) até a fase ganhar a dela.
 Artes do André já trocadas: Dr. Soro Platinum (`SORO_ART`, 6 quadros: parado, flexão, arremesso, investida, cansado, dor; âncora nos pés; `tools/arte/soro.py`, fundo magenta, escala 0,12; a dor serve também para a derrota)
 e recepcionista, cartão VIP e gotinhas de grife (`GRIFE_ART`, atlas; `tools/arte/grife.py`, fundo ciano porque há gotinha rosa e verde, escala 0,06; o cartão veio colado no arremesso pelos rastros e é separado no script; olhos e sorriso das gotinhas refeitos à mão; a rosa agacha antes do pulo).
-Próxima folha pedida: objetos do lounge (bolsas, gotas, poças, lustre, suporte de soro, poltrona, planta, balcão, coluna), fundo ciano.
+Objetos do lounge (`LOUNGE_ART`, `tools/arte/lounge.py`, fundo ciano, uma janela e uma escala por objeto): bolsas, gotas, poças, lustre, suporte de soro (veículo), gancho do suporte (topo da plataforma `pole`), poltrona, planta, balcão e coluna (capitel e base inteiros, fuste repetido).
+Próximas folhas pedidas: blocos da clínica e fundos da recepção e do lounge.
 - **Trechos** (`buildLevel3`, 430 blocos): recepção de mármore (recepcionista, lustres em pêndulo sobre o espelho d'água, com a geometria dos sinos da fase 2) · lounge da soroterapia (suportes de soro como degraus sobre o vão,
   bolsas pingando, pacientes VIP: boato, vírus e fake news da fase 1 nas poltronas) · arena do Dr. Soro Platinum (101 a 120) · corredor no suporte de soro (a geometria da mina da fase 2, 125 a 211) ·
   farmácia premium com a balança (a geometria da balança 1 da fase 2, deslocada 148 blocos) · sala do diagnóstico quântico · spa detox com o buraco atrás da cafeteira (270 e 271) ·
