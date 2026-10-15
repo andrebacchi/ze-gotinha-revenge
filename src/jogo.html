@@ -2730,7 +2730,7 @@ function stepBomb3(b, p, L, R, D, easy, ph2) {
     case 'intro': if (b.t === 40) { b.flex = 30; sfx('slam'); } if (b.flex > 0) b.flex--; if (b.t > 90) { b.st = 'walk'; b.t = 0; introStart('bomb', b); } break;
     case 'walk': {   // anda atrás do Zé e alterna arremesso, supino e investida
       const tx = clamp(pcx + (cx < pcx ? -60 : 60), L, R - b.w); b.x += clamp(tx - b.x, -.5, .5);
-      if (b.t > (easy ? 80 : 55)) { b.t = 0; b.n++; b.st = 'flex'; b.next = b.n % 4 === 0 ? 'charge' : ph2 && b.n % 4 === 2 ? 'press' : 'throw'; }
+      if (b.t > (easy ? 80 : 55)) { b.t = 0; b.n++; b.st = 'flex'; b.next = b.n % 4 === 0 ? 'charge' : 'throw';   /* o supino que fazia chover soro saiu (o André achou apelativo) */ }
     } break;
     case 'flex': if (b.t === 1) txt(cx, b.y - 8, b.next === 'charge' ? 'Olha o shape!' : 'Hmpf!', '#fff'); if (b.t > (b.next === 'charge' ? D.warn + 14 : 22)) { b.st = b.next; b.t = 0; } break;
     case 'throw':
