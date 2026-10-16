@@ -1,4 +1,4 @@
-// Fase 3: alcance a pé (lustres e suportes de soro), robô no suporte de soro e na xícara, balança, máquina quântica e os três chefes
+// Fase 3: alcance a pé (lustres e suportes de soro), robô no suporte de soro e na xícara, máquina quântica e os três chefes (a balança fica no t87.js)
 const { chromium } = require('playwright');
 (async () => { const b = await chromium.launch(); const errs = [];
   const p = await (await b.newContext()).newPage(); p.on('pageerror', e => errs.push('PAGEERR ' + e.message));
@@ -56,15 +56,8 @@ const { chromium } = require('playwright');
       const P = () => g.st.p, B = () => g.st.blocks;
       const tp = (x, y) => { const p = P(); p.x = x; p.y = y - p.h; p.vx = 0; p.vy = 0; for (let i = 0; i < 4; i++) g.step(); };
       const push = (dir, k, until, max = 900) => { K[dir] = true; let last = k.x, still = 0, i = 0; for (; i < max; i++) { g.step(); if (until(k)) break; if (Math.abs(k.x - last) < .01) { if (++still > 40) break; } else still = 0; last = k.x; } K[dir] = false; for (let j = 0; j < 30; j++) g.step(); return +(k.x / T).toFixed(2); };
-      const [T1, T2, E1, E2, Q1, Q2, Q3] = B();
-      tp(234 * T + 3, 12 * T); push('right', T2, k => false);
-      tp(233 * T - 11, 12 * T); push('right', T1, k => false);
-      const pesoTrad = s.bals[0].w;
-      tp(231 * T + 2, 7 * T); push('right', E1, k => k.y > 8 * T);
-      tp(236 * T + 2, 7 * T); push('right', E2, k => k.y > 8 * T);
-      tp(E2.x - 11, 12 * T); push('right', E2, k => false);
-      tp(E1.x - 11, 12 * T); push('right', E1, k => false);
-      out.balanca = { pesoTrad, w: s.bals[0].w, solved: s.bals[0].solved, porta: s.map[10][244] };
+      // a balança de três evidências tem o robô dela, em t87.js
+      const [Q1, Q2, Q3] = B().filter(k => k.k === 'qo');
       const M = s.maq, lab = [];
       for (const q of [Q3, Q2, Q1]) { tp(q.x - 11, 12 * T); push('right', q, k => k.y > 12 * T - 1); lab.push([q.obj, +(q.x / T).toFixed(1), +(q.y / T).toFixed(1), M.lights]); }
       out.maquina = { lab, luzes: M.lights, done: M.done, porta: s.map[10][259] };

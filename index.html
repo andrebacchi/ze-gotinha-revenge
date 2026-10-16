@@ -264,7 +264,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.54</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.55</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -333,7 +333,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win" id="winNote">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btNext" type="button" hidden>Próxima fase</button><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.54</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.55</p>
     </div>
   </section>
 
@@ -1671,6 +1671,9 @@ function stepBlock(k) {
   for (const o of s.blocks) if (o !== k && !o.gone && overlap(k, o) && pb <= o.y + 1) { k.y = o.y - k.h; k.vy = 0; k.onG = true; k.on = o; }
   k.x = fx; k.w = 16;
   if (!k.onG) { const cx = Math.floor((k.x + 8) / T) * T; k.x += clamp(cx - k.x, -1.2, 1.2); }   // caindo, encaixa no vão
+  if (k.onG && !was && k.y >= G * T - 1 && k.bal >= 0) {   // caiu num buraco raso e virou chão
+    if (k.k === 'ev') hintOnce('evBuraco', 'Evidência enterrada no buraco não chega ao prato. O bloco <b>↺</b> devolve os blocos ao lugar.', 300);
+    else txt(k.x + 8, k.y - 6, 'Serviu de aterro.', '#ffd23f'); }
   if (k.onG && !was && k.fell > 6) { sfx('bump'); dust(k.x + 8, k.y + k.h, 4, 12); shake(4, 1); }
   k.fell = k.onG ? 0 : (k.fell || 0) + 1;
   if (k.y > LH * T + 8) {
@@ -1688,7 +1691,7 @@ function solveBal(bl, quiet) {
   for (const x of [bl.door, bl.door + 1]) for (let y = 8; y <= 11; y++) { s.map[y][x] = '.'; if (!quiet) burst(x * T + 8, y * T + 8, '#6b3f22', 3); }
   if (quiet) return;
   sfx('ok'); shake(10, 2); s.balOk = (s.balOk || 0) + 1; txt(bl.door * T, 7 * T, 'A evidência pesou!', '#9fd4ff');
-  introStart('balok', { x: bl.x0 * T, y: 10 * T, w: (bl.door - bl.x0 + 2) * T, h: 2 * T }, { kind: 'Balança da evidência', name: 'O prato desceu', text: s.fase === 3 ? 'Duas evidências fizeram o que o pote importado não fez. Preço e selo de prêmio não pesam na balança.' : 'Duas evidências fizeram o que séculos de tradição não fizeram. Tempo de uso não pesa na balança.', tipLabel: '', tip: 'A porta abriu.', zoom: 1.4, cls: 'ok', quiet: true });
+  introStart('balok', { x: bl.x0 * T, y: 10 * T, w: (bl.door - bl.x0 + 2) * T, h: 2 * T }, { kind: 'Balança da evidência', name: 'O prato desceu', text: s.fase === 3 ? 'Três evidências fizeram o que o pote importado não fez. Preço e selo de prêmio não pesam na balança.' : 'Duas evidências fizeram o que séculos de tradição não fizeram. Tempo de uso não pesa na balança.', tipLabel: '', tip: 'A porta abriu.', zoom: 1.4, cls: 'ok', quiet: true });
 }
 function resetBal(i) {
   if (i === 'maq') return resetMaq();
@@ -2447,13 +2450,17 @@ function buildLevel3() {
   E('drone', 137, 8.5); E('drone', 157, 10); E('drone', 206, 10);
   gotas(129, 133, 10); gota(137, 8); gota(149, 8); gotas(164, 165, 8); gota(171, 8); gotas(184, 186, 8); gotas(195, 198, 8); gotas(206, 208, 10);
   const vehs = [{ k: 'poste', x: 127 * T, y: G * T - 14, w: 22, h: 14, x0: 127 * T, end: 209 * T, state: 'park' }];
-  // trecho 4: farmácia premium, balança (a geometria da balança 1 da fase 2)
-  gate(222); E('gotinha', 226, null, { v: 2 });
-  mplat('y', 229 * T, G * T - 12, 6 * T, G * T - 12, .55);
-  hl(231, 234, 7, '='); hl(236, 239, 7, '=');
-  blk('tr', 233, 11, 0, 'R$ 890'); blk('tr', 236, 11, 0, 'IMPORTADO');
-  blk('ev', 233, 6, 0, 'ENSAIO CLÍNICO'); blk('ev', 238, 6, 0, 'DADOS');
-  bal(240, 4, 244, 2, 227, 8);
+  // trecho 4: farmácia premium, a balança de três evidências (um passo acima da balança 2 da fase 2; pedido do André, 16/10/2026)
+  //   prato de 2 blocos, então a terceira evidência só entra empilhada, caindo da prateleira baixa: ela tem de ser a última;
+  //   a evidência do chão vem antes de um buraco raso, e quem o tapa é o preço, empurrado de volta pelo outro lado;
+  //   a evidência da prateleira alta só se alcança subindo no pote importado.
+  gate(222);
+  blk('tr', 225, 11, 0, 'IMPORTADO');                                  // degrau para a prateleira alta
+  hl(229, 231, 9, '='); blk('ev', 231, 8, 0, 'DADOS');                 // prateleira alta (48 px: só de cima do pote)
+  blk('ev', 234, 11, 0, 'ENSAIO CLÍNICO'); set(235, 12, '.');          // buraco raso logo depois da evidência (a linha 13 continua chão)
+  blk('tr', 237, 11, 0, 'R$ 890');                                     // o aterro: empurrado para a esquerda, pelo outro lado
+  hl(239, 240, 10, '='); blk('ev', 240, 9, 0, 'METANÁLISE');           // prateleira baixa sobre o caminho do prato
+  bal(241, 2, 243, 3, 224, 8);
   // trecho 5: diagnóstico quântico
   blk('qo', 247, 11, -1, 'PEDRA', 'pedra'); blk('qo', 249, 11, -1, 'BANANA', 'banana'); blk('qo', 251, 11, -1, 'VASO', 'vaso');
   hl(253, 254, 12, 'Y'); hl(255, 257, 12, '.');   // plataforma de leitura e o fosso das amostras (raso: a linha 13 continua chão)
@@ -2461,7 +2468,7 @@ function buildLevel3() {
   const maq = { plate: [253, 254], door: 259, read: [], lights: 0, done: false, screen: null, zeT: 0, smoke: 0 };
   // trecho 6: spa detox (buraco para o intestino de café) e Guru Glow
   gotas(262, 264, 10); E('vapor', 266, null, { ph: 0 }); deco.push({ k: 'cafeteira', tx: 268 }); pit(HOLE3[0], HOLE3[1]);
-  E('vapor', 274, null, { ph: 2.4 }); drip(275, 4, 2, 140); deco.push({ k: 'cano', tx: PIPE3 }); E('gotinha', 280, null, { v: 1 }); syr(281, 10);
+  E('vapor', 274, null, { ph: 2.4 }); drip(275, 4, 2, 140); deco.push({ k: 'cano', tx: PIPE3 }); E('gotinha', 276, null, { v: 1 }); syr(279, 10);   // posto em 281, logo antes da arena da Guru (pedido do André, 16/10/2026)
   arena(AR3.guru, true); hl(287, 289, 10, '='); hl(296, 298, 10, '=');
   // trecho 7: último portão e o auditório
   gotas(305, 307, 10); E('gotinha', 308, null, { v: 4 });
@@ -2485,7 +2492,7 @@ function buildLevel3() {
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   const s = {
     map: m, qb, items, enemies, gates, plats, deco, shots: [], eshots: [], parts: [], texts: [], fx: [],
-    cps: [52, 98, 122, 225, 262, 305].map(x => ({ x, on: false })),
+    cps: [52, 98, 122, 225, 262, 281, 305].map(x => ({ x, on: false })),
     jacs: [],
     boss: { active: false, dead: false, st: 'wait', x: 0, y: 0, w: 24, h: 40, hp: 10, max: 10, t: 0, inv: 0, hurtT: 0, face: -1, throws: 0, throwT: 0 },
     p: { x: 2 * T + 3, y: G * T - 24, w: 10, h: 24, vx: 0, vy: 0, face: 1, onG: true, big: false, growT: 0, ammo: 3, maxAmmo: 3, plat: null, inv: 0, cd: 0, coy: 0, buf: 0, stun: 0, canCut: false, ride: null, bite: 0, shield: false, boost: 0, dead: false, deadT: 0, shootT: 0, slip: 0, slowT: 0 },

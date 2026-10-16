@@ -169,8 +169,8 @@ Fundos da recepção e do lounge (`FUNDO3`, `tools/arte/fundo3.py`): duas baias 
 Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as dele). Até o primeiro chefe a fase está toda com a arte do André; do corredor em diante segue provisória.
 - **Trechos** (`buildLevel3`, 430 blocos): recepção de mármore (recepcionista, lustres em pêndulo sobre o espelho d'água, com a geometria dos sinos da fase 2) · lounge da soroterapia (suportes de soro como degraus sobre o vão,
   bolsas pingando, pacientes VIP: boato, vírus e fake news da fase 1 nas poltronas) · arena do Dr. Soro Platinum (101 a 120) · corredor no suporte de soro (a geometria da mina da fase 2, 125 a 211) ·
-  farmácia premium com a balança (a geometria da balança 1 da fase 2, deslocada 148 blocos) · sala do diagnóstico quântico · spa detox com o buraco atrás da cafeteira (270 e 271) ·
-  arena da Guru Glow (283 a 302) · auditório do Prof. Magnus Aurum (316 a 335, palco em 332 a 335). Postos em 52, 98 (logo antes da arena do Dr. Soro, pedido do André em 15/10/2026), 122, 225, 262, 305. Portões em 48, 222 e 313.
+  farmácia premium com a balança de três evidências · sala do diagnóstico quântico · spa detox com o buraco atrás da cafeteira (270 e 271) ·
+  arena da Guru Glow (283 a 302) · auditório do Prof. Magnus Aurum (316 a 335, palco em 332 a 335). Postos em 52, 98 (logo antes da arena do Dr. Soro, pedido do André em 15/10/2026), 122, 225, 262, 281 (logo antes da arena da Guru, pedido dele em 16/10/2026), 305. Portões em 48, 222 e 313.
   Com o posto novo os índices mudaram: o suporte de soro já conta como usado quando o posto do jogo salvo fica depois do corredor (`VEIC3.corr[1]`), sem depender do índice.
 - **Área bônus:** o intestino de café fica em 340 a 427, atrás de uma parede. Cair no buraco do spa (`fall3()`) solta o Zé direto na xícara; a xícara anda como o vagonete (geometria da mina de novo) e no fim o cano (277) devolve o Zé ao spa.
   Na área bônus nenhum posto conta. Morrer lá volta ao último posto.
@@ -179,6 +179,11 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
 - **Soros coloridos** (`SORO_COR`): laranja (vitamina C), verde (detox), rosa (beleza), azul (energia), dourada (longevidade). As bolsas (`s.drips`) pingam gotas `gota3`: laranja cai reto, verde deixa poça, rosa quica, azul faz zigue-zague, dourada persegue.
   As gotinhas de grife (inimigo `gotinha`) têm o mesmo código de cores: laranja anda, verde deixa poça, rosa pula, azul corre em zigue-zague, dourada persegue e aguenta dois golpes.
   Poça (`s.pocas`) escorrega (`p.slip`); o adesivo da Guru deixa o Zé lento sem tirar vida (`p.slowT`).
+- **Balança de três evidências** (pedido do André em 16/10/2026: um nível acima da balança 2 da fase 2, sem repetir): prato de 2 blocos (241 e 242, porta em 243), três evidências.
+  A terceira só entra empilhada, caindo da prateleira baixa (239 e 240, linha 10): a METANÁLISE tem de ser a última; empurrada antes, cai no prato vazio e trava o resto.
+  O ENSAIO CLÍNICO (234) fica antes de um buraco raso (235); quem tapa o buraco é o R$ 890 (237), empurrado para a esquerda, pelo outro lado. Se o ensaio cair no buraco, aparece a dica do bloco ↺.
+  DADOS fica na prateleira alta (229 a 231, linha 9, 48 px): sobe-se pelo pote IMPORTADO (225, empurrado até perto dela) ou de cima de outro bloco. Bloco ↺ em 224, 8.
+  Robô em `t87.js` (só setas, pulo e empurrão, busca por força bruta para chegar a cada ponto; confere também as duas armadilhas).
 - **Máquina quântica** (`s.maq`): blocos `qo` (pedra, banana, vaso) empurrados até a plataforma `Y` (253 e 254); depois de 24 quadros parado ali sai o laudo, sempre o mesmo. Cada objeto diferente acende uma luz;
   três abrem a porta (259 e 260). O fosso raso (255 a 257) recebe as amostras. O Zé na plataforma também ganha laudo e não acende luz. O bloco ↺ em 250, 8 recoloca as amostras (`resetAt` = 'maq').
 - **Chefes** (`BOSS3`, `boss3Start()`, `stepBoss3()`): um de cada vez no mesmo `s.boss`, com `b.who`. Entrar na arena fecha a parede de trás; vencer um subchefe abre a porta da frente (`bossOpen3()`) e o jogo continua.
@@ -189,7 +194,7 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
   Seringas na arena a cada 4 s (3 s no fácil). Vida: 6, 8 e 12 no normal; 4, 6 e 8 no fácil (o Dr. Soro tinha 10 e 7; o André achou forte demais para um chefe do meio da fase, 15/10/2026); o fácil tem 3 diplomas em vez de 5.
 - **Perguntas:** `QS3`, sobre autoridade, preço, soro e detox. Os fatos aguardam a revisão do André.
 - **Testes:** `t80.js` (capturas de cada trecho), `t81.js` (força bruta nos lustres e suportes, robô no suporte de soro e na xícara, balança, máquina e os três chefes; aceita `pe`, `veic`, `puz` ou `boss`),
-  `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura), `t84.js` (sem invulnerabilidade: escapar da investida pulando e na plataforma).
+  `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura), `t84.js` (sem invulnerabilidade: escapar da investida pulando e na plataforma), `t87.js` (balança de três evidências).
 - **Alcance nas arenas:** o pulo do Zé sobe uns 43 px. Plataforma de arena fica na linha 10 (32 px); na linha 9 (48 px) não se alcança, e o André não conseguiu vencer o Dr. Soro por isso (14/10/2026).
 
 ## Pendências e ideias em aberto
