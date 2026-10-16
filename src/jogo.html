@@ -2415,6 +2415,7 @@ function buildLevel3() {
   E('gotinha', 97, null, { v: 3 });
   arena(AR3.bomb, true); hl(104, 106, 10, '='); hl(115, 117, 10, '=');   // linha 10: o pulo alcança uns 43 px; na linha 9 (48 px) não dava
   // trecho 3: corredor, no suporte de soro (a geometria da mina da fase 2, conferida por robô)
+  gotas(123, 125, 10);   // pausa depois da arena do Dr. Soro, antes de subir no suporte de soro
   const [C0, C1] = VEIC3.corr;
   for (let x = C0; x <= C1; x++) vl(x, 0, 5, 'B');
   for (let x = 154; x <= 160; x++) vl(x, 6, 7, 'B'); for (let x = 175; x <= 180; x++) vl(x, 6, 7, 'B');   // teto baixo
@@ -2435,13 +2436,17 @@ function buildLevel3() {
   blk('tr', 237, 11, 0, 'R$ 890');                                     // o aterro: empurrado para a esquerda, pelo outro lado
   hl(239, 240, 10, '='); blk('ev', 240, 9, 0, 'METANÁLISE');           // prateleira baixa sobre o caminho do prato
   bal(241, 2, 243, 3, 224, 8);
+  // gotas como guia e recompensa (16/10/2026, a partir do ritmo da Green Hill): arco sobre o buraco raso, prateleiras, porta da balança
+  gota(234, 10); gota(235, 9); gota(236, 10); gotas(229, 230, 8); gota(239, 9); gotas(245, 246, 10);
   // trecho 5: diagnóstico quântico
   blk('qo', 247, 11, -1, 'PEDRA', 'pedra'); blk('qo', 249, 11, -1, 'BANANA', 'banana'); blk('qo', 251, 11, -1, 'VASO', 'vaso');
+  gota(255, 10); gota(256, 9); gota(257, 10);   // arco sobre o fosso das amostras
   hl(253, 254, 12, 'Y'); hl(255, 257, 12, '.');   // plataforma de leitura e o fosso das amostras (raso: a linha 13 continua chão)
   vl(259, 0, 7, 'B'); vl(260, 0, 7, 'B'); vl(259, 8, 11, 'D'); vl(260, 8, 11, 'D'); set(250, 8, 'O'); resetAt['250,8'] = 'maq';
   const maq = { plate: [253, 254], door: 259, read: [], lights: 0, done: false, screen: null, zeT: 0, smoke: 0 };
   // trecho 6: spa detox (buraco para o intestino de café) e Guru Glow
-  gotas(262, 264, 10); E('vapor', 266, null, { ph: 0 }); deco.push({ k: 'cafeteira', tx: 268 }); pit(HOLE3[0], HOLE3[1]);
+  gotas(262, 264, 10); hl(269, 272, 10, '='); gotas(269, 272, 8); items.push({ t: 'boost', x: 270 * T + 3, y: 9 * T + 2, w: 10, h: 12, src: 'spa-270' });   // atalho alto sobre o buraco do spa: prateleira com dose de reforço
+  E('vapor', 266, null, { ph: 0 }); deco.push({ k: 'cafeteira', tx: 268 }); pit(HOLE3[0], HOLE3[1]);
   E('vapor', 274, null, { ph: 2.4 }); drip(275, 4, 2, 140); deco.push({ k: 'cano', tx: PIPE3 }); E('gotinha', 276, null, { v: 1 }); syr(279, 10);   // posto em 281, logo antes da arena da Guru (pedido do André, 16/10/2026)
   arena(AR3.guru, true); hl(287, 289, 10, '='); hl(296, 298, 10, '=');
   // trecho 7: último portão e o auditório

@@ -184,6 +184,10 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
   O ENSAIO CLÍNICO (234) fica antes de um buraco raso (235); quem tapa o buraco é o R$ 890 (237), empurrado para a esquerda, pelo outro lado. Se o ensaio cair no buraco, aparece a dica do bloco ↺.
   DADOS fica na prateleira alta (229 a 231, linha 9, 48 px): sobe-se pelo pote IMPORTADO (225, empurrado até perto dela) ou de cima de outro bloco. Bloco ↺ em 224, 8.
   Robô em `t87.js` (só setas, pulo e empurrão, busca por força bruta para chegar a cada ponto; confere também as duas armadilhas).
+- **Gotas como guia e atalho alto** (16/10/2026, a partir da leitura do ritmo da Green Hill Zone 1 e 2, `sonicretro/s1disasm`, só como referência; nada copiado): a Clínica tinha menos da metade das gotas da fase 1 e as salas de puzzle ficavam sem recompensa.
+  Gotas em arco sobre o buraco raso da farmácia (234 a 236) e sobre o fosso da máquina (255 a 257), nas prateleiras da balança (229, 230 e 239) e na porta (245, 246); pausa de gotas depois da arena do Dr. Soro (123 a 125).
+  Atalho alto no spa: prateleira em 269 a 272 (linha 10, alcança a pé) sobre o buraco do bônus, com dose de reforço (`src: 'spa-270'`) e gotas na linha 8; o buraco continua acessível por baixo. Não há mola no jogo, então a ideia de mola ao lado de gotas ficou de fora.
+  Medição por tela de 20 blocos (perigos que andam ou pingam, sem buracos, caixotes, puzzles e chefes): fase 1 1,4 perigos e 7,0 gotas; fase 2 1,5 e 4,5; fase 3 1,05 e 3,4 (antes das gotas novas). Teste do atalho: `t88.js`.
 - **Máquina quântica** (`s.maq`): blocos `qo` (pedra, banana, vaso) empurrados até a plataforma `Y` (253 e 254); depois de 24 quadros parado ali sai o laudo, sempre o mesmo. Cada objeto diferente acende uma luz;
   três abrem a porta (259 e 260). O fosso raso (255 a 257) recebe as amostras. O Zé na plataforma também ganha laudo e não acende luz. O bloco ↺ em 250, 8 recoloca as amostras (`resetAt` = 'maq').
 - **Chefes** (`BOSS3`, `boss3Start()`, `stepBoss3()`): um de cada vez no mesmo `s.boss`, com `b.who`. Entrar na arena fecha a parede de trás; vencer um subchefe abre a porta da frente (`bossOpen3()`) e o jogo continua.
@@ -194,7 +198,7 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
   Seringas na arena a cada 4 s (3 s no fácil). Vida: 6, 8 e 12 no normal; 4, 6 e 8 no fácil (o Dr. Soro tinha 10 e 7; o André achou forte demais para um chefe do meio da fase, 15/10/2026); o fácil tem 3 diplomas em vez de 5.
 - **Perguntas:** `QS3`, sobre autoridade, preço, soro e detox. Os fatos aguardam a revisão do André.
 - **Testes:** `t80.js` (capturas de cada trecho), `t81.js` (força bruta nos lustres e suportes, robô no suporte de soro e na xícara, balança, máquina e os três chefes; aceita `pe`, `veic`, `puz` ou `boss`),
-  `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura), `t84.js` (sem invulnerabilidade: escapar da investida pulando e na plataforma), `t87.js` (balança de três evidências).
+  `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura), `t84.js` (sem invulnerabilidade: escapar da investida pulando e na plataforma), `t87.js` (balança de três evidências), `t88.js` (atalho alto do spa).
 - **Alcance nas arenas:** o pulo do Zé sobe uns 43 px. Plataforma de arena fica na linha 10 (32 px); na linha 9 (48 px) não se alcança, e o André não conseguiu vencer o Dr. Soro por isso (14/10/2026).
 
 ## Pendências e ideias em aberto
