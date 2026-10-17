@@ -264,7 +264,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.56</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.57</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -333,7 +333,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win" id="winNote">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btNext" type="button" hidden>Próxima fase</button><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.56</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.57</p>
     </div>
   </section>
 
@@ -2405,7 +2405,7 @@ function buildLevel3() {
   const syr = (x, y) => items.push({ t: 'syr', x: x * T + 2, y: y * T + 6, w: 12, h: 6 });
   const Q = (x, y, k) => { set(x, y, '?'); qb[x + ',' + y] = k; };
   const mplat = (ax, x, y, a, b, v) => plats.push({ ax, x, y, w: 32, h: 6, a, b, v, dx: 0, dy: 0 });
-  const swing = (px, py, L, A, sp, ph) => { const pl = { kind: 'swing', px, py, L, A, sp, ph, w: 22, h: 6, x: 0, y: 0, dx: 0, dy: 0 }; platMove2(pl, 0); plats.push(pl); };
+  const swing = (px, py, L, A, sp, ph) => { const pl = { kind: 'swing', px, py, L, A, sp, ph, w: 30, h: 6, x: 0, y: 0, dx: 0, dy: 0 }; platMove2(pl, 0); plats.push(pl); };   // w 30: a largura do corpo do lustre
   const pole = (tx, ty) => { plats.push({ kind: 'pole', x: tx * T, y: ty * T, w: 16, h: 6, dx: 0, dy: 0 }); deco.push({ k: 'polo', tx, ty }); };   // suporte de soro: o gancho em cima é degrau
   const E = (t, tx, ty, o = {}) => {
     const gy = (ty ?? G) * T, b = { t, hp: 1, fl: 0, vx: 0, vy: 0, ...o };
@@ -2429,7 +2429,7 @@ function buildLevel3() {
   // trecho 1: recepção de mármore
   gotas(4, 7, 10); E('recep', 11); deco.push({ k: 'balcao', tx: 10 }); Q(8, 8, 'gotas'); deco.push({ k: 'placa', tx: 6 });
   pit(16, 24); swing(19.5 * T, T, 150, .5, .034, 0); swing(23.5 * T, T, 150, .5, .034, 1.6); gotas(17, 23, 7, 2);   // lustres sobre o espelho d'água (a geometria dos sinos da fase 2)
-  E('gotinha', 28, null, { v: 0 }); Q(30, 8, 'sus'); hl(33, 35, 9, '='); gotas(33, 35, 8);
+  E('gotinha', 28, null, { v: 0 }); Q(30, 8, 'sus'); hl(33, 35, 10, '='); gotas(33, 35, 9);   // linha 10 (32 px): na 9 (48 px) o pulo não alcançava (o André, 17/10/2026)
   hl(37, 38, 11, '^'); syr(40, 10); E('gotinha', 42, null, { v: 2 });
   gate(48);
   // trecho 2: lounge da soroterapia
@@ -2468,7 +2468,7 @@ function buildLevel3() {
   blk('qo', 247, 11, -1, 'PEDRA', 'pedra'); blk('qo', 249, 11, -1, 'BANANA', 'banana'); blk('qo', 251, 11, -1, 'VASO', 'vaso');
   gota(255, 10); gota(256, 9); gota(257, 10);   // arco sobre o fosso das amostras
   hl(253, 254, 12, 'Y'); hl(255, 257, 12, '.');   // plataforma de leitura e o fosso das amostras (raso: a linha 13 continua chão)
-  vl(259, 0, 7, 'B'); vl(260, 0, 7, 'B'); vl(259, 8, 11, 'D'); vl(260, 8, 11, 'D'); set(250, 8, 'O'); resetAt['250,8'] = 'maq';
+  vl(259, 0, 7, 'B'); vl(260, 0, 7, 'B'); vl(259, 8, 11, 'D'); vl(260, 8, 11, 'D'); set(245, 8, 'O'); resetAt['245,8'] = 'maq';   /* na entrada da sala: no meio atrapalhava o pulo (o André, 17/10/2026) */
   const maq = { plate: [253, 254], door: 259, read: [], lights: 0, done: false, screen: null, zeT: 0, smoke: 0 };
   // trecho 6: spa detox (buraco para o intestino de café) e Guru Glow
   gotas(262, 264, 10); hl(269, 272, 10, '='); gotas(269, 272, 8); items.push({ t: 'boost', x: 270 * T + 3, y: 9 * T + 2, w: 10, h: 12, src: 'spa-270' });   // atalho alto sobre o buraco do spa: prateleira com dose de reforço
@@ -3013,8 +3013,9 @@ function deco3(tx0) {
 function plat3(pl) {
   const x = Math.round(pl.x) - camX, y = Math.round(pl.y) - camY, F = (a, b, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(a, b, w, h); };
   if (pl.kind === 'swing') {
-    ctx.strokeStyle = '#d9a441'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(pl.px) - camX + .5, pl.py - camY); ctx.lineTo(x + pl.w / 2 + .5, y); ctx.stroke();
-    F(Math.round(pl.px) - camX - 4, pl.py - camY - 3, 8, 4, '#d9a441'); spr(SPR3.lustre, Math.round(x + pl.w / 2 - SPR3.lustre.width / 2), y - 1);
+    ctx.strokeStyle = '#d9a441'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(pl.px) - camX + .5, pl.py - camY); ctx.lineTo(x + pl.w / 2 + .5, y - (SPR3.obj ? 6 : 3)); ctx.stroke();
+    const sy = y - (SPR3.obj ? 6 : 3);   // o topo do corpo do lustre (depois da haste) fica na altura da plataforma: o Zé pisa no corpo, não na ponta
+    F(Math.round(pl.px) - camX - 4, pl.py - camY - 3, 8, 4, '#d9a441'); spr(SPR3.lustre, Math.round(x + pl.w / 2 - SPR3.lustre.width / 2), sy);
   } else if (pl.kind === 'pole') {
     const O = SPR3.obj; if (O) { F(x + 7, y + 8, 3, LH * T - pl.y, '#0b1030'); F(x + 8, y + 8, 1, LH * T - pl.y, '#cfd6e6'); ctx.drawImage(O.gancho, x + 8 - (O.gancho.width >> 1), y - 2); return; }
     F(x + 7, y + 4, 2, LH * T - pl.y, '#cfd6e6'); F(x + 7, y + 4, 1, LH * T - pl.y, '#ffffff'); F(x, y, 16, 4, '#0b1030'); F(x + 1, y + 1, 14, 2, '#dfe5f0'); F(x + 1, y, 2, 4, '#9aa3b8'); F(x + 13, y, 2, 4, '#9aa3b8');
@@ -3623,7 +3624,7 @@ function win() {
   $('#winNote').textContent = WIN_NOTE[s.fase] || '';
   $('#soonEyebrow').textContent = 'Fase ' + s.fase + ' completa';
   if (next) { $('#soonTitle').textContent = 'Fase ' + next.n + ' liberada'; $('#soonText').textContent = 'Próxima parada: ' + next.name.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase()).replace(' Do ', ' do ') + '. Ela fica em CONTINUAR, na tela inicial.'; }
-  else { $('#soonTitle').textContent = 'Em construção'; $('#soonText').innerHTML = 'Este jogo está em construção.<br>Em breve, novas fases e atualizações.'; }
+  else { $('#soonTitle').textContent = 'Em construção'; $('#soonText').innerHTML = (s.fase === 3 ? '<b>Parabéns, você recuperou R$ ' + num(s.grana * 450) + ' para os pacientes.</b><br>' : '') + 'Este jogo está em construção.<br>Em breve, novas fases e atualizações.'; }   /* fase 3: soma do dinheiro pego dos chefes (R$ 450 cada) */
   $('#btNext').hidden = !next;
   $('#fReg').hidden = false; $('#sReg').hidden = true;
   try { $('#inNome').value = localStorage.getItem('mg-nome') || ''; } catch (e) {}
