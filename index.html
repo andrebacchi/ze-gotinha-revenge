@@ -264,7 +264,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.57</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.58</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -333,7 +333,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win" id="winNote">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btNext" type="button" hidden>Próxima fase</button><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.57</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.58</p>
     </div>
   </section>
 
@@ -2472,7 +2472,7 @@ function buildLevel3() {
   const maq = { plate: [253, 254], door: 259, read: [], lights: 0, done: false, screen: null, zeT: 0, smoke: 0 };
   // trecho 6: spa detox (buraco para o intestino de café) e Guru Glow
   gotas(262, 264, 10); hl(269, 272, 10, '='); gotas(269, 272, 8); items.push({ t: 'boost', x: 270 * T + 3, y: 9 * T + 2, w: 10, h: 12, src: 'spa-270' });   // atalho alto sobre o buraco do spa: prateleira com dose de reforço
-  E('vapor', 266, null, { ph: 0 }); deco.push({ k: 'cafeteira', tx: 268 }); pit(HOLE3[0], HOLE3[1]);
+  E('vapor', 266, null, { ph: 0 }); deco.push({ k: 'cafeteira', tx: 268 }); deco.push({ k: 'placaCafe', tx: 273 }); pit(HOLE3[0], HOLE3[1]);
   E('vapor', 274, null, { ph: 2.4 }); drip(275, 4, 2, 140); deco.push({ k: 'cano', tx: PIPE3 }); E('gotinha', 276, null, { v: 1 }); syr(279, 10);   // posto em 281, logo antes da arena da Guru (pedido do André, 16/10/2026)
   arena(AR3.guru, true); hl(287, 289, 10, '='); hl(296, 298, 10, '=');
   // trecho 7: último portão e o auditório
@@ -3006,6 +3006,9 @@ function deco3(tx0) {
       case 'bag': F(x + 7, 0 - camY, 1, d.ty * T, '#9aa3b8'); spr(SPR3.bolsa[d.v], x + 3, d.ty * T - camY); break;
       case 'cafeteira': { const yy = gy - 70; F(x - 8, yy, 44, 70, '#59607e'); F(x - 8, yy, 44, 3, '#dfe5f0'); F(x - 4, yy + 8, 36, 22, '#3a405c'); F(x, yy + 12, 28, 14, '#1a1f3d'); label('DETOX', x + 14, yy + 22, '#8be36a', 7);
         F(x + 8, yy + 34, 12, 8, '#2b2f48'); F(x + 12, yy + 42, 4, 10, '#4f2a16'); if ((s.anim >> 4) & 1) F(x + 13, yy + 52, 2, 4, '#4f2a16'); F(x - 8, yy + 64, 44, 6, '#2b2f48'); label('GRÃOS SELECIONADOS', x + 14, yy - 4, '#e8c9a0', 6); } break;
+      case 'placaCafe': { const c = '#4f2a16'; F(x + 22, gy - 22, 3, 22, c); F(x - 1, gy - 45, 52, 24, c); F(x, gy - 44, 50, 22, '#c68642'); F(x, gy - 44, 50, 2, '#e3a35c');
+        for (let r = -6; r <= 6; r++) { const w = 7 - Math.abs(r); F(x - w - 1, gy - 33 + r, w + 1, 1, c); F(x - w, gy - 33 + r, w, 1, '#c68642'); }   /* seta para a esquerda, para o buraco */
+        label('VAI UM', x + 27, gy - 33, '#3a1f0e', 6); label('CAFEZINHO?', x + 27, gy - 26, '#3a1f0e', 6); } break;   /* pedido do André, 17/10/2026 */
       case 'cano': F(x, gy - 22, 16, 22, '#2a8a34'); F(x - 2, gy - 26, 20, 6, '#49c05a'); F(x - 2, gy - 26, 20, 1, '#8be36a'); F(x + 2, gy - 20, 2, 18, '#5ccf5a'); F(x + 1, gy - 22, 14, 2, '#1a5a24'); break;
     }
   }
