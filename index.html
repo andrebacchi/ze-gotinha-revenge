@@ -264,7 +264,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.59</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.60</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -333,7 +333,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win" id="winNote">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btNext" type="button" hidden>Próxima fase</button><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.59</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.60</p>
     </div>
   </section>
 
@@ -2680,11 +2680,11 @@ function eshot3(f, p) {   // move os projéteis da fase 3; devolve true se cuido
   if (f.t === 'adesivo') {   // persegue devagar; pega e deixa o Zé lento, sem dano
     const dx = p.x + p.w / 2 - f.x - 4, dy = p.y + p.h / 2 - f.y - 4, d = Math.hypot(dx, dy) || 1, v = .95;
     f.vx += (dx / d * v - f.vx) * .05; f.vy += (dy / d * v - f.vy) * .05; f.y += f.vy;
-    if (!p.dead && overlap(p, f)) { f.life = 0; p.slowT = 200; sfx('ploc'); burst(f.x + 4, f.y + 4, '#b46cff', 8); txt(p.x + 5, p.y - 8, 'Adesivo energético: lerdeza!', '#d9a8ff'); }
+    if (!p.dead && overlap(p, f)) { f.life = 0; p.slowT = 120; sfx('ploc'); burst(f.x + 4, f.y + 4, '#b46cff', 8); txt(p.x + 5, p.y - 8, 'Adesivo energético: lerdeza!', '#d9a8ff'); }
     return true;
   }
   if (f.t === 'vela') {   // vela: acende depois de um tempo e queima até apagar
-    f.t2 = (f.t2 || 0) + 1; f.vx = 0; f.lit = f.t2 > 45; f.h = 14; f.y = f.lit ? f.gy - 14 : f.gy + 4; return true;   // apagada fica abaixo do chão: não machuca
+    f.t2 = (f.t2 || 0) + 1; f.vx = 0; f.lit = f.t2 > 60; f.h = 14; f.y = f.lit ? f.gy - 14 : f.gy + 4; return true;   // apagada fica abaixo do chão: não machuca
   }
   return false;
 }
@@ -2692,7 +2692,7 @@ const ESHOT3 = new Set(['gota3', 'card', 'bolsa3', 'cristal', 'livro', 'adesivo'
 /* ───────── Fase 3: os três chefes ───────── */
 const BOSS3 = {
   bomb: { name: 'DR. SORO PLATINUM', tag: 'Dr. Soro Platinum', w: 26, h: 44, hp: [6, 4], quote: '“Na veia o efeito é total!”' },
-  guru: { name: 'GURU GLOW', tag: 'Guru Glow', w: 22, h: 38, hp: [8, 6], quote: '“Confie na sua energia!”' },
+  guru: { name: 'GURU GLOW', tag: 'Guru Glow', w: 22, h: 38, hp: [6, 4], quote: '“Confie na sua energia!”' },
   prof: { name: 'PROF. DR. PHD MAGNUS AURUM', tag: 'Prof. Magnus Aurum', w: 22, h: 44, hp: [12, 8], quote: '“Confiem em mim, eu sou doutor.”' },
 };
 const DIPLOMAS = ['CURSO DE FIM DE SEMANA', 'TÍTULO HONORÁRIO', 'CERTIFICADO DE PARTICIPAÇÃO', 'PÓS EM 48 HORAS', 'PRÊMIO DE REVISTA', 'MEMBRO DE ACADEMIA'];
@@ -2798,22 +2798,22 @@ function stepGuru3(b, p, L, R, D, easy, ph2) {
     case 'intro': b.y += (hover - b.y) * .05; if (b.t > 90) { b.st = 'float'; b.t = 0; b.tx = L + 40; introStart('guru', b); } break;
     case 'float': {   // flutua de um lado ao outro e alterna cristal, vela e adesivo
       b.y += (hover - b.y) * .08; if (Math.abs(b.tx - b.x) < 2) b.tx = L + 20 + Math.random() * (R - L - 60); b.x += clamp(b.tx - b.x, -.7, .7);
-      if (b.t > (easy ? 90 : 65)) { b.t = 0; b.n++; b.st = ['cristal', 'vela', 'adesivo', 'cristal', 'medita'][(b.n - 1) % 5]; if (b.st === 'adesivo' && easy && !ph2) b.st = 'cristal'; }
+      if (b.t > (easy ? 110 : 85)) { b.t = 0; b.n++; b.st = ['cristal', 'vela', 'adesivo', 'cristal', 'medita'][(b.n - 1) % 5]; if (b.st === 'adesivo' && easy && !ph2) b.st = 'cristal'; }
     } break;
     case 'cristal':
-      if (b.t % 16 === 1 && b.t < 40) { b.throwT = 14; sfx('shot'); const k = b.t / 16 | 0, dx = pcx - cx + (k - 1) * 30; s.eshots.push({ t: 'cristal', v: (b.n + k) % 5, x: cx - 3, y: b.y + 10, w: 7, h: 9, vx: clamp(dx / 60, -2.2, 2.2), vy: -2.6, life: 300 }); }
+      if (b.t % 16 === 1 && b.t < (easy ? 4 : 20)) { b.throwT = 14; sfx('shot'); const k = b.t / 16 | 0, dx = pcx - cx + (k - (easy ? 0 : .5)) * 30; s.eshots.push({ t: 'cristal', v: (b.n + k) % 5, x: cx - 3, y: b.y + 10, w: 7, h: 9, vx: clamp(dx / 60, -2.2, 2.2), vy: -2.6, life: 300 }); }
       if (b.t > 60) { b.st = 'float'; b.t = 0; } break;
     case 'vela':   // acende velas no chão perto do Zé; queimam um tempo e apagam
-      if (b.t === 1) { b.throwT = 20; txt(cx, b.y - 6, 'Vela de lavanda, R$ 380', '#fff'); const n = easy ? 2 : 3; for (let i = 0; i < n; i++) { const x = clamp(pcx + (i - (n - 1) / 2) * 34, L + 6, R - 10); s.eshots.push({ t: 'vela', x: x - 3, y: G * T - 1, gy: G * T, w: 6, h: 1, vx: 0, vy: 0, life: easy ? 200 : 260 }); } }
+      if (b.t === 1) { b.throwT = 20; txt(cx, b.y - 6, 'Vela de lavanda, R$ 380', '#fff'); const n = 2; for (let i = 0; i < n; i++) { const x = clamp(pcx + (i - (n - 1) / 2) * 46, L + 6, R - 10); s.eshots.push({ t: 'vela', x: x - 3, y: G * T - 1, gy: G * T, w: 6, h: 1, vx: 0, vy: 0, life: easy ? 200 : 260 }); } }
       if (b.t > 50) { b.st = 'float'; b.t = 0; } break;
     case 'adesivo':
-      if (b.t === 1) { b.throwT = 16; sfx('shot'); for (const d of ph2 ? [-1, 1] : [1]) s.eshots.push({ t: 'adesivo', x: cx - 4, y: b.y + 12, w: 9, h: 9, vx: d * 1, vy: -1, life: 360 }); txt(cx, b.y - 6, 'Adesivo energético!', '#d9a8ff'); }
+      if (b.t === 1) { b.throwT = 16; sfx('shot'); for (const d of [pcx < cx ? -1 : 1]) s.eshots.push({ t: 'adesivo', x: cx - 4, y: b.y + 12, w: 9, h: 9, vx: d * 1, vy: -1, life: 360 }); txt(cx, b.y - 6, 'Adesivo energético!', '#d9a8ff'); }
       if (b.t > 50) { b.st = 'float'; b.t = 0; } break;
     case 'medita':   // desce para meditar: é a hora do pisão
       b.y += (G * T - b.h - b.y) * .1; if (b.t > 30) { b.st = 'tired'; b.t = 0; txt(cx, b.y - 8, 'Namastê…', '#fff'); hintOnce('gurut', '<span><b class="tag">Meditando.</b> De olhos fechados ela não vê o pisão: tira 2.</span>', 220); } break;
     case 'tired':
       b.y += (G * T - b.h - b.y) * .1;
-      if (b.t > (easy ? 230 : 170)) { b.st = 'float'; b.t = 0;
+      if (b.t > (easy ? 300 : 230)) { b.st = 'float'; b.t = 0;
         if (ph2 && !b.gaveSus) { b.gaveSus = true; s.items.push({ t: 'sus', x: (AR3.guru + 10) * T - 7, y: -12, w: 15, h: 9, vx: 0, vy: 0, phys: true, stopY: 0, arena: true, src: 'arena-guru' }); } }
       break;
   }
