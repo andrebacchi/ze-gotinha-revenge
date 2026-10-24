@@ -264,7 +264,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
         <button class="pill" id="qr-btn" type="button">QR code</button>
         <button class="pill" id="fs-pill" type="button" aria-pressed="false" hidden>Tela cheia</button>
       </div>
-      <p class="tcred">Criado por André D. Bacchi · v1.62</p>
+      <p class="tcred">Criado por André D. Bacchi · v1.63</p>
       <div class="tmenu">
         <button class="tbtn" id="btCont" type="button" hidden>CONTINUAR<span class="tsub" id="contInfo"></span></button>
         <button class="tbtn" id="btStart" type="button">PRESS START</button>
@@ -333,7 +333,7 @@ body.pad-on .tbtn:focus{color:var(--alerta);outline:0}
       <p class="fine" id="sEmpty">Ninguém registrou pontos ainda.</p>
       <p class="fine only-win" id="winNote">Um estudo publicado na Science em 2018 mediu isso no Twitter: a notícia falsa chegava a 1.500 pessoas seis vezes mais rápido que a verdadeira. Antes de repassar, confira a fonte.</p>
       <div class="row"><button class="btn only-win" id="btNext" type="button" hidden>Próxima fase</button><button class="btn only-win" id="btAgain" type="button">Jogar de novo</button><button class="btn ghost only-board" id="btCloseBoard" type="button">Voltar</button></div>
-      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.62</p>
+      <p class="fine">Jogo educativo independente, sem vínculo oficial. Zé Gotinha é personagem do Ministério da Saúde, criado por Darlan Rosa. © André Demambre Bacchi · v1.63</p>
     </div>
   </section>
 
@@ -888,7 +888,7 @@ const BESTIARY = {
   jac: { kind: 'Montaria', name: 'Jacaré', zoom: 2.8, text: 'Disseram que quem toma vacina vira jacaré. O Zé preferiu montar em um.',
     list: [`Encoste no ovo e monte. ${isTouch ? 'B' : 'X'} morde.`, 'Montado, o Zé atravessa a água. Sozinho, se afoga.', 'Pulo de novo no ar: salta mais alto e desce. Só assim se chega às plataformas altas.', 'Se levar um golpe, o jacaré foge.'] },
   gate: { kind: 'Desafio', name: 'Mito ou fato?', zoom: 1.6, text: 'O portão só abre com a resposta certa. Leia a afirmação e bata a cabeça no bloco M (mito) ou no F (fato).',
-    list: ['Você tem 10 segundos para responder.', 'Errar ou deixar o tempo acabar solta boatos e troca a afirmação.', 'Acertar de primeira vale mais pontos.'] },
+    list: ['Não há limite de tempo para responder.', 'Errar solta boatos e troca a afirmação.', 'Acertar de primeira vale mais pontos.'] },
   boss: { name: 'Tio do Zap', kind: 'Chefão', zoom: 2.1, text: 'Repassa tudo o que recebe para todos os grupos, de preferência antes de ler. Sua bolha o torna resistente a correções e à informação verdadeira.', tip: 'Desvie até a bateria do celular acabar. Aí a bolha cai.' },
 };
 /* Fase em que cada cartão estreia. O jogo é linear: inimigo, item ou desafio apresentado numa fase não é apresentado de novo nas seguintes (pedido do André). */
@@ -1146,7 +1146,7 @@ const DIFF = {
 };
 const DF = () => DIFF[(st && st.diff) || 'normal'] || DIFF.normal;
 const qSecs = () => DF().qTime / 60;
-const noTimer = () => !!st && st.fase === 3;   /* fase 3: sem tempo para responder o mito ou fato (pedido do André, 23/10/2026) */
+const noTimer = () => true;   /* sem tempo para responder o mito ou fato, em todas as fases (pedido do André, 23/10/2026); o contador continua no código, em Infinity */
 function answer(tx, c) {   // c: 'M', 'F' ou 'T' (tempo esgotado)
   const s = st, g = c === 'T' ? tx : s.gates.find(g => !g.open && (g.mx === tx || g.fx === tx)); if (!g || g.open) return;
   if (g.lock > 0) { sfx('bump'); return; }
@@ -3583,7 +3583,6 @@ function start(diff, sv, fase) {
   if (typeof diff !== 'string') diff = (st && st.diff) || 'normal';   // sem modo (Jogar de novo, Recomeçar): mantém o da partida
   fase = sv ? sv.fase : fase || (st && st.fase) || 1;
   audioOn(); st = buildLevel(fase); music('stage'); st.diff = DIFF[diff] ? diff : 'normal'; st.p.shield = DF().shield;
-  BESTIARY.gate.list[0] = `Você tem ${qSecs()} segundos para responder.`;
   if (sv) applySave(sv); else writeSave();
   if (!window.__mgNoIntro) { st.opening = { t: 0 }; st.cam.y = OPEN_Y; } setMsg(''); msgTTL = 0; mode = 'play'; $('#intro').hidden = true; show(null); document.activeElement?.blur?.(); }
 function pause(on) {

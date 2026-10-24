@@ -73,7 +73,7 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
 ## Regras do jogo (decisões do André)
 
 - **Modos:** escolhidos em "Modo de jogo" ao começar um jogo novo (`DIFF`, `DF()`, `st.diff`). Normal é a fase e o chefão como foram feitos. Fácil: chefão com 8 de vida em vez de 12,
-  mais lento, com menos tiros e mais tempo cansado; 15 segundos nas perguntas; escudo de imunidade a cada vida; sem os boatos que caem na segunda metade da luta. O placar marca "· fácil".
+  mais lento, com menos tiros e mais tempo cansado; escudo de imunidade a cada vida; sem os boatos que caem na segunda metade da luta. O placar marca "· fácil".
   "Jogar de novo" e "Recomeçar a fase" mantêm o modo da partida.
 - **Jogo salvo:** ao tocar uma bandeira (posto), o jogo grava em localStorage `mg-salvo` a fase, a bandeira, o modo, o tempo, inimigos, power-ups, portões e cartões já vistos.
   Um jogo novo grava a partida no começo da fase. A tela de título mostra CONTINUAR (com fase, posto e modo) e NOVO JOGO; sem jogo salvo, PRESS START leva à escolha do modo.
@@ -87,7 +87,7 @@ Cada fase tem um chefão que representa um obstáculo à vacinação.
 - **Jacaré (montaria):** nasce do ovo no ninho. Atravessa a água nadando (o Zé sozinho se afoga). Qualquer golpe, em terra ou na água, faz o jacaré fugir: ele corre, não para na beirada,
   nada se cair na água e some se cair no buraco (o ovo volta ao ninho). Pulo de novo no ar, montado, é o pulo duplo: o Zé salta mais alto e desce, e o jacaré fica parado esperando.
   Há três plataformas altas que só o pulo duplo alcança (conferido por força bruta em `tools/testes/t37.js`). Com um jacaré, outro ovo vira bônus.
-- **Mito ou fato:** três portões. A afirmação aparece, o jogador tem 10 segundos (15 no fácil) e responde batendo a cabeça no bloco M ou F. Erro ou tempo esgotado soltam boatos e trocam a afirmação.
+- **Mito ou fato:** três portões. A afirmação aparece e o jogador responde batendo a cabeça no bloco M ou F, sem limite de tempo (decisão do André, 23/10/2026, igual em todas as fases e modos). Erro solta boatos e troca a afirmação.
   O resultado pausa o jogo com um cartão de explicação.
 - **Cartões de apresentação:** na primeira vez que cada inimigo, item, o jacaré e o portão aparecem, o jogo congela, dá zoom e explica. Voltam a cada partida nova.
   O jogo é linear: o que estreou numa fase não é apresentado de novo nas seguintes (`CARD_FASE`, pedido do André em 14/10/2026). Na fase 3, boato, vírus, fake news, itens, portão e balança não têm cartão.
@@ -200,7 +200,7 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
   Seringas na arena a cada 4 s (3 s no fácil). Vida: 6, 6 e 12 no normal; 4, 4 e 8 no fácil (a Guru baixou de 8 e 6 em 17/10/2026) (o Dr. Soro tinha 10 e 7; o André achou forte demais para um chefe do meio da fase, 15/10/2026); o fácil tem 3 diplomas em vez de 5.
 - **Ajustes de 17/10/2026:** prateleira de vidro da recepção (33 a 35) na linha 10 (na 9 não alcançava); lustre da recepção com plataforma de 30 px e o corpo (não a haste) na altura dela, o Zé pisa em cima do lustre;
   tela final da fase 3 mostra "Parabéns, você recuperou R$ X para os pacientes" (`s.grana` × 450, o dinheiro pego dos chefes; fica no `soonText` quando não há fase seguinte). Placa "vai um cafezinho?" ao lado do buraco do spa (`placaCafe`, tx 273: fundo escuro com letra clara, como a da recepção, e seta na diagonal descendo para o buraco; a primeira versão, de madeira com seta reta, o André reprovou pelo contraste). Testes: `t89.js`, `t90.js` (lustre), `t91.js` (↺ na entrada), `t92.js` (tela final), `t93.js` (placa).
-- **Sem tempo no mito ou fato** (pedido do André, 23/10/2026): na fase 3 as perguntas esperam o tempo que o jogador quiser (`noTimer()`; o contador fica em `Infinity`, a barra e os segundos somem e o painel diz "Sem pressa"). As fases 1 e 2 continuam com 10 s (15 no fácil). Para tirar o tempo das outras, basta `noTimer` devolver verdadeiro nelas. Teste: `t94.js`.
+- **Sem tempo no mito ou fato** (pedido do André, 23/10/2026, primeiro só na fase 3, depois padronizado em todas as fases e modos): as perguntas esperam o tempo que o jogador quiser (`noTimer()` devolve sempre verdadeiro; o contador fica em `Infinity`, a barra e os segundos somem e o painel diz "Sem pressa"). O caminho do tempo esgotado (`answer(g, 'T')`) e `DIFF.qTime` ficam no código, sem uso. `t35.js` (que testa o contador) ficou obsoleto; `t94.js` confere as três fases.
 - **Perguntas:** `QS3`, sobre autoridade, preço, soro e detox. Os fatos aguardam a revisão do André.
 - **Testes:** `t80.js` (capturas de cada trecho), `t81.js` (força bruta nos lustres e suportes, robô no suporte de soro e na xícara, balança, máquina e os três chefes; aceita `pe`, `veic`, `puz` ou `boss`),
   `t82.js` (capturas dos chefes e momentos especiais), `t83.js` (com cartões e abertura), `t84.js` (sem invulnerabilidade: escapar da investida pulando e na plataforma), `t87.js` (balança de três evidências), `t88.js` (atalho alto do spa).
@@ -215,4 +215,4 @@ Com o fundo da arte, as colunas de enfeite da frente saem (o fundo já tem as de
 
 - Placar online: hoje é só no aparelho. Fora do artefato dá para usar um banco externo (sugestão feita: Firebase); o André ainda não decidiu.
 - Cartões de apresentação só na primeira partida do aparelho (oferecido, sem resposta).
-- Revisão do André: textos do bestiário e das explicações; se 10 segundos bastam para as afirmações mais longas; dificuldade do golpe sobre a água.
+- Revisão do André: textos do bestiário e das explicações; dificuldade do golpe sobre a água.
